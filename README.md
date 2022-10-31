@@ -5,7 +5,7 @@ Melo as short for mellow and melody.
 Current stage:
 29.09.2022 - Player can play videos and music, also unplanned added functionlity to view images is being worked on. Dark mode is working
 31.09.2022 - Added new panels, shortcuts, improved design, video/audio playlist seperation, unpause menu built, image zoom slider added
-
+<pre>
 To do:
 -Build Tauri app, improve design, configure tabs for loaded images, fix image dragging when zoomed in
 -Add support for more video formats
@@ -15,3 +15,4 @@ To do:
 -Fix image viewing panel size
 -Create image loading function
 -Seperate loaded tracks 
+</pre>
