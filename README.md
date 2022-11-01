@@ -19,5 +19,5 @@ To do:
 -Seperate loaded tracks 
 
 Will add libvlc maybe in order to support all video formats
-
+Also in future it will be WASM + Rust code
 </pre>
