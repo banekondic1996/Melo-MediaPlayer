@@ -18,6 +18,6 @@ To do:
 -Create image loading function
 -Seperate loaded tracks 
 
-Will add vlclib maybe in order to support all video formats
+Will add libvlc maybe in order to support all video formats
 
 </pre>
