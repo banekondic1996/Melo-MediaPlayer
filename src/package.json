@@ -1,0 +1,13 @@
+{
+    "name": "test",
+    "main": "index.html",
+    "chromium-args": "--mixed-context",
+    "window": {
+        "frame": false,
+        "width": 1200,
+        "height": 720,
+        "position": "center",
+        "icon":"set/mello_logo2d.png",
+        "transparent": false
+     }
+  }
