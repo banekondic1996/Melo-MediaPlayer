@@ -1,0 +1,19 @@
+{
+  "name": "helloworld",
+  "main": "src/index.html",
+  "description": "A demo app to show how NW.js works",
+  "scripts": {
+    "start": "node index.js",
+    "start-nw": "nw src/",
+    "build-nw": "nwbuild --platform win --arch x64 --outDir dist/src --glob=false src"
+  },
+  "dependencies": {
+    "ffmpeg-static": "^5.2.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "nw": "^0.83.0"
+  },
+  "devDependencies": {
+    "nw-builder": "^4.5.3",
+    "nw-dev": "^3.0.1"
+  }
+}

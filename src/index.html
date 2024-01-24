@@ -1625,7 +1625,8 @@ function trackMousePosition() {
   else{
   track_list.push(theFile);
   populateVideo();
-  loadTrack(track_list.length-1);
+  track_index=track_list.length-1;
+  loadTrack(track_index);
   playTrack();
   }
   console.log("yes");
@@ -1704,7 +1705,7 @@ function doTrimConvert(filePath,formatInput,formatOutput){
         console.log("outputFile:"+outputFile);
         const command = ffmpeg()
         .input(filePath)
-        //.inputFormat(formatInput)
+        .inputFormat(formatInput)
         .outputFormat(formatOutput)
         .outputOptions(['-ab', '192k'])
         .seek(time_trim_start.innerHTML)
@@ -1730,7 +1731,7 @@ function doTrimConvert(filePath,formatInput,formatOutput){
         });
         console.log(command.run());
 }
-win.showDevTools(); //debuging only, will crash nw.js non sdk version, you have to download nw.js sdk package
+//win.showDevTools(); //debuging only, will crash nw.js non sdk version, you have to download nw.js sdk package
     </script>
 </body>
 
