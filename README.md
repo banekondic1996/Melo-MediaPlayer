@@ -15,3 +15,10 @@ To do:
 -Add radio list source
 -Add more extensions to audio/video playlist
 </pre>
+Images of UI:
+1. Video play, with video trimming support
+![image](https://github.com/banekondic1996/Melo/assets/22860264/8440a346-a98b-475e-baeb-f9cbc41fb9b3)
+![image](https://github.com/banekondic1996/Melo/assets/22860264/23640013-c79b-4483-9d06-8584f75f881d)
+2. Music play
+![image](https://github.com/banekondic1996/Melo/assets/22860264/7f21765e-959b-4773-be2f-dd6e45e1effd)
+
