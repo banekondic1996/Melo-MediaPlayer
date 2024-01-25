@@ -1,7 +1,7 @@
 {
-    "name": "test",
+    "name": "Melo",
     "main": "index.html",
-    "chromium-args": "--mixed-context",
+    "chromium-args": "--mixed-context --disable-pinch",
     "window": {
         "frame": false,
         "width": 1200,
