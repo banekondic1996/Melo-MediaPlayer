@@ -8,6 +8,8 @@
         "height": 720,
         "position": "center",
         "icon":"set/mello_logo2d.png",
-        "transparent": false
+        "transparent": false,
+        "min_width":350,
+        "min_height":420
      }
   }
