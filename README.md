@@ -14,6 +14,9 @@ To do:
 -Add support for more video formats
 -Add radio list source
 -Add more extensions to audio/video playlist
+-Add input box for file name before video conversion
+-Improve windows movement and enable window snapping
+-Improve code to improve perfomance
 </pre>
 Images of UI:
 1. Video play, with video trimming support
