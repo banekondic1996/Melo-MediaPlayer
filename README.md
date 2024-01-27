@@ -8,7 +8,8 @@ Current stage:
 31.09.2022 - Added new panels, shortcuts, improved design, video/audio playlist seperation, unpause menu built, image zoom slider added
 24.01.2024 - After long time, i decided to continue the project. App is now running using NW.js
 </pre>
-**Project To-do and problems:** <a href="https://github.com/users/banekondic1996/projects/5/views/2"></a>
+**Project To-do and problems:** <a href="https://github.com/users/banekondic1996/projects/5/views/2">link</a>
+
 Images of UI:
 1. Video play, with video trimming support
 ![image](https://github.com/banekondic1996/Melo/assets/22860264/8440a346-a98b-475e-baeb-f9cbc41fb9b3)
