@@ -11,12 +11,14 @@ Current stage:
 <pre>
 To do:
 -Load images inside iframe, configure tabs for images, fix image dragging when zoomed in
--Add support for more video formats
+-Add support for more video formats (rebuild chromium to add support)
 -Add radio list source
 -Add more extensions to audio/video playlist
 -Add input box for file name before video conversion
 -Improve windows movement and enable window snapping
 -Improve code to improve perfomance
+-Custom scroll bar for track lists
+-Add keyboard shortcuts
 </pre>
 Images of UI:
 1. Video play, with video trimming support
