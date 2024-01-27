@@ -2,7 +2,7 @@
 Just a player, music and video player that's for Linux, Windows, MacOS. I'm so tired of ugly designed players on Linux distros and video loop of broken link on VLC player. 
 Melo as short for mellow and melody.
 
-**To <a href="https://github.com/banekondic1996/Melo/releases/tag/development">download it</a> and try it, click on "Releases" tag on right side of the page you'l find download link there, everything is in development branch currently.**
+**Everything is in development branch currently <br> Link to download: <a href="https://github.com/banekondic1996/Melo/releases/tag/development"></a>**
 <br><br>
 Video player prototype image:
 ![image](https://user-images.githubusercontent.com/22860264/199244935-04ad5d8a-70d5-4d40-b75d-bc954f25f93c.png)
