@@ -7,8 +7,9 @@ Current stage:
 29.09.2022 - Player can play videos and music, also unplanned added functionlity to view images is being worked on. Dark mode is working
 31.09.2022 - Added new panels, shortcuts, improved design, video/audio playlist seperation, unpause menu built, image zoom slider added
 24.01.2024 - After long time, i decided to continue the project. App is now running using NW.js
+27.01.2024 - Videos can be trimmed and converted now, drag and drop works, responsive design is added, update button added (not final), context menu added
 </pre>
-**Project To-do and problems:** <a href="https://github.com/users/banekondic1996/projects/5/views/2">link</a>
+**Project to-do and problems:** <a href="https://github.com/users/banekondic1996/projects/5/views/2">link</a>
 
 Images of UI:
 1. Video play, with video trimming support
