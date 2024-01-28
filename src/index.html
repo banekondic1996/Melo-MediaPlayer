@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,406 +11,399 @@
     <!--  <script src="functions.js"></script> -->
     <!-- CSS style -->
     <style>
-      *{
-        user-select: none;
-      }
-        body {
-          background-color: rgb(255, 255, 255);
-           margin:0px;
-          /* Smoothly transition the background color */
-          transition: background-color .5s;
-          overflow: hidden;
-        }
-        .seek_slider::-moz-range-thumb  {
-          background: url('https://cdn-icons-png.flaticon.com/24/54/54601.png');
-          background-repeat: repeat;
-          cursor: pointer;
-          width: 6px;
-          height: 24px;
-          border: none;
-          -webkit-appearance: none;
-          appearance: none;
-          background-repeat: no-repeat;
-          padding: 9px;
-          }
-          /* ::-webkit-scrollbar {
-            width: 12px;
-            height:12px;
-          } */
+  /* Forbid dragging of interface elements */
+  *{
+    user-select: none;       
+    -webkit-user-drag: none;    
+  }
+  body {
+    background-color: rgb(255, 255, 255);
+    margin:0px;
+    transition: background-color .5s;
+    overflow: hidden;
+  }
+  .seek_slider::-moz-range-thumb  {
+    background: url('https://cdn-icons-png.flaticon.com/24/54/54601.png');
+    background-repeat: repeat;
+    cursor: pointer;
+    width: 6px;
+    height: 24px;
+    border: none;
+    -webkit-appearance: none;
+    appearance: none;
+    background-repeat: no-repeat;
+    padding: 9px;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height:10px;
+  }
+  ::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 1px grey; 
+    border-radius: 10px;
+  }
+  .darkMe2::-webkit-scrollbar-thumb {
+    background: gray; 
+    border-radius: 10px;
+  }
+  /* If light mode is on, change slider color */
+  ::-webkit-scrollbar-thumb {
+    background: #dcdcdc; 
+    border-radius: 10px;
+  }
+/*   ::-webkit-scrollbar-thumb:hover {
+    background: #dcdcdc; 
+  } */
+  /*Video container */
+  .details {
+    right: 0px;
+    left: 0px;
+    bottom: 0px;
+    top: 0px;
+    margin: auto;
+    position: absolute;
+    z-index: 200;
+  }
+  /* Track image */
+  .track-art {
+    position: absolute;
+    top: 134px;
+    margin: 0px;
+    height: 220px;
+    width: 220px;
+    border-radius: 15%;
+    padding: 10px;
+    left: 11px;
+  }
+  .now-playing {
+    font-size: 1rem;
+  }
+  .track-name {
+    font-size: 1.6em;
+  }
+  .track-artist {
+    font-size: 1.3rem;
+  }
+  .buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-radius: 40px;
+    padding: 2px;
+    justify-content: center;
+  }
+  .volume_slider{
+    bottom: 109px;
+    right: -47px;
+  }
+  .playpause-track,
+  .prev-track,
+  .next-track {
+    padding-inline: 1px;
+    opacity: 0.4;
+    transition: opacity .2s;
+  }
+  .playpause-track:hover,
+  .prev-track:hover,
+  .next-track:hover {
+    opacity: 1.0;
+  }
+  .slider_container {
+    width: 100%;
+    background: #dddddd70;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    bottom: 0px;
+    z-index: 200;
+    position: absolute;
+    /* filter: invert(1); */
+  }
+  .slider2 {
+    height: 35px;
+  }
+  .slider2 div {
+    padding-inline:20px;
+  }
+  /* Modify the appearance of the slider */
+  .seek_slider,
+  .volume_slider {
+    border-radius: 20px;
+    height: 3px;
+    background: black;
+    accent-color: black;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+  }
+  .yes{
+    margin:0px
+  }
 
-          ::-webkit-scrollbar-track {
-            box-shadow: inset 0 0 1px grey; 
-            border-radius: 10px;
-          }
-          
-          /* Handle */
-          ::-webkit-scrollbar-thumb {
-            background: gray; 
-            border-radius: 10px;
-          }
-
-          /* Handle on hover */
-          ::-webkit-scrollbar-thumb:hover {
-            background: #b30000; 
-          }
-
-        .details {
-          right: 0px;
-          left: 0px;
-          bottom: 0px;
-          top: 0px;
-          margin: auto;
-          position: absolute;
-          z-index: 200;
-        }
-        
-        .track-art {
-          position: absolute;
-top: 134px;
-          margin: 0px;
-height: 220px;
-width: 220px;
-border-radius: 15%;
-padding: 10px;
-left: 11px;
-        }
-        
-        .now-playing {
-          font-size: 1rem;
-        }
-        
-        .track-name {
-          font-size: 1.6em;
-     
-        }
-        
-        .track-artist {
-          font-size: 1.3rem;
-       
-        }
-        
-        .buttons {
-          display: flex;
-flex-direction: row;
-align-items: center;
-border-radius: 40px;
-padding: 2px;
-justify-content: center;
-        }
-        .volume_slider{
-          bottom: 109px;
-          right: -47px;
-        }
-        .playpause-track,
-        .prev-track,
-        .next-track {
-          padding-inline: 1px;
-          opacity: 0.4;
-        
-          /* Smoothly transition the opacity */
-          transition: opacity .2s;
-        }
-        
-        .playpause-track:hover,
-        .prev-track:hover,
-        .next-track:hover {
-          opacity: 1.0;
-        }
-        
-        .slider_container {
-          width: 100%;
-background: #dddddd70;
-display: flex;
-justify-content: center;
-align-items: center;
-bottom: 0px;
-z-index: 200;
-position: absolute;
-/* filter: invert(1); */
-
-}
-        
-        .slider2 {
-         height: 35px;
-        }
-        .slider2 div {
-         padding-inline:20px;
-        }
-        /* Modify the appearance of the slider */
-        .seek_slider,
-        .volume_slider {
-          border-radius: 20px;
-          height: 3px;
-          
-          background: black;
-          accent-color: black;
-          opacity: 0.7;
-          -webkit-transition: .2s;
-          transition: opacity .2s;
-        }
-        .yes{
-          margin:0px
-        }
-        
-        /* Modify the appearance of the slider thumb */
-        .seek_slider::-webkit-slider-thumb,
-        .volume_slider::-moz-range-thumb {
-          background: url('https://cdn-icons-png.flaticon.com/24/54/54601.png');
-          background-repeat: repeat;
-          cursor: pointer;
-          width: 8px;
-          height: 24px;
-          border: none;
-          -webkit-appearance: none;
-          appearance: none;
-          background-repeat: no-repeat;
-          padding: 9px;
-        }
-        
-        .seek_slider:hover,
-        .volume_slider:hover {
-          opacity: 1.0;
-        }
-        
-        .seek_slider {
-          width: 100%;
-          user-select: none;
-        }
-        
-        .volume_slider {
-          position: absolute;
-bottom: 70px;
-right: -51.5px;
-transform: rotateZ(270deg);
-        }
-        
-        .current-time,
-        .total-duration {
-          padding: 5px;
-        }
-        .duration{
-          margin: 10px;
-          
-          opacity: 0.7;
-          border-radius: 40px;
-          
-        }
-      
-        
-        i.fa-volume-down,
-        i.fa-volume-up {
-          margin-right: 94px;
-          padding: 10px;
-        }
-        .floatdetails{
-          display: flex;
-          height: 30px;
-/* position: absolute; */
-color: rgb(0, 0, 0);
-margin: -8px;
-padding: 36px;
-border-radius: 26px;
-opacity: 0.9;
-padding-right: 21px;
-padding-left: 23px;
-/* text-align: center; */
-justify-content: center;
-align-items: center;
-align-content: center;
-        }
-        .wcontrol
-        {
-          display: flex;
-position: absolute;
-right: 0px;
-top: 13px;
-flex-direction: column;
-flex-wrap: nowrap;
-justify-content: space-between;
-height: 84px;
-        }
-        .wcontrols{
-          margin-top: 3.4px;
-          right: 4px;
-display: block;
-position: absolute;
-        }
-        .wcontrols2{
-          opacity: 0.5;
-        }
-        .wcontrols2:hover{
-          opacity: 0.8;
-        }
-.list{
-position: absolute;
-display: flex;
-background-color: rgb(224 224 224 / 37%);
-border-radius: 10px;
-margin: 0px;
-height: auto;
-top: 146px;
-bottom: 59px;
-left: 254px;
-right: 10px;
-z-index: 1;
-overflow: auto;
-}
-.list2{
-position: absolute;
-width: 176px;
-height: 228px;
-background-color: rgb(228, 228, 228);
-opacity: 0.5;
-border: none;
-border-radius: 10px;
-overflow: auto;
-z-index: 222;
-}
-.list2poz1{
-top: 150px;
-right: 40px;
-width: 300px;
-height:450px;
-}
-.list2poz2{
-border-collapse: collapse;
-border-style: none;
-right: 13px;
-bottom: 46px;
-}
-.list2:hover{
-opacity: 1;
-}
-.list2 tr th td{
-color:white;
-background-color:rgb(231, 231, 231);
-}
-table {
-font-family: arial, sans-serif;
-border-collapse: collapse;
-width: 100%;
-position: absolute;
-height:auto;
-}
-
-td, th {
-text-align: left;
-padding: 8px;
-}
-tr:hover {
-background-color: rgb(48, 48, 48);
-color: white;
-user-select: none;
-}
-tr:active {
-background-color: rgb(170, 64, 64);
-color: white;
-}
-tr:nth-child(even):hover {
-background-color: rgb(48, 48, 48);
-}
-tr:nth-child(even):active {
-background-color: rgb(170, 64, 64);
-}
-.lista{
-display:none;
-position: absolute;
-height: 25%;
-right: 4px;
-/* top: 47vh; */
-top: 35vh;
-opacity: 0;
-z-index: 800;
-}
-.lista:hover{
-opacity: 1;
-}
-.menu{
-position: absolute;
-right: 4px;
-bottom: 10px;
-opacity:0.5;
-z-index:1000;
-}
-.repeat{
-position: absolute;
-right: 34px;
-bottom: 10px; 
-z-index:1000;
-}
-.shuffle{
-position: absolute;
-right: 68px;
-bottom: 10px;
-z-index:1000;
-}
-#volume2{
-display: none;
-position: absolute;
-border: 1px solid #cfcfcf;
-background-color: rgb(239, 239, 239);
-width: 30px;
-height: 148px;
-bottom: 51px;
-bottom: 34px;
-right: 98px;
-border-radius: 50px;
-z-index: 202;
-}
-.infoplay
-{
-width: auto;
-display: flex;
-background-color: rgb(224 224 224 / 37%);
-margin-left: 10px;
-border-radius: 11px;
-margin-right: 10px;
-margin-top: 47px;
-justify-content: center;
-}
-.imagine {
-height: 90%;
-width: 98%;
-/* margin-left: 1%; */
-/* margin-right: 10%; */
-/* margin-right: 30px; */
-padding: auto;
-margin: auto;
-/* background-position: center; */
-/* background-repeat: no-repeat; */
-/* background-size: cover; */
-z-index: 1000;
-border-radius: 10px;
-}
-.darkMe{
-filter: invert(1);
-}
-.darkMe2{
-color:#e7e7e7;                       
-}
-.darkMeSlider{
-accent-color: snow;
-}
-.toggle{
-position: absolute;
-background-color: #d7d7d7;
-width: 30px;
-height: 30px;
-border-radius: 100%;
-z-index:1000;
-}
-#tabovi{
-display: flex;
-/* filter: grayscale(1); */
-margin-left: 18px;
-opacity: 0.3;
-transition: opacity 0.3s;
-z-index: 991;
-}
-#tabovi:hover{
-opacity:0.9;
-}
-.tab-close{
+  /* Modify the appearance of the slider thumb */
+  .seek_slider::-webkit-slider-thumb,
+  .volume_slider::-moz-range-thumb {
+    background: url('https://cdn-icons-png.flaticon.com/24/54/54601.png');
+    background-repeat: repeat;
+    cursor: pointer;
+    width: 8px;
+    height: 24px;
+    border: none;
+    -webkit-appearance: none;
+    appearance: none;
+    background-repeat: no-repeat;
+    padding: 9px;
+  }
+  .seek_slider:hover,
+  .volume_slider:hover {
+    opacity: 1.0;
+  }
+  .seek_slider {
+    width: 100%;
+    user-select: none;
+  }
+  .volume_slider {
+    position: absolute;
+    bottom: 70px;
+    right: -51.5px;
+    transform: rotateZ(270deg);
+  }
+  .current-time,
+  .total-duration {
+    padding: 5px;
+  }
+  .duration{
+    margin: 10px;
+    opacity: 0.7;
+    border-radius: 40px;
+  }
+  i.fa-volume-down,
+  i.fa-volume-up {
+    margin-right: 94px;
+    padding: 10px;
+  }
+  .floatdetails{
+    display: flex;
+    height: 30px;
+    /* position: absolute; */
+    color: rgb(0, 0, 0);
+    margin: -8px;
+    padding: 36px;
+    border-radius: 26px;
+    opacity: 0.9;
+    padding-right: 21px;
+    padding-left: 23px;
+    /* text-align: center; */
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+  }
+  .wcontrol
+  {
+    display: flex;
+    position: absolute;
+    right: 0px;
+    top: 13px;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    height: 84px;
+  }
+  /* Close,maximize,minimize buttons container */
+  .wcontrols{
+    margin-top: 3.4px;
+    right: 4px;
+    display: block;
+    position: absolute;
+  }
+    /* Close,maximize,minimize buttons */
+  .wcontrols2{
+    opacity: 0.5;
+  }
+  .wcontrols2:hover{
+    opacity: 0.8;
+  }
+ /*  Container for list of loaded tracks */
+  .list{
+    position: absolute;
+    display: flex;
+    background-color: rgb(224 224 224 / 37%);
+    border-radius: 10px;
+    margin: 0px;
+    height: auto;
+    top: 146px;
+    bottom: 59px;
+    left: 254px;
+    right: 10px;
+    z-index: 1;
+    overflow: auto;
+  }
+  /* Loaded video tracks list (Activated when moving cursor to right edge of the window) */
+  .list2{
+    position: absolute;
+    width: 176px;
+    height: 228px;
+    background-color: rgb(228, 228, 228);
+    opacity: 0.5;
+    border: none;
+    border-radius: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 222;
+  }
+  .list2poz1{
+    top: 150px;
+    right: 40px;
+    width: 300px;
+    height:450px;
+  }
+  .list2poz2{
+    border-collapse: collapse;
+    border-style: none;
+    right: 13px;
+    bottom: 46px;
+  }
+  .list2:hover{
+    opacity: 1;
+  }
+  .list2 tr th td{
+    color:white;
+    background-color:rgb(231, 231, 231);
+  }
+  table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    position: absolute;
+    height:auto;
+  }
+  td, th {
+    text-align: left;
+    padding: 8px;
+  }
+  tr:hover {
+    background-color: rgb(48, 48, 48);
+    color: white;
+    user-select: none;
+  }
+  tr:active {
+    background-color: rgb(170, 64, 64);
+    color: white;
+  }
+  tr:nth-child(even):hover {
+    background-color: rgb(48, 48, 48);
+  }
+  tr:nth-child(even):active {
+    background-color: rgb(170, 64, 64);
+  }
+  .lista{
+    display:none;
+    position: absolute;
+    height: 25%;
+    right: 4px;
+    /* top: 47vh; */
+    top: 35vh;
+    opacity: 0;
+    z-index: 800;
+  }
+  .lista:hover{
+    opacity: 1;
+  }
+ /*  Menu button */
+  .menu{
+    position: absolute;
+    right: 4px;
+    bottom: 10px;
+    opacity:0.5;
+    z-index:1000;
+  }
+  /* Repeat button */
+  .repeat{
+    position: absolute;
+    right: 34px;
+    bottom: 10px; 
+    z-index:1000;
+  }
+  /* Shuffle button */
+  .shuffle{
+    position: absolute;
+    right: 68px;
+    bottom: 10px;
+    z-index:1000;
+  }
+  #volume2{
+    display: none;
+    position: absolute;
+    border: 1px solid #cfcfcf;
+    background-color: rgb(239, 239, 239);
+    width: 30px;
+    height: 148px;
+    bottom: 51px;
+    bottom: 34px;
+    right: 98px;
+    border-radius: 50px;
+    z-index: 202;
+  }
+  .infoplay
+  {
+    width: auto;
+    display: flex;
+    background-color: rgb(224 224 224 / 37%);
+    margin-left: 10px;
+    border-radius: 11px;
+    margin-right: 10px;
+    margin-top: 47px;
+    justify-content: center;
+  }
+  .imagine {
+    height: 90%;
+    width: 98%;
+    /* margin-left: 1%; */
+    /* margin-right: 10%; */
+    /* margin-right: 30px; */
+    padding: auto;
+    margin: auto;
+    /* background-position: center; */
+    /* background-repeat: no-repeat; */
+    /* background-size: cover; */
+    z-index: 1000;
+    border-radius: 10px;
+  }
+  /* Dark/Light mode CSS */
+  .darkMe{
+    filter: invert(1);
+  }
+  /* Dark/Light mode CSS for text*/
+  .darkMe2{
+    color:#e7e7e7;                       
+  }
+  /* Dark/Light mode CSS for slider*/
+  .darkMeSlider{
+    accent-color: snow;
+  }
+ /*  Button CSS when toggled */
+  .toggle{
+    position: absolute;
+    background-color: #d7d7d7;
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
+    z-index:1000;
+  }
+  /* Tabs for loaded images */
+  #tabovi{
+    display: flex;
+    /* filter: grayscale(1); */
+    margin-left: 18px;
+    opacity: 0.3;
+    transition: opacity 0.3s;
+    z-index: 991;
+  }
+  #tabovi:hover{
+    opacity:0.9;
+  }
+ /*  Tab close button */
+  .tab-close{
     width: 12px;
     float: left;
     margin-top: 3px;
@@ -420,132 +412,145 @@ opacity:0.9;
     border-radius: 100%;
     margin-right: -9px;
     margin-left: 2px;
-}
-.anal{
-display: flex;
-position: absolute;
-width: 100%;
-height: 30px;
-background-color: rgba(255, 255, 255, 0);
-align-items: flex-start;
-flex-direction: row;
-flex-wrap: nowrap;
-z-index: 1000;
-top: 0px;
-}
-.tab{
-color: rgb(206 206 206);
-background: #171717;
-/* border: 1px solid rgb(212, 212, 212); */
-width: 40px;
-/* height: 9px; */
-/* margin-inline: 2px; */
-margin-inline: -4px;
-margin-top: 6px;
-margin-left: -5px;
-/* margin-bottom: -28px; */
-border-radius: 6px;
-text-align: center;
-padding: 3.5px;
-user-select: none;
-overflow: hidden;
-transition: width 0.2s;
-border: #414141;
-border-style: solid;
-border-width: 0.1px;
-}
-.tab-active{
-width: 80px;
-transition: width 0.2s;
-}
-.slikacontent{
-max-width: 100%;
-max-height: 100%;
-width: 100%;
-height: auto;
-text-align: center;
-}
-.divslika{
-position: absolute;
-display: flex;
-height: auto;
-width: auto;
-right: 5px;
-left: 5px;
-bottom: 35px;
-top: 37px;
-margin: auto;
-z-index: 200;
-padding: auto;
-align-content: center;
-justify-content: center;
-align-items: center;
-flex-direction: column;
-flex-wrap: nowrap;
-overflow: hidden;
-}
-.piclamp{
-position: absolute;
-left: 7px;
-bottom: 6px;
-opacity: 0.5;
-z-index: 1000;
-}
-#playpauseId{
-position: absolute;
-right: 16px;
-bottom: 67px;
-opacity: 0.6;
-}
-.overley{
-display: none;
-width: 100%;
-height: 100%;
-position: fixed;
-/* z-index: 5555; */
-top: 0px;
-left: -150px;
-background-color: #bb3b3b86;
-}
-.homeButtons{
-display: flex;
-background-color: #dddddd70;
-position: absolute;
-right: 0px;
-top: 0px;
-flex-direction: row;
-flex-wrap: nowrap;
-justify-content: space-between;
-}
-.homeButtons img{
-padding: 10px;
-opacity: 0.5;
-}
-.homeButtons img:hover{
-opacity: 1;
-}
-#titleBarId{
-  display: block;
-  position: absolute;
-  width: 70%;
-  height: 32px;
-}
-.choiceMenu{
-position: absolute;
-display: flex;
-background-color: rgb(224 224 224 / 37%);
-border-radius: 10px;
-margin: 0px;
-height: auto;
-top: 382px;
-bottom: 59px;
-left: 23px;
-width: 218px;
-z-index: 1;
-overflow: hidden;
-}
-.inputDialog{
-   display: none;
+  }
+  /* Top bar container for elements */
+  .anal{
+    display: flex;
+    position: absolute;
+    width: 100%;
+    height: 30px;
+    background-color: rgba(255, 255, 255, 0);
+    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    z-index: 1000;
+    top: 0px;
+  }
+  /*  Tab CSS */
+  .tab{
+    color: rgb(206 206 206);
+    background: #171717;
+    /* border: 1px solid rgb(212, 212, 212); */
+    width: 40px;
+    /* height: 9px; */
+    /* margin-inline: 2px; */
+    margin-inline: -4px;
+    margin-top: 6px;
+    margin-left: -5px;
+    /* margin-bottom: -28px; */
+    border-radius: 6px;
+    text-align: center;
+    padding: 3.5px;
+    user-select: none;
+    overflow: hidden;
+    transition: width 0.2s;
+    border: #414141;
+    border-style: solid;
+    border-width: 0.1px;
+  }
+  .tab-active{
+    width: 80px;
+    transition: width 0.2s;
+  }
+  /* Container 2 for loaded image */
+  .slikacontent{
+    max-width: 100%;
+    max-height: 100%;
+    width: 100%;
+    height: auto;
+    text-align: center;
+  }
+  /* Container 1 for loaded image */
+  .divslika{
+    position: absolute;
+    display: flex;
+    height: auto;
+    width: auto;
+    right: 5px;
+    left: 5px;
+    bottom: 35px;
+    top: 37px;
+    margin: auto;
+    z-index: 200;
+    padding: auto;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+/* Light/Dark mode button in picture view */
+  .piclamp{
+    position: absolute;
+    left: 7px;
+    bottom: 6px;
+    opacity: 0.5;
+    z-index: 1000;
+  }
+  /* Play/Pause button */
+  #playpauseId{
+    position: absolute;
+    right: 16px;
+    bottom: 67px;
+    opacity: 0.6;
+  }
+  /* Overlay to hide volume slider, track list when mouse goes over it */
+  .overley{
+    display: none;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    /* z-index: 5555; */
+    top: 0px;
+    left: -150px;
+    /* background-color: #bb3b3b86;  */    /* remove in dist */
+  }
+  /* Top bar photo, video, radio list, image buttons */
+  .homeButtons{
+    display: flex;
+    background-color: #dddddd70;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+  .homeButtons img{
+    padding: 10px;
+    opacity: 0.5;
+  }
+  .homeButtons img:hover{
+    opacity: 1;
+  }
+  #titleBarId{
+    display: block;
+    position: absolute;
+    width: 70%;
+    height: 32px;
+  }
+  .choiceMenu{
+    position: absolute;
+    display: flex;
+    background-color: rgb(224 224 224 / 37%);
+    border-radius: 10px;
+    margin: 0px;
+    height: auto;
+    top: 382px;
+    bottom: 59px;
+    left: 23px;
+    width: 218px;
+    z-index: 1;
+    overflow: hidden;
+  }
+  .hidden {
+    opacity: 0;
+    pointer-events: none; /* Ensure no interaction with hidden elements */
+    transition: opacity 0.5s ease; 
+  }
+  .inputDialog{
+    display: none;
     top: 40%;
     left: 35%;
     bottom: 40%;
@@ -561,77 +566,77 @@ overflow: hidden;
     flex-wrap: wrap;
     align-content: space-around;
     justify-content: center;
-}
-.buttonTime{
-height: 43px;
-width: 100%;
-margin: auto;
-shape-outside: margin-box;
-border: #37373700;
-padding: 8px;
-border-radius: 32px;
-}
-#meeting-time{
-margin: auto;
-border-radius: 55px;
-border: none;
-height: 50px;
-width: auto;
-padding: 20px
-}
-@keyframes fade-in {
-from {
-opacity: 0;
-}
-to {
-opacity: 1;
-}
-}
+  }
+  .buttonTime{
+    height: 43px;
+    width: 100%;
+    margin: auto;
+    shape-outside: margin-box;
+    border: #37373700;
+    padding: 8px;
+    border-radius: 32px;
+  }
+  #meeting-time{
+    margin: auto;
+    border-radius: 55px;
+    border: none;
+    height: 50px;
+    width: auto;
+    padding: 20px
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 
-@keyframes fade-out {
-from {
-opacity: 1;
-}
-to {
-opacity: 0;
-}
-}
-th{
-  background: gainsboro;
-}
-.contextMenuVideo{
-display: none;
-position: absolute;
-width: 134px;
-height: 199px;
-background-color: rgb(228, 228, 228);
-opacity: 0.8;
-border: none;
-border-radius: 10px;
-overflow: hidden;
-z-index: 222;
-text-align: center;
-}
-.contextMenuVideo td{
-  text-align: center;
-}
-.trim_slider{
-  position: absolute;
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  th{
+    background: gainsboro;
+  }
+  .contextMenuVideo{
+    display: none;
+    position: absolute;
+    width: 134px;
+    height: 199px;
+    background-color: rgb(228, 228, 228);
+    opacity: 0.8;
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    z-index: 222;
+    text-align: center;
+  }
+  .contextMenuVideo td{
+    text-align: center;
+  }
+  .trim_slider{
+    position: absolute;
     appearance: none;
     background: none;
     bottom: 16px;
     pointer-events: none;
-}
-.trim_slider_up{
-  background:linear-gradient(to right, rgb(8, 8, 8, 0.44) 0%, rgb(8, 8, 8, 0.44) 0%, rgb(255 102 129) 0%, rgb(255 102 129) 100%, rgb(8, 8, 8, 0.44) 100%, rgb(8, 8, 8, 0.44) 100%); 
-  border: #a9a9a98f;
-  border-style: solid;
-  border-width: 0.1px;
-}
-#trimBlock input[type=range]::-webkit-slider-thumb {
-  pointer-events: all;
-}
-#conversion{ 
+  }
+  .trim_slider_up{
+    background:linear-gradient(to right, rgb(8, 8, 8, 0.44) 0%, rgb(8, 8, 8, 0.44) 0%, rgb(255 102 129) 0%, rgb(255 102 129) 100%, rgb(8, 8, 8, 0.44) 100%, rgb(8, 8, 8, 0.44) 100%); 
+    border: #a9a9a98f;
+    border-style: solid;
+    border-width: 0.1px;
+  }
+  #trimBlock input[type=range]::-webkit-slider-thumb {
+    pointer-events: all;
+  }
+  #conversion{ 
     display:none;
     width: 50px;
     position: absolute;
@@ -640,89 +645,122 @@ text-align: center;
     height: 10px;
     filter: hue-rotate(118deg);
     z-index: 999;
-}
-#zoomSliderId{
+  }
+  #zoomSliderId{
     position: absolute;
     right: 34px;
     padding: 0px;
     accent-color: currentcolor;
-}
-@media only screen and (max-width: 600px) {
-  #zoomSliderId{
+  }
+  .messageDialog{
+    display:none;
+    background: #0404048f;
+    position: absolute;
+    top: 45%;
+    padding-inline: 80px;
+    height: 80px;
+    width: auto;
+    z-index: 10000;
+    backdrop-filter: blur(10px);
+    margin: auto;
+  }
+  #message{
+    margin: 10px;
+    text-align: center;
+    font-size: 1em;
+    border-radius: 10px;
+    color: white;
+  }
+  .messageDialog input[type="button"]{
+    height: 34px;
+    width: 100px;
+    border-radius: 10px;
+    background: #afafaf33;
+    border-style: none;
+    color: white;
+  }
+  .messageDialog input[type="button"]:active{
+    background: #9a9a9a;
+  }
+  @media only screen and (max-width: 600px) {
+    #zoomSliderId{
     display: none;
     transform: rotate(270deg) translate(80px, 60px);
-}
-#rotateButton{
-  right:48px!important;
-}
-#zoomButton{
-  display: block!important;
-}
-#tabovi{
-  position: absolute;
-  top: 33px;
-  left: 0px;
-}
-.tabovi-active{
-  display:block!important;
-}
-.tabovi-deActivate{
-  display:none!important;
-}
-/* #tabsButton{
-  display:block!important;
-} */
-#titleBarId{
-  width: 25%;
-  left: 30px;
-}
-.seek_slider{
-    position: absolute!important;
-    bottom: 38px!important;
-}
-.trim_slider{
-    bottom: 30px!important;
-    height: 3px!important;
-    left: -4px!important;
-}
-.slider_container{
-  justify-content: space-between;
-}
-.current-time{
+  }
+  #rotateButton{
+    right:48px!important;
+  }
+  #zoomButton{
+    display: block!important;
+  }
+  #tabovi{
     position: absolute;
-    left: 84px;
-    bottom: 6px;
-}
-.total-duration{
-    position: absolute;
-    right: 143px;
-    bottom: 6px;
-}
-.fa-volume-up
-{
-  margin-bottom: 2px;
-}
-.track-art{
-  display:none!important;
-}
-.list{
-  left:10px;
-}
-.choiceMenu{
-  display:none!important;
-}
-}
-@media only screen and (min-width: 600px){
-#zoomSliderId{
-  display:block!important;
-}
-}
-
-    </style>
+    top: 33px;
+    left: 0px;
+  }
+  .tabovi-active{
+    display:block!important;
+  }
+  .tabovi-deActivate{
+    display:none!important;
+  }
+  /* #tabsButton{
+    display:block!important;
+  } */
+  /* Top bar element for window dragging */
+  #titleBarId{
+    width: 25%;
+    left: 30px;
+  }
+  .seek_slider{
+      position: absolute!important;
+      bottom: 38px!important;
+  }
+  .trim_slider{
+      bottom: 30px!important;
+      height: 3px!important;
+      left: -4px!important;
+  }
+  .slider_container{
+    justify-content: space-between;
+  }
+  .current-time{
+      position: absolute;
+      left: 84px;
+      bottom: 6px;
+  }
+  .total-duration{
+      position: absolute;
+      right: 143px;
+      bottom: 6px;
+  }
+  .fa-volume-up
+  {
+    margin-bottom: 2px;
+  }
+  .track-art{
+    display:none!important;
+  }
+  .list{
+    left:10px;
+  }
+  .choiceMenu{
+    display:none!important;
+  }
+  }
+  @media only screen and (min-width: 600px){
+  #zoomSliderId{
+    display:block!important;
+  }
+ }
+  @media only screen and (max-height: 650px){
+  .list2poz1{
+    height:50vh!important;
+  }
+  }
+</style>
 </head>
-
 <body>
-  
   <div class="divslika" id="elSlikaId" style="display:none;">
     <div class="slikacontent" id="slikaContId">
       <img id="picka" style="max-width: 100%;
@@ -730,7 +768,6 @@ text-align: center;
       margin: auto;user-select: none;-webkit-user-drag: none;" src="media/123097127-selection-of-traditional-greek-food.jpg"></img>
     </div>
   </div>
-  
   <div class="slider_container slider2" id="slikacontrol" style="background:rgb(238, 238, 238);display:none;">
     <div class="buttons">
       <!-- <div class="prev-track" style="position: absolute;right:34px;padding: 0px;" onclick="zoomIn()"><img src="set/zoom_in.png" class="lMode"  width="22px" height="auto"></div>
@@ -743,10 +780,18 @@ text-align: center;
       <input type="range" class="lMode" id="zoomSliderId" style="position: absolute;right:20px;padding: 0px;accent-color: currentcolor;" min="1" max="10" step="0.1" value="1"  onInput="zoomSlider()">
   </div>
   </div>
-  <div class="inputDialog" id="unPauseAtTimeId"><input type="datetime-local" id="meeting-time"
-    name="meeting-time" max="2039-08-08T00:00">
-  <div style="margin: auto;height: auto;width: 85%;max-width: 188px;"><input class="buttonTime" id="buttonTimeId" type="button" value="Set" onclick="unPauseAtTimeEl.style.display='none';"></div>
-</div>
+  <div class="inputDialog" id="unPauseAtTimeId">
+    <input type="datetime-local" id="meeting-time" name="meeting-time" max="2039-08-08T00:00">
+  <div style="margin: auto;height: auto;width: 85%;max-width: 188px;">
+    <input class="buttonTime" id="buttonTimeId" type="button" value="Set" onclick="unPauseAtTimeEl.style.display='none';">
+  </div>
+  </div>
+    <div class="messageDialog" id="messageDialogID">
+      <div id="message">This is the message</div>
+      <div style="text-align: center;">
+        <input id="messageButtonId" type="button" value="Ok">
+      </div>
+    </div>
   <div class="anal" id="barId">
   <!-- <div class="wcontrols"> 
      <img class="wcontrols2 lMode" src="set/min.png" width="32px" height="auto">
@@ -754,35 +799,35 @@ text-align: center;
   <img class="wcontrols2 lMode"src="set/close.png" width="32px" height="auto">
 </div> -->
 <div class="tabovi-deActivate" style="display: none;" id="tabovi">
-<div class="tab">
-  1
-</div>
-<div class="tab">
- 2
-</div>
-<div class="tab">
-  3
-</div>
-<div class="tab">
-  4
-</div>
-<div class="tab">
-  5
-</div>
-<div class="tab">
-  6
-</div>
+  <div class="tab">
+    1
+  </div>
+  <div class="tab">
+    2
+  </div>
+  <div class="tab">
+    3
+  </div>
+  <div class="tab">
+    4
+  </div>
+  <div class="tab">
+    5
+  </div>
+  <div class="tab">
+    6
+  </div>
 </div>
 <img id="tabsButton" class="lMode" onclick="activateTabovi();" src="set/menu12.png" style="display:none;position: absolute;top: 11px;left:10px;height: 18px;width: 20px;opacity: 0.6;">
 <div id="titleBarId"></div>
 <div class="homeButtons" id="homeButtonsId">
-<img src="set/music.png" class="lMode" onClick="openMusic()" width="16px" height="auto"></td>
-<img src="set/video.png" class="lMode" onClick="openVideo()" width="16px" height="auto"></td>
-<img src="set/radio.png" class="lMode" onClick="openRadio()" width="16px" height="auto"></td>
-<img src="set/photo.png" class="lMode" onClick="loadPicture()" width="16px" height="auto"></td>
-<img class="wcontrols2 lMode" src="set/min.png" onclick="win.minimize()" width="16px" height="auto">
-<img class="wcontrols2 lMode"src="set/max.png" onclick="WindowMinMax()" width="16px" height="auto">
-<img class="wcontrols2 lMode"src="set/close.png" onclick="win.close()"  width="16px" height="auto">
+  <img src="set/music.png" class="lMode" onClick="openMusic()" width="16px" height="auto"></td>
+  <img src="set/video.png" class="lMode" onClick="openVideo()" width="16px" height="auto"></td>
+  <img src="set/radio.png" class="lMode" onClick="openRadio()" width="16px" height="auto"></td>
+  <img src="set/photo.png" class="lMode" onClick="loadPicture()" width="16px" height="auto"></td>
+  <img class="wcontrols2 lMode" src="set/min.png" onclick="win.minimize()" width="16px" height="auto">
+  <img class="wcontrols2 lMode"src="set/max.png" onclick="WindowMinMax()" width="16px" height="auto">
+  <img class="wcontrols2 lMode"src="set/close.png" onclick="win.close()"  width="16px" height="auto">
 </div>
 </div>
 <div class="infoplay" id="infoId"><img class="track-art"><div class="floatdetails" id="floatdetailsId"><div class="track-name" style="opacity:1;">Track Name</div> &nbsp&nbsp<span style="font-size: 1.3rem;padding-bottom: 4px;">-</span>&nbsp&nbsp<div class="track-artist" style="opacity:1;">Track Artist</div></div>
@@ -790,10 +835,8 @@ text-align: center;
           <div class="list" id="listaGId">
           <table id="tabelaId">
 
-
           </table>
         </div>
-
 <div class="choiceMenu" id="choiceMenuId">
 <table>
         <tr style="color:black;">
@@ -819,14 +862,11 @@ text-align: center;
         </tr>
       </table>
 </div>
-
     <div class="player" id="playerId">
         <div class="details" id="videoD" style="display:none;overflow: hidden;">                                    
-            <video style="width: 100%; height: 100%;background-color: black;"id="audiodd" width="98.3%" onclick="playpauseTrack()">
-                <source src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+            <video type="video/mp4" style="width: 100%; height: 100%;background-color: black;"id="audiodd" width="98.3%" onclick="playpauseTrack()">
             </video>
-            <!-- <img class="lMode" id="playpauseId" src="set/pause2.png"  width="54px" height="auto"> -->
-            
+            <!-- <img class="lMode" id="playpauseId" src="set/pause2.png"  width="54px" height="auto"> -->   
         </div>
         <div class="lista lMode" id="lista2Id" onmouseover="lista2()"><img width="32px" height="auto"></div>
         <progress id="conversion" value="0" max="100" style="width: 50px;"></progress>
@@ -851,19 +891,14 @@ text-align: center;
             <div class="toggle" id="repeatId" style="right: 30px; bottom: 6px;display:none;"></div>
             <img class="repeat lMode"  onclick="repeat();closeall()" src="set/repeat.png"  width="22px" height="auto">
             <img class="menu lMode" onclick="openMenu();" src="set/menu12.png"  width="22px" height="auto">
-
         </div>
-          
           <div class="duration" id="durationCId"><span class="current-time">00:00</span></div>  <input type="range" min="1" max="500" value="0" id="seeksliderId" class="seek_slider" onInput="seekTo()"><div class="duration" id="durationEId"><span class="total-duration">00:00</span></div> 
           <div class="yes">
             <div class="overley" id="overleyId" onmouseover="overleymentFunction(overleyment)"></div>
             <i class="fa fa-volume-up lMode" onmouseOver="volumeH()" onClick="volumeC()"></i>
             <div style="display:none;" id="volume2"><input type="range" min="1" max="100" value="99" class="volume_slider" id="volumesliderId" onchange="setVolume()"></div>
           </div>
-       
         </div> 
-
-
     </div>
     <div class="list2 list2poz1" id="listaId" style="display:none;">
       <table id="videoBarLista">
@@ -929,22 +964,20 @@ text-align: center;
 </div>
     <!-- Main script for the player -->
     <script>
-      
    document.addEventListener('dragover', function () {
       document.getElementById("drop_zone").style.display="block";
     });
 function dropHandler(ev) {
   console.log("File(s) dropped");
-
   // Prevent default behavior (Prevent file from being opened)
   ev.preventDefault();
-
   if (ev.dataTransfer.items) {
     // Use DataTransferItemList interface to access the file(s)
     [...ev.dataTransfer.items].forEach((item, i) => {
       // If dropped items aren't files, reject them
       if (item.kind === "file") {
         const file = item.getAsFile();
+        console.log(file);
         console.log(`… file[${i}].name = ${file.path}`);
         let splitArg=file.path.split("\\");
         let nameLen=splitArg.length-1;
@@ -952,7 +985,22 @@ function dropHandler(ev) {
         console.log(nameArg);
         let theFile=newFileObj(nameArg,file.path);
         console.log(theFile);
-        track_list.push(theFile);
+      /*   if(!listOfPaths.includes(theFile.path)){ // To avoid double items in list
+          listOfPaths.push(theFile.path);
+          track_list.push(theFile);
+        } */
+        let found_file=0;
+        track_list.forEach(function(element,index) {
+          if (theFile.path==element.path){
+            found_file=1;
+            track_index=index;
+          }
+       });
+       if(found_file==0){
+       console.log("push non repeated file");
+       track_list.push(theFile);
+       track_index=track_list.length-1;
+      } 
       }
     });
   } else {
@@ -962,21 +1010,18 @@ function dropHandler(ev) {
     });
   }
   document.getElementById("drop_zone").style.display="none";
-  console.log("filepath sucks:"+theFile.path);
-  let track_len=track_list.length-1;
-  let last_track=track_list[track_len];
+  let last_track=track_list[track_index];
   console.log(last_track);
 if(last_track.path.includes('.mp3')){
-  populateMusic();
+  openMusic();
  }
 if(last_track.path.includes('.mp4')){
-  populateVideo();
+  openVideo();
 }
 if(last_track.path.includes('.jpg') || last_track.path.includes('.jpeg') || last_track.path.includes('.png')|| last_track.path.includes('.webp')){
   pickaEl.src=last_track.path;
   loadPicture();
 }
-  track_index=track_list.length-1;
   loadTrack(track_index);
   playTrack();
 }
@@ -1023,10 +1068,10 @@ let slikaControlEl=document.getElementById('slikacontrol');
 let listaEl=document.getElementById('listaGId');
 let listaVideoBar=document.getElementById('listaId');
 let volumeb=document.getElementById('volume2');
-  let infoEl=document.getElementById('infoId');
-  let slikaElem=document.getElementById('slikaContId');  
-  let seeksliderEl=document.getElementById('seeksliderId');
-  let volumeEl=document.getElementById('volumesliderId');
+let infoEl=document.getElementById('infoId');
+let slikaElem=document.getElementById('slikaContId');  
+let seeksliderEl=document.getElementById('seeksliderId');
+let volumeEl=document.getElementById('volumesliderId');
 // Create new audio element
 let curr_track = document.getElementById('audiodd');
 let tabelaG=document.getElementById('tabelaId');
@@ -1037,15 +1082,17 @@ let scaleValue=1;
 var overleyment = document.getElementById('overleyId');
 let choiceMenuEl=document.getElementById('choiceMenuId');
 let playerEl=document.getElementById('audiodd');
-  let videoEl=document.getElementById('videoD');
-  let lista2El=document.getElementById('lista2Id');
-  let  elSlikaEl=document.getElementById("elSlikaId");
-  let seekStartDuration=0;
-  let seekEndDuration=0;
+let videoEl=document.getElementById('videoD');
+let lista2El=document.getElementById('lista2Id');
+let elSlikaEl=document.getElementById("elSlikaId");
+let seekStartDuration=0;
+let seekEndDuration=0;
 let tabsBar=document.getElementById('tabovi');
 let tabsEl=tabsBar.getElementsByClassName("tab");
 var videoWasOpened=0;
 let cImageRotation=0;
+let VideoErr=0;
+let listOfPaths=[];
 const fileObj={
     name: "Object",
     artist: "Object",
@@ -1084,12 +1131,24 @@ let track_list = [
 var isMax=0;
 function WindowMinMax(){
   if(isMax==1){
+    if(win.isKioskMode==true){
+      win.leaveKioskMode();
+      isMax=0;
+    }
+    else{
     win.unmaximize();
     isMax=0;
+    }
   }
   else{
+    if(videoEl.style.display=="block"){
+      win.enterKioskMode();
+      isMax=1;
+    }
+    else{
     win.maximize();
     isMax=1;
+    }
   }
 }
 function populateMusic(){         
@@ -1295,7 +1354,7 @@ for (let item of imgs) {
  listaEl.classList.add("darkMe2");
  infoEl.classList.add("darkMe2");
  tabsBar.classList.remove("darkMe");
-
+ listaVideoBar.classList.add("darkMe");
 for (i = 0; i < elements.length; i++) {
 elements[i].style.background = "#838383";  
 }
@@ -1324,6 +1383,7 @@ for (let item of imgs) {
  listaEl.classList.remove("darkMe2");
  infoEl.classList.remove("darkMe2");
  tabsBar.classList.add("darkMe");
+ listaVideoBar.classList.remove("darkMe");
   break;
   default:
   document.getElementById('choiceMenuId').style.color="white";
@@ -1346,7 +1406,7 @@ for (let item of imgs) {
  listaEl.classList.add("darkMe2");
  infoEl.classList.add("darkMe2");
  tabsBar.classList.remove("darkMe");
- 
+ listaVideoBar.classList.add("darkMe");
 
 for (i = 0; i < elements.length; i++) {
 elements[i].style.background = "#838383";  
@@ -1374,8 +1434,9 @@ function loadPicture(){
      document.getElementById("tabovi").style.display="flex";
    }
 
-
-function loadTrack(track_index) {
+let error_track_src="";
+function loadTrack(index) {
+  track_index=index;
   clearInterval(updateTimer);
   resetValues();
   if (track_list[track_index].path.includes(".mp4")){
@@ -1395,13 +1456,26 @@ function loadTrack(track_index) {
   track_art.src= track_list[track_index].image ;
   track_name.textContent = track_list[track_index].name;
   document.title = track_list[track_index].artist+' - '+track_list[track_index].name;
- track_artist.textContent =  track_list[track_index].artist;
+  track_artist.textContent =  track_list[track_index].artist;
   //now_playing.textContent = "PLAYING " + (track_index + 1) + " OF " + track_list.length;
   // Set an interval of 1000 milliseconds for updating the seek slider
   updateTimer = setInterval(seekUpdate, 1000);
   // Move to the next track if the current one finishes playing
 }
-
+curr_track.addEventListener('error', function() {
+      console.log("Video error");
+      console.log(event);
+      if(isNaN(curr_track.duration) && track_list[track_index].path.includes(".mp4") && VideoErr==0 && curr_track.src!=error_track_src){
+          error_track_src=curr_track.src;
+          VideoErr=1;
+          alert("Mp4 is broken, and will be fixed. Melo_fixed will be added to the name of the file");
+          fixMp4(track_list[track_index].path);
+        } 
+      },false);
+  curr_track.addEventListener('loadeddata', function() {
+  console.log("Video loaded");
+  VideoErr=0;
+  }, false);
 
 let pos = { top: 0, left: 0, x: 0, y: 0 };
 const ele = document.getElementById('picka');
@@ -1434,9 +1508,7 @@ ele.scrollLeft = pos.left - dx;
 const mouseUpHandler = function () {
 document.removeEventListener('mousemove', mouseMoveHandler);
 document.removeEventListener('mouseup', mouseUpHandler);
-
 ele.style.cursor = 'grab';
-
 };
 function openMusic(){
 clearList();
@@ -1715,10 +1787,12 @@ menuE.style.display="none";
 
 videoEl.addEventListener('dblclick', function (e) {
   if(win.isKioskMode==false){
-  win.enterKioskMode();
+    win.enterKioskMode();
+    isMax=1;
   }
   else if(win.isKioskMode==true){
     win.leaveKioskMode();
+    isMax=0;
   }
 });
 function trackMousePosition() {
@@ -1778,7 +1852,7 @@ function trackMousePosition() {
   // Call the function to start tracking mouse position
   trackMousePosition();
   darkmode();
-  //Open file with app
+  //Open file with apppopulateVideo(
   let pathArg=nw.App.argv.toString();
   let splitArg=pathArg.split("\\");
   let nameLen=splitArg.length-1;
@@ -1792,7 +1866,9 @@ function trackMousePosition() {
         }
   else{
   track_list.push(theFile);
-  populateVideo();
+  openVideo(); // Open video populates the list also
+  //populateVideo();
+  console.log("error 1");
   track_index=track_list.length-1;
   loadTrack(track_index);
   playTrack();
@@ -1804,23 +1880,32 @@ function trackMousePosition() {
   let splitArg=pathArg.split("\\");
   let nameLen=splitArg.length-1;
   let nameArg=splitArg[nameLen];
-  console.log(nameArg);
   let theFile=newFileObj(nameArg,pathArg);
-  console.log(theFile);
-  track_list.push(theFile);
-  let track_len=track_list.length-1;
-  let last_track=track_list[track_len];
+  console.log("App opened via file" + theFile);
+      let found_file=0;
+        track_list.forEach(function(element,index) {
+          if (theFile.path==element.path){
+            found_file=1;
+            track_index=index;
+          }
+       });
+       if(found_file==0){
+       console.log("Push non repeated file");
+       track_list.push(theFile);
+       track_index=track_list.length-1;
+      }
+  let last_track=track_list[track_index];
   if(last_track.path.includes('.mp3')){
-  populateMusic();
+  openMusic();
  }
 if(last_track.path.includes('.mp4')){
-  populateVideo();
+  //populateVideo();
+  openVideo();
 }
 if(last_track.path.includes('.jpg') || last_track.path.includes('.jpeg') || last_track.path.includes('.png')|| last_track.path.includes('.webp')){
   pickaEl.src=last_track.path;
   loadPicture();
 }
-  track_index=track_list.length-1;
   loadTrack(track_index);
   playTrack(); 
   })
@@ -1851,7 +1936,7 @@ document.addEventListener('click', function(e) {
     contextMenuVideo.style.display="none";
   }, false);
 //Context menu END
-const fs = require ('fs')
+const fs = require ('fs');
 async function updateApp() {
   fs.copyFile('index.html', 'index_backup.html', (err) => {
   if (err) {
@@ -1911,8 +1996,95 @@ function doTrimConvert(filePath,formatInput,formatOutput){
         });
         console.log(command.run());
 }
-//win.showDevTools(); //debuging only, will crash nw.js non sdk version, you have to download nw.js sdk package
+let numberFix=0;
+function fixMp4(filePath,formatInput,formatOutput){
+      numberFix+=1;
+      console.log("Fix:"+numberFix);
+      let outputFile=filePath.split('.')[0];
+      let inputFile=outputFile+'.mp4';
+      const command = ffmpeg()
+      .input(inputFile) // inputFile
+      .withVideoCodec('copy')
+      .withAudioCodec('copy')
+      .output(outputFile+'_MeloFixed.mp4') // outputFile+'.mp4'
+      .on('progress', (progress) => { 
+        if (progress) {
+        }
+      })
+      .on('end', () => {
+        if (fs.existsSync(inputFile)) {
+          fs.unlink(inputFile, (err) => {
+        if (err) {
+          console.log(err);
+         }
+          console.log('deleted');
+          })
+        }
+        track_list[track_index].path=outputFile+'_MeloFixed.mp4';
+        curr_track.src=track_list[track_index].path;
+        /* curr_track.load(); */
+        curr_track.play();
+        /* renameFile(); */
+        alert("Mp4 is fixed. _Melofixed is added to the name of the file");
+        })
+        .on('error', (error) => {
+          alert("Failed to fix this mp4");
+          VideoErr=0;
+        });
+        console.log(command.run());
 
+      /*   function renameFile(sourcePath, destinationPath) {
+          fs.rename(outputFile+'_MeloFixed.mp4', outputFile+'.mp4',
+          (error) => {
+              if (error) {
+                  if (error.code === 'EBUSY') {
+                    // Retry after a delay
+                    setTimeout(() => {
+                      console.log("Trying to rename file again");
+                      renameFile(outputFile+'_MeloFixed.mp4', outputFile+'.mp4');
+                    }, 1000); // 1 second delay, adjust as needed
+                  }
+                  else{
+                    console.log(error);
+                  }
+              }
+              else {
+                function setTrack(){curr_track.src="";curr_track.src = track_list[track_index].path;return true;}
+                setTimeout(() => {
+                console.log("Setting current_track.src  "+ setTrack());
+                console.log("Current track source?:  "+curr_track.src);
+                console.log("Loading curr_track "+ curr_track.load());
+                console.log("Playing curr_track "+ curr_track.play());
+                }, 5000);
+                VideoErr=0;
+              }
+            });
+        } */
+}
+//win.showDevTools(); //debuging only, will crash nw.js non sdk version, you have to download nw.js sdk package
+const inactivityTimeout = 2000; 
+let timeoutId;
+function hideElementsAndCursor() {
+    if(isMax==1){
+    document.getElementById('slider_container_Id').classList.add('hidden');
+    document.getElementById('homeButtonsId').classList.add('hidden');
+    document.body.style.cursor = 'none';
+  }
+}
+function resetTimeout() {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(hideElementsAndCursor, inactivityTimeout);
+}
+document.addEventListener('mousemove', function() {
+    resetTimeout();
+    document.getElementById('slider_container_Id').classList.remove('hidden');
+    document.getElementById('homeButtonsId').classList.remove('hidden');
+    document.body.style.cursor = 'auto';
+});
+document.addEventListener('mouseout', function() {
+    resetTimeout();
+});
+resetTimeout();
     </script>
 </body>
 
