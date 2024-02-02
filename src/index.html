@@ -964,6 +964,33 @@
 </div>
     <!-- Main script for the player -->
     <script>
+      document.addEventListener("keydown", (event) => {
+     if(event.code=='Space'){
+      playpauseTrack();
+     }
+     if(event.code=='ArrowLeft'){
+      curr_track.currentTime-=10;
+     }
+     if(event.code=='ArrowRight'){
+      curr_track.currentTime+=10;
+     }
+     if(event.code=='ArrowUp'){
+      volume_slider.value+=10; // I don't get it
+      setVolume();
+      console.log(volume_slider.value);
+     }
+     if(event.code=='ArrowDown'){
+      volume_slider.value-=10;
+      setVolume();
+      console.log(volume_slider.value);
+     }
+     if(event.code=='KeyF'){
+      WindowMinMax();
+     }
+     console.log(event);
+     
+  });
+  console.log("errorrrrrrrrrrrrrr 1");
    document.addEventListener('dragover', function () {
       document.getElementById("drop_zone").style.display="block";
     });
@@ -983,7 +1010,7 @@ function dropHandler(ev) {
         let nameLen=splitArg.length-1;
         let nameArg=splitArg[nameLen];
         console.log(nameArg);
-        let theFile=newFileObj(nameArg,file.path);
+        let theFile=newFileObj(nameArg,file.path,file.type);
         console.log(theFile);
       /*   if(!listOfPaths.includes(theFile.path)){ // To avoid double items in list
           listOfPaths.push(theFile.path);
@@ -1012,25 +1039,26 @@ function dropHandler(ev) {
   document.getElementById("drop_zone").style.display="none";
   let last_track=track_list[track_index];
   console.log(last_track);
-if(last_track.path.includes('.mp3')){
+if(last_track.type.includes('audio')){
   openMusic();
  }
-if(last_track.path.includes('.mp4')){
+if(last_track.type.includes('video')){
   openVideo();
 }
-if(last_track.path.includes('.jpg') || last_track.path.includes('.jpeg') || last_track.path.includes('.png')|| last_track.path.includes('.webp')){
+if(last_track.type.includes('image')){
   pickaEl.src=last_track.path;
   loadPicture();
 }
   loadTrack(track_index);
   playTrack();
 }
+console.log("errorrrrrrrrrrrrrr 2");
 function dragOverHandler(ev) {
   console.log("File(s) in drop zone");
   // Prevent default behavior (Prevent file from being opened)
   ev.preventDefault();
 }
-
+console.log("errorrrrrrrrrrrrrr 2");
 var win = nw.Window.get();
 win.resizeTo(1200,720);
 win.setPosition("center");
@@ -1092,6 +1120,11 @@ let tabsEl=tabsBar.getElementsByClassName("tab");
 var videoWasOpened=0;
 let cImageRotation=0;
 let VideoErr=0;
+let numberFix=0;
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpegStatic = require('ffmpeg-static');
+ffmpeg.setFfmpegPath(ffmpegStatic);
+const fs = require ('fs');
 let listOfPaths=[];
 const fileObj={
     name: "Object",
@@ -1099,10 +1132,12 @@ const fileObj={
     image: "set/default.webp",
     path: "",
     duration: "",
+    type:"",
 }
+console.log("errorrrrrrrrrrrrrr 3");
 // Define desired object
-function newFileObj(name,path){
-  return {"name": name, "artist": "","image":"set/default.webp","path":path,"duration":""};
+function newFileObj(name,path,type){
+  return {"name": name, "artist": "","image":"set/default.webp","path":path,"duration":"","type":type};
 }
 let track_list = [
   {
@@ -1111,6 +1146,7 @@ let track_list = [
     image: "https://images.pexels.com/photos/2264753/pexels-photo-2264753.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=250&w=250",
     path: "media/Mr. Plenty – Part Time AI cover.mp3",
     duration: "3:23",
+    type:"audio/mpeg",
   },
   {
     name: "Shipping Lanes",
@@ -1118,7 +1154,8 @@ let track_list = [
     image: "https://images.pexels.com/photos/1717969/pexels-photo-1717969.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=250&w=250",
     path: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     duration:"2:19",
-  },
+    type:"video/mp4",
+  }
 /*   {
     name: "Famous Sally",
     artist: "Sally",
@@ -1128,6 +1165,7 @@ let track_list = [
   },
  */
 ];  
+console.log("errorrrrrrrrrrrrrr 4");
 var isMax=0;
 function WindowMinMax(){
   if(isMax==1){
@@ -1158,16 +1196,19 @@ function populateMusic(){
       <th>Duration</th>
     </tr>`;
   track_list.forEach(function(element,index) {
-    if (element.path.includes('.mp3')){
+    console.log("Element type is :"+element.type);
+    if(element.type){
+    if (element.type.includes('audio')){
     console.log(index);
     tabelaG.innerHTML  = tabelaG.innerHTML  + `<tr onclick="loadTrack('`+ index +`');playTrack();">
   <td>`+element.name+`</td>
   <td>`+element.artist+`</td>
   <td>`+element.duration+`</td>
 </tr>`;
-  }
+  }}
   }); 
 }
+console.log("errorrrrrrrrrrrrrr 5");
 function populateVideo(){
   tabelaG.innerHTML=`  <tr style="color:black;">
       <th>Video</th>
@@ -1178,7 +1219,9 @@ function populateVideo(){
           <th>Duration</th>
         </tr>`;
   track_list.forEach(function(element,index) {
-    if (element.path.includes('.mp4')){
+    console.log("Element type is :"+element.type);
+    if(element.type){
+    if (element.type.includes('video')){
     console.log(index);
     tabelaG.innerHTML  = tabelaG.innerHTML  + `<tr onclick="loadTrack('`+ index +`');playTrack();">
   <td>`+element.name+`</td>
@@ -1188,9 +1231,10 @@ tabelaVideoBarLista.innerHTML=tabelaVideoBarLista.innerHTML+`<tr onclick="loadTr
   <td>`+element.name+`</td>
   <td>`+element.duration+`</td>
 </tr>`;
-  }
+  }}
   }); 
 }
+console.log("errorrrrrrrrrrrrrr 6");
 function clearList(){
 
   tabelaG.innerHTML="";
@@ -1227,6 +1271,7 @@ listaVideoBar.style.display='none'; */
 
 } 
 }
+console.log("errorrrrrrrrrrrrrr 7");
 function openMenu(){
   overleyment.style.display="block";
 switch(menuE.style.display) {
@@ -1306,7 +1351,7 @@ pickaEl.style.transform="scale("+scaleValue+")";
 }
 }
 
-
+console.log("errorrrrrrrrrrrrrr 8");
 function repeat(){
 
 switch(repeatEl.style.display) {
@@ -1433,13 +1478,13 @@ function loadPicture(){
     //  document.getElementById("picka").src="";
      document.getElementById("tabovi").style.display="flex";
    }
-
+   console.log("errorrrrrrrrrrrrrr 9");
 let error_track_src="";
 function loadTrack(index) {
   track_index=index;
   clearInterval(updateTimer);
   resetValues();
-  if (track_list[track_index].path.includes(".mp4")){
+  if (track_list[track_index].type.includes("video")){
     videoEl.style.display="block";
     lista2El.style.display="block";
     track_art.style.display="none";
@@ -1476,7 +1521,7 @@ curr_track.addEventListener('error', function() {
   console.log("Video loaded");
   VideoErr=0;
   }, false);
-
+  console.log("errorrrrrrrrrrrrrr 10");
 let pos = { top: 0, left: 0, x: 0, y: 0 };
 const ele = document.getElementById('picka');
 
@@ -1529,11 +1574,12 @@ slikaElem.style.display="block";
      document.getElementById("tabovi").style.display="none";
      videoEl.style.display="none";
 }
+console.log("errorrrrrrrrrrrrrr 11");
 function openVideo(){
 clearList();
 populateVideo();
 console.log("openVideo");
-if (curr_track.src.includes(".mp4")){
+if (track_list[track_index].type.includes("video")){
     videoEl.style.display="block";
     lista2El.style.display="block";
   }
@@ -1575,7 +1621,7 @@ function playTrack() {
   // Replace icon with the pause icon
   playpause.src = "set/pause.png";
 }
-
+console.log("errorrrrrrrrrrrrrr 12");
 function pauseTrack() {
   curr_track.pause();
   isPlaying = false;
@@ -1637,7 +1683,7 @@ function seekTrimColor(){
 function setVolume() {
   curr_track.volume = volume_slider.value / 100;
 }
-
+console.log("errorrrrrrrrrrrrrr 13");
 function seekUpdate() {
   let seekPosition = 0;
 
@@ -1693,6 +1739,7 @@ function overleymentFunction (pelement) {
   eleArray.forEach((element) => {if(element!=pelement){element.style.animation="fade-out 0.4s"}});
 
 }
+console.log("errorrrrrrrrrrrrrr 14");
 function closeall(){
   overleyment.style.display="none";
   if(volumeb.style.display=='block'){
@@ -1769,7 +1816,7 @@ for (var i = 0; i < tabsEl.length; i++) {
     current[0].innerHTML+="<span class='tab-close'>";
   });
 }
-
+console.log("errorrrrrrrrrrrrrr 15");
 /* random_color_tabs(); */
 populateMusic();
 document.addEventListener('animationstart', function (e) {
@@ -1784,7 +1831,7 @@ volumeb.style.display="none";
 menuE.style.display="none";
 }
 });
-
+console.log("errorrrrrrrrrrrrrr 16");
 videoEl.addEventListener('dblclick', function (e) {
   if(win.isKioskMode==false){
     win.enterKioskMode();
@@ -1844,34 +1891,36 @@ function trackMousePosition() {
       isMouseDownTitleBar = false;
       isMouseDownPicture = false;
     });
-
+    console.log("errorrrrrrrrrrrrrr 17");
     // Add event listener for mouse move
     document.addEventListener('mousemove', handleMouseMove);
   }
-
+ 
   // Call the function to start tracking mouse position
   trackMousePosition();
   darkmode();
   //Open file with apppopulateVideo(
   let pathArg=nw.App.argv.toString();
+  //track_name.innerHTML=nw.App.argv;
+  //fileObj.name="the File";
+  if(pathArg){
   let splitArg=pathArg.split("\\");
   let nameLen=splitArg.length-1;
   let nameArg=splitArg[nameLen];
   let theFile=newFileObj(nameArg,pathArg);
-  //track_name.innerHTML=nw.App.argv;
-  //fileObj.name="the File";
+  track_list.push(theFile);
   if(nameArg.includes(".jpg")){
           pickaEl.src=pathArg;
           loadPicture();
-        }
+  }
   else{
-  track_list.push(theFile);
   openVideo(); // Open video populates the list also
   //populateVideo();
-  console.log("error 1");
+  console.log("errorrrrrrrrrrrrrr 18");
   track_index=track_list.length-1;
   loadTrack(track_index);
   playTrack();
+  }
   }
   console.log("yes");
   nw.App.on('open', (args)=>{
@@ -1895,20 +1944,20 @@ function trackMousePosition() {
        track_index=track_list.length-1;
       }
   let last_track=track_list[track_index];
-  if(last_track.path.includes('.mp3')){
+  if(last_track.type.includes('audio')){
   openMusic();
  }
-if(last_track.path.includes('.mp4')){
+if(last_track.type.includes('video')){
   //populateVideo();
   openVideo();
 }
-if(last_track.path.includes('.jpg') || last_track.path.includes('.jpeg') || last_track.path.includes('.png')|| last_track.path.includes('.webp')){
+if(last_track.type.includes('image')){
   pickaEl.src=last_track.path;
   loadPicture();
 }
   loadTrack(track_index);
   playTrack(); 
-  })
+  });
   //background: linear-gradient(to right, rgb(198, 198, 198) 0%, rgb(198, 198, 198) 16%, rgb(37, 218, 165) 16%, rgb(37, 218, 165) 89%, rgb(198, 198, 198) 89%, rgb(198, 198, 198) 100%);
   window.onresize = reSize;
   function reSize(){
@@ -1919,6 +1968,7 @@ if(last_track.path.includes('.jpg') || last_track.path.includes('.jpeg') || last
   reSize();
   //Open file with app END
 //Context menu
+console.log("errorrrrrrrrrrrrrr 19");
 if (document.addEventListener) {
   videoEl.addEventListener('contextmenu', function(e) {
     contextMenuVideo.style.display="block";
@@ -1936,7 +1986,6 @@ document.addEventListener('click', function(e) {
     contextMenuVideo.style.display="none";
   }, false);
 //Context menu END
-const fs = require ('fs');
 async function updateApp() {
   fs.copyFile('index.html', 'index_backup.html', (err) => {
   if (err) {
@@ -1957,9 +2006,7 @@ async function updateApp() {
   alert("Update complete. Restart the app to see changes");
   
 }
-const ffmpeg = require('fluent-ffmpeg');
-const ffmpegStatic = require('ffmpeg-static');
-ffmpeg.setFfmpegPath(ffmpegStatic);
+console.log("errorrrrrrrrrrrrrr 20");
 function doTrimConvert(filePath,formatInput,formatOutput){
         let duration=Math.floor(seekEndDuration-seekStartDuration);
         let outputFile=filePath.split('.')[0];
@@ -1996,7 +2043,7 @@ function doTrimConvert(filePath,formatInput,formatOutput){
         });
         console.log(command.run());
 }
-let numberFix=0;
+console.log("errorrrrrrrrrrrrrr 21");
 function fixMp4(filePath,formatInput,formatOutput){
       numberFix+=1;
       console.log("Fix:"+numberFix);
@@ -2061,7 +2108,8 @@ function fixMp4(filePath,formatInput,formatOutput){
             });
         } */
 }
-//win.showDevTools(); //debuging only, will crash nw.js non sdk version, you have to download nw.js sdk package
+win.showDevTools(); //debuging only, will crash nw.js non sdk version, you have to download nw.js sdk package
+console.log("errorrrrrrrrrrrrrr 22");
 const inactivityTimeout = 2000; 
 let timeoutId;
 function hideElementsAndCursor() {
@@ -2070,11 +2118,15 @@ function hideElementsAndCursor() {
     document.getElementById('homeButtonsId').classList.add('hidden');
     document.body.style.cursor = 'none';
   }
+  else{
+    document.body.style.cursor = 'none';
+  }
 }
 function resetTimeout() {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(hideElementsAndCursor, inactivityTimeout);
 }
+console.log("errorrrrrrrrrrrrrr 23");
 document.addEventListener('mousemove', function() {
     resetTimeout();
     document.getElementById('slider_container_Id').classList.remove('hidden');
@@ -2085,6 +2137,7 @@ document.addEventListener('mouseout', function() {
     resetTimeout();
 });
 resetTimeout();
+
     </script>
 </body>
 
