@@ -4,14 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Melo player</title>
-    <!-- Load FontAwesome icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <!--   <script src="../node_modules/nw-dev/lib/dev.js"></script> -->
-    <!-- script type="module" src="main.js" defer></script> -->
-    <!--  <script src="functions.js"></script> -->
-    <!-- CSS style -->
     <style>
-  /* Forbid dragging of interface elements */
   *{
     user-select: none;       
     -webkit-user-drag: none;    
@@ -22,17 +16,42 @@
     transition: background-color .5s;
     overflow: hidden;
   }
-  .seek_slider::-moz-range-thumb  {
-    background: url('https://cdn-icons-png.flaticon.com/24/54/54601.png');
-    background-repeat: repeat;
-    cursor: pointer;
-    width: 6px;
-    height: 24px;
+  #alertID{
+    display: flex;
+    background: rgba(103, 103, 103, 0.551);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    top: 0px;
+    backdrop-filter: blur(3px);
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+  }
+  #alertID input[type="button"]{
+    width: 113px;
+    height: 32px;
+    margin: auto;
+    background: #ffffffa6;
+    border-radius: 14px;
+    /* position: absolute; */
+    outline: none;
     border: none;
-    -webkit-appearance: none;
-    appearance: none;
-    background-repeat: no-repeat;
-    padding: 9px;
+  }
+  #alertID input[type="button"]:hover{
+    opacity: 1;
+  }
+  #alertID input[type="button"]:active{
+    filter: contrast(0.5);
+  }
+  #alertMessageID{
+    margin: auto;
+    padding: 10px;
+    color: white;
+    text-shadow: 0px 0px 4px #312f2fbf;
   }
   ::-webkit-scrollbar {
     width: 10px;
@@ -55,7 +74,7 @@
     background: #dcdcdc; 
   } */
   /*Video container */
-  .details {
+  .videoContainer {
     right: 0px;
     left: 0px;
     bottom: 0px;
@@ -139,21 +158,6 @@
   .yes{
     margin:0px
   }
-
-  /* Modify the appearance of the slider thumb */
-  .seek_slider::-webkit-slider-thumb,
-  .volume_slider::-moz-range-thumb {
-    background: url('https://cdn-icons-png.flaticon.com/24/54/54601.png');
-    background-repeat: repeat;
-    cursor: pointer;
-    width: 8px;
-    height: 24px;
-    border: none;
-    -webkit-appearance: none;
-    appearance: none;
-    background-repeat: no-repeat;
-    padding: 9px;
-  }
   .seek_slider:hover,
   .volume_slider:hover {
     opacity: 1.0;
@@ -176,11 +180,6 @@
     margin: 10px;
     opacity: 0.7;
     border-radius: 40px;
-  }
-  i.fa-volume-down,
-  i.fa-volume-up {
-    margin-right: 94px;
-    padding: 10px;
   }
   .floatdetails{
     display: flex;
@@ -242,22 +241,23 @@
   .list2{
     position: absolute;
     width: 176px;
-    height: 228px;
+    height: 149px;
     background-color: rgb(228, 228, 228);
     opacity: 0.5;
     border: none;
     border-radius: 10px;
-    overflow-y: auto;
+    overflow-y: hidden;
     overflow-x: hidden;
     z-index: 222;
   }
-  .list2poz1{
-    top: 150px;
+  .videoSidePlaylist{
+    top: 82px;
     right: 40px;
     width: 300px;
-    height:450px;
+    height: 80%;
+    overflow: auto;
   }
-  .list2poz2{
+  .menuList{
     border-collapse: collapse;
     border-style: none;
     right: 13px;
@@ -316,6 +316,12 @@
     bottom: 10px;
     opacity:0.5;
     z-index:1000;
+  }
+   /*  volume button */
+  .volume{
+    position: absolute;
+    right: 104px;
+    bottom: 10px;
   }
   /* Repeat button */
   .repeat{
@@ -482,17 +488,25 @@
     flex-wrap: wrap;
     align-content: space-around;
     justify-content: center;
+    padding-top:10px
   }
   .buttonTime{
     height: 43px;
     width: 100%;
-    margin: auto;
+    margin: 5px;
     shape-outside: margin-box;
     border: #37373700;
     padding: 8px;
     border-radius: 32px;
+    opacity: 0.8;
   }
-  #meeting-time{
+  .buttonTime:hover{
+    opacity: 1;
+  }
+  .buttonTime:active{
+    filter: contrast(0.5);
+  }
+  #unPause-time{
     margin: auto;
     border-radius: 55px;
     border: none;
@@ -509,6 +523,9 @@
   }
   .hide-scrollbar {
   scrollbar-width: none;
+ }
+ .hide{
+  display: none !important;
  }
   @keyframes fade-in {
     from {
@@ -652,17 +669,18 @@
 
  }
   @media only screen and (max-height: 650px){
-  .list2poz1{
-    height:50vh!important;
+  .videoSidePlaylist{
+    height:60vh!important;
   }
   }
 </style>
 </head>
   <body>
     <div class="inputDialog" id="unPauseAtTimeId">
-      <input type="datetime-local" id="meeting-time" name="meeting-time" max="2039-08-08T00:00">
-    <div style="margin: auto;height: auto;width: 85%;max-width: 188px;">
-      <input class="buttonTime" id="buttonTimeId" type="button" value="Set" onclick="unPauseAtTimeEl.style.display='none';">
+      <input type="datetime-local" id="unPause-time" name="unPause-time" max="2039-08-08T00:00">
+    <div style="display: flex;margin: auto;height: auto;width: 85%;max-width: 188px;">
+      <input class="buttonTime" id="buttonTimeId" type="button" value="Set" onclick="watchTime(unPause_time.value);unPauseAtTimeEl.style.display='none';">
+      <input class="buttonTime" style="background: lightcoral;" type="button" value="Close" onclick="unPauseAtTimeEl.style.display='none';">
     </div>
     </div>
       <div class="messageDialog" id="messageDialogID">
@@ -708,23 +726,25 @@
       </tr>
     </table>
   </div>
+  <!-- <embed type="application/x-mpvjs" style="width: 100%; height: 100%;background-color: black;" width="98.3%" onclick="playpauseTrack()">
+  </embed> -->
       <div class="player" id="playerId">
-          <div class="details" id="videoD" style="display:none;overflow: hidden;">                                    
-              <video type="video/mp4" style="width: 100%; height: 100%;background-color: black;"id="audiodd" width="98.3%" onclick="playpauseTrack()">
+          <div class="videoContainer" id="videoContainerID" style="display:none;overflow: hidden;">                                    
+              <video type="video/mp4" style="width: 100%; height: 100%;background-color: black;"id="audioVideoElementID" width="98.3%" onclick="playpauseTrack()">
               </video>
               <!-- <img class="lMode" id="playpauseId" src="set/pause2.png"  width="54px" height="auto"> -->   
           </div>
-          <div class="lista lMode" id="lista2Id" onmouseover="lista2()"><img width="32px" height="auto"></div>
+          <div class="lista lMode" id="videoPlaylistSideButtonID" onmouseover="videoPlaylistSideButton()"><img width="32px" height="auto"></div>
           <progress id="conversion" value="0" max="100" style="width: 50px;"></progress>
           <div class="slider_container" id="slider_container_trim_Id" style="display:none;background: rgba(8, 8, 8, 0.44);bottom: 38.5px;">
             <!--  <progress id="conversion" value="0" max="100" style="width: 50px;"> 0% </progress> -->
             <div class="duration" id="durationTrimStartId" style="color: white;margin-left: 90px;margin-right: 14px;"><span id="timeTrimStartId">00:00</span></div>  
             <div id="trimBlock" style="display: flex;width: 100%;">
-            <input type="range" min="0" max="499" value="0" id="seeksliderTrimStartId" class="trim_slider trim_slider_up darkMeSlider" oninput="seekTrimColor();seekTrimStart();" style="bottom: 15px;height:3px;left: 141px;">  
-            <input type="range" min="1" max="500" value="500" id="seeksliderTrimEndId" class="trim_slider darkMeSlider" oninput="seekTrimColor();seekTrimEnd();" style="bottom: 16px;height:3px;left: 141px;">
+            <input type="range" min="0" max="499" value="0" id="seeksliderTrimStartId" class="trim_slider trim_slider_up darkMeSlider" oninput="seekTrimColor();seekTrimStart();audioVideoElement.pause();" style="bottom: 15px;height:3px;left: 141px;">  
+            <input type="range" min="1" max="500" value="500" id="seeksliderTrimEndId" class="trim_slider darkMeSlider" oninput="seekTrimColor();seekTrimEnd();audioVideoElement.pause();audioVideoElement.currentTime = seekEndDuration;" style="bottom: 16px;height:3px;left: 141px;">
             </div>    
             <div class="duration" id="durationTrimEndId" style="color: white;margin-right: 18px "><span id="timeTrimEndId">00:00</span></div> 
-            <input type="button" onclick="doTrimConvert(track_list[track_index].path,'mp4','mp4')" value="Trim" style="margin-right: 14px;width: 50px;height: 22px;border-radius: 10px;margin-left: 1px;margin-right:0px;">
+            <input type="button" onclick="doTrimConvert(track_list[track_index].path,'mp4','mp4',true);console.log(track_list[track_index].path.toString())" value="Trim" style="margin-right: 14px;width: 50px;height: 22px;border-radius: 10px;margin-left: 1px;margin-right:0px;">
             <input type="button" value="Close" onclick="slider_container_trim.style.display='none';" style="margin-right: 14px;width: 50px;height: 22px;border-radius: 10px;margin-right:28px;margin-left: 10px;">
           </div>
           <div class="slider_container" id="slider_container_Id">
@@ -732,40 +752,34 @@
               <div class="prev-track" onclick="prevTrack()"><img src="set/up.png" class="lMode" width="22px" height="auto"></div>
               <div class="next-track" onclick="nextTrack()"><img src="set/down.png" class="lMode" width="22px" height="auto"></div>
               <div class="playpause-track" onclick="playpauseTrack()"><img id="playpause" src="set/play.png" class="lMode" width="20px" height="auto"></div>
+              <img class="volume lMode" src="set/sound.png"  width="22px" height="auto" onmouseOver="volumeH()" onClick="volumeC()">
               <div class="toggle" id="shuffleId" style="right: 64px; bottom: 7px;display:none;"></div>
               <img class="shuffle lMode"  onclick="shuffle();closeall()" src="set/shuffle.png"  width="22px" height="auto">
               <div class="toggle" id="repeatId" style="right: 30px; bottom: 6px;display:none;"></div>
               <img class="repeat lMode"  onclick="repeat();closeall()" src="set/repeat.png"  width="22px" height="auto">
               <img class="menu lMode" onclick="openMenu();" src="set/menu12.png"  width="22px" height="auto">
             </div>
-            <div class="duration" id="durationCId"><span class="current-time">00:00</span></div>  <input type="range" min="1" max="500" value="0" id="seeksliderId" class="seek_slider" onInput="seekTo()"><div class="duration" id="durationEId"><span class="total-duration">00:00</span></div> 
+            <div class="duration" id="durationCId"><span class="current-time">00:00</span></div>  <input type="range" min="1" max="500" value="0" id="seeksliderId" class="seek_slider" onInput="seekTo()">
+            <div class="duration" id="durationEId" style="margin-right: 130px;"><span class="total-duration">00:00</span></div> 
             <div class="yes">
               <div class="overley" id="overleyId" onmouseover="overleymentFunction(overleyment)"></div>
-              <i class="fa fa-volume-up lMode" onmouseOver="volumeH()" onClick="volumeC()"></i>
               <div style="display:none;" id="volume2"><input type="range" min="1" max="100" value="99" class="volume_slider" id="volumesliderId" onchange="setVolume()"></div>
             </div>
           </div> 
       </div>
-      <div class="list2 list2poz1" id="listaId" style="display:none;">
+      <div class="list2 videoSidePlaylist" id="videoPlaylistID" style="display:none;">
         <table id="videoBarLista">
 
         </table>
       </div>
       <div id="overleyId" onmouseover="overleymentFunction(overleyment)"></div>
-      <div class="list2 list2poz2" id="menuId" onclick="closeall()" style="display: none;">
+      <div class="list2 menuList" id="menuID" onclick="closeall()" style="display: none;">
         <table>
-          <tr>
-            <td>  <img src="set/add.png" class="lMode" width="18px" height="auto"></td>
-            <td><label>
-              Open file
-              <input type="file" style="position: fixed; top: -100%">
-            </label></td>
-          </tr>
-          <tr>
+          <tr onclick="document.getElementById('useFolderID').click()">
             <td> <img src="set/folder.png" class="lMode" width="18px" height="auto"></td>
             <td><label>
               Use folder
-              <input type="file" style="position: fixed; top: -100%" webkitdirectory directory multiple>
+              <input type="file" id="useFolderID" onchange="useFolder(files)" style="position: fixed; top: -100%" webkitdirectory="">
             </label></td>
           </tr>
           <tr onclick="darkmode()">
@@ -776,14 +790,14 @@
             <td>  <img src="set/clock.png" class="lMode" width="18px" height="auto"></td>
             <td>Unpause at time</td>
           </tr>
-          <tr onclick="updateApp();">
+          <tr onclick="customAlert('Not working yet')">
             <td>  <img src="set/system-update.png" class="lMode" width="18px" height="auto"></td>
             <td>Update</td>
           </tr>
-          <tr>
+       <!--    <tr>
             <td>  <img src="set/settings.png" onclick="win.showDevTools();" class="lMode" width="18px" height="auto"></td>
             <td>Settings</td>
-          </tr>
+          </tr> -->
         </table>
       </div>
       <div class="contextMenuVideo" id="contextMenuVideoId">
@@ -800,21 +814,27 @@
         <select id="select-format" style="width:150px;height:40px;margin-bottom: 10px;border-radius: 5px;">
           <option value="mp4">Mp4 (video)</option>
           <option value="avi">Avi (video)</option>
-          <option value="mov">Mov (video)</option>
+          <option value="mov">Mov (video)</option> 
           <option value="mp3">Mp3 (audio)</option>
         </select>
-        <input type="button" value="Convert" style="height: 40px;border-radius: 10px;" onclick="convertDialog.style.display='none';seekTrimEnd();doTrimConvert(track_list[track_index].path,'mp4',document.getElementById('select-format').value)">
+        <input type="button" value="Convert" style="height: 40px;border-radius: 10px;" onclick="convertDialog.style.display='none';/* seekTrimEnd() */;doTrimConvert(track_list[track_index].path,'mp4',document.getElementById('select-format').value)">
         </div>
       </div>
       <div id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="display:none;background:rgba(158, 20, 20, 0.582);width:100%;height:100%;position: absolute;z-index:9000;left:0px;top:0px">
+  </div>
+  <div id="alertID" class="hide">
+    <div style="text-align: center;font-size: 1.3em;">
+      <div id="alertMessageID">This is alert</div>
+      <input type="button" value="Ok" onclick="this.parentElement.parentElement.classList.add('hide')">
+    </div>
   </div>
   <!-- Main script for the player -->
     <script>
 //Keyboard shortcuts START
 document.addEventListener("keydown", (event) => {
 if(event.code=='Space'){playpauseTrack();}
-if(event.code=='ArrowLeft'){curr_track.pause();curr_track.currentTime-=0.8;}
-if(event.code=='ArrowRight'){curr_track.pause();curr_track.currentTime+=0.8;}
+if(event.code=='ArrowLeft'){audioVideoElement.pause();audioVideoElement.currentTime-=0.8;}
+if(event.code=='ArrowRight'){audioVideoElement.pause();audioVideoElement.currentTime+=0.8;}
 if(event.code=='ArrowUp'){volume_slider.value+=10;setVolume();}  // I don't get it
 if(event.code=='ArrowDown'){volume_slider.value-=10;setVolume();}
 if(event.code=='Numpad8'){nextTrack();}
@@ -824,11 +844,43 @@ console.log(event);
 });
 
 document.addEventListener("keyup", (event) => {
-if(event.code=='ArrowLeft'){curr_track.currentTime-=10;curr_track.play();}
-if(event.code=='ArrowRight'){curr_track.currentTime+=10;curr_track.play();}
+if(event.code=='ArrowLeft'){audioVideoElement.currentTime-=10;audioVideoElement.play();}
+if(event.code=='ArrowRight'){audioVideoElement.currentTime+=10;audioVideoElement.play();}
 });   
 //Keyboard shortcuts END
 console.log("Checkpoint 1");
+//Use folder function START
+function useFolder(files){
+  for (let i=0;i<files.length;i++)
+  {
+    if(files[i].type.includes("audio") || files[i].type.includes("video") && !files[i].type.includes("tts") ){
+      ffmpeg.ffprobe(files[i].path,function(err, metadata) {
+        console.log(metadata);
+      });
+      console.log(files[i])
+      let found_file=0;
+      let theFile=newFileObj(files[i].name,files[i].path,files[i].type);
+      track_list.forEach(function(element,index) 
+        {
+          if (theFile==element.path)
+          {
+            found_file=1;
+            track_index=index;
+          }
+        });
+      if(found_file==0)
+        {
+          console.log("Push non repeated file");
+          track_list.push(theFile);
+          track_index=track_list.length-1;
+        }
+    } 
+  }
+  clearList();
+  populateVideo();
+  populateMusic();
+}
+//Use folder function END
 //Drop handling START
 document.addEventListener('dragover', function () {document.getElementById("drop_zone").style.display="block";}); 
 function dropHandler(ev) 
@@ -895,6 +947,7 @@ win.setPosition("center");
 //win.showDevTools(); 
 //Window customisation SEND
 //Decleration  START
+let customAlertElement=document.getElementById("alertID")
 let now_playing = document.querySelector(".now-playing");
 let track_art = document.querySelector(".track-art");
 let track_name = document.querySelector(".track-name");
@@ -915,7 +968,7 @@ let volume_slider = document.querySelector(".volume_slider");
 let playerGEl=document.getElementById("playerId");
 let curr_time = document.querySelector(".current-time");
 let total_duration = document.querySelector(".total-duration");
-let menuE=document.getElementById('menuId');
+let menuListElement=document.getElementById('menuID');
 let track_index = 0;
 let repeatN=0;
 let shufferN=0;
@@ -924,26 +977,27 @@ let updateTimer;
 let repeatEl=document.getElementById('repeatId');
 let shuffleEl=document.getElementById('shuffleId'); 
 let listaEl=document.getElementById('listaGId');
-let listaVideoBar=document.getElementById('listaId');
+let videoPlaylistElement=document.getElementById('videoPlaylistID');
 let volumeb=document.getElementById('volume2');
 let infoEl=document.getElementById('infoId');
 let prevThumbnail=0;
 let seeksliderEl=document.getElementById('seeksliderId');
 let volumeEl=document.getElementById('volumesliderId');
-let curr_track = document.getElementById('audiodd');
+let audioVideoElement = document.getElementById('audioVideoElementID');
 let tabelaG=document.getElementById('tabelaId');
 let tabelaVideoBarLista=document.getElementById('videoBarLista');
 let scaleValue=1;
 var overleyment = document.getElementById('overleyId');
 let choiceMenuEl=document.getElementById('choiceMenuId');
-let playerEl=document.getElementById('audiodd');
-let videoEl=document.getElementById('videoD');
-let lista2El=document.getElementById('lista2Id');
+let videoContainerElement=document.getElementById('videoContainerID');
+let videoPlaylistSideButtonElement=document.getElementById('videoPlaylistSideButtonID');
 let seekStartDuration=0;
 let seekEndDuration=0;
 var videoWasOpened=0;
 let VideoErr=0;
 let numberFix=0;
+let oldFolderPath="";
+let unPause_time=document.getElementById("unPause-time");
 let pos = { top: 0, left: 0, x: 0, y: 0 };
 var isMax=0;
 const ffmpeg = require('fluent-ffmpeg');
@@ -954,7 +1008,7 @@ let listOfPaths=[];
 const fileObj={
     name: "Object",
     artist: "Object",
-    image: "set/default.webp",
+    image: "set/default.jpg",
     path: "",
     duration: "",
     type:"",
@@ -964,7 +1018,7 @@ console.log("Checkpoint 3");
 // Define desired object
 function newFileObj(name,path,type)
 {
-  return {"name": name, "artist": "","image":"set/default.webp","path":path,"duration":"","type":type};
+  return {"name": name, "artist": "","image":"set/default.jpg","path":path,"duration":"","type":type};
 }
 let track_list = [
   {
@@ -985,6 +1039,11 @@ let track_list = [
   }
 ];  
 console.log("Checkpoint 4");
+//Custom alert
+function customAlert(message){
+  customAlertElement.classList.remove('hide');
+  customAlertElement.children[0].children[0].innerHTML=message;
+}
 //Windows maximization handling
 function WindowMinMax()
 {
@@ -995,7 +1054,7 @@ function WindowMinMax()
   }
   else
   {
-    if(videoEl.style.display=="block"){win.enterKioskMode();isMax=1;}
+    if(videoContainerElement.style.display=="block"){win.enterKioskMode();isMax=1;}
     else{win.maximize();isMax=1;}
   }
 }
@@ -1087,13 +1146,13 @@ function volumeC(){
   } 
 }
 //Show sidebar list in video view, activate overlay for autohide
-function lista2()
+function videoPlaylistSideButton()
 {
-  switch(listaVideoBar.style.display) 
+  switch(videoPlaylistElement.style.display) 
   {
   case 'none':
     overleyment.style.display="block";
-    listaVideoBar.style.display='block';
+    videoPlaylistElement.style.display='block';
     break;
   } 
 }
@@ -1102,14 +1161,14 @@ console.log("Checkpoint 7");
 function openMenu()
 {
   overleyment.style.display="block";
-  switch(menuE.style.display) 
+  switch(menuListElement.style.display) 
   {
   case 'none':
-    menuE.style.display='block';
-    menuE.style.animation="fade-in 0.4s";
+    menuListElement.style.display='block';
+    menuListElement.style.animation="fade-in 0.4s";
     break;
   case 'block':
-    menuE.style.animation="fade-out 0.4s";
+    menuListElement.style.animation="fade-out 0.4s";
     break;
   } 
 }
@@ -1125,14 +1184,14 @@ function shuffle()
       shuffleEl.style.display='block';
       repeatEl.style.display='none';
       console.log("shuffle on");
-      curr_track.removeEventListener("ended", nextTrack);
-      curr_track.addEventListener("ended", shufflePlay);
+      audioVideoElement.removeEventListener("ended", nextTrack);
+      audioVideoElement.addEventListener("ended", shufflePlay);
       break;
     case 'block':
       shuffleEl.style.display='none';
       console.log("shuffle off");
-      curr_track.removeEventListener("ended", shufflePlay);
-      curr_track.addEventListener("ended", nextTrack);
+      audioVideoElement.removeEventListener("ended", shufflePlay);
+      audioVideoElement.addEventListener("ended", nextTrack);
       break;
   } 
 }
@@ -1162,14 +1221,14 @@ function repeat()
       repeatEl.style.display='block';
       shuffleEl.style.display='none';
       console.log("repeat on");
-      curr_track.removeEventListener("ended", nextTrack);
-      curr_track.addEventListener("ended", playTrack);
+      audioVideoElement.removeEventListener("ended", nextTrack);
+      audioVideoElement.addEventListener("ended", playTrack);
       break;
     case 'block':
       repeatEl.style.display='none';
       console.log("repeat off");
-      curr_track.removeEventListener("ended", playTrack);
-      curr_track.addEventListener("ended", nextTrack);
+      audioVideoElement.removeEventListener("ended", playTrack);
+      audioVideoElement.addEventListener("ended", nextTrack);
       break;
   } 
 }
@@ -1189,14 +1248,14 @@ function darkmode()
     volumeb.style.background="#08080870";
     document.getElementById('durationCId').style.color="white";
     document.getElementById('durationEId').style.color="white";
-    menuE.style.color="white";
-    menuE.style.background="#2c2c2c";
+    menuListElement.style.color="white";
+    menuListElement.style.background="#2c2c2c";
     for (let item of imgs) {item.classList.add("darkMe");}
     seeksliderEl.classList.add('darkMeSlider');
     volumeEl.classList.add('darkMeSlider');
     listaEl.classList.add("darkMe2");
     infoEl.classList.add("darkMe2");
-    listaVideoBar.classList.add("darkMe");
+    videoPlaylistElement.classList.add("darkMe");
     for (i = 0; i < elements.length; i++) {elements[i].style.background = "#838383";}
     break;
 
@@ -1209,14 +1268,14 @@ function darkmode()
     document.getElementById('durationCId').style.color="black";
     document.getElementById('durationEId').style.color="black";
     document.body.style.backgroundColor = "white";
-    menuE.style.color="black";
-    menuE.style.background="rgb(228, 228, 228)";
+    menuListElement.style.color="black";
+    menuListElement.style.background="rgb(228, 228, 228)";
     for (let item of imgs) {item.classList.remove("darkMe");}
     seeksliderEl.classList.remove('darkMeSlider');
     volumeEl.classList.remove('darkMeSlider');
     listaEl.classList.remove("darkMe2");
     infoEl.classList.remove("darkMe2");
-    listaVideoBar.classList.remove("darkMe");   
+    videoPlaylistElement.classList.remove("darkMe");   
     break;
 
   default:
@@ -1228,22 +1287,22 @@ function darkmode()
     volumeb.style.background="#08080870";
     document.getElementById('durationCId').style.color="white";
     document.getElementById('durationEId').style.color="white";
-    menuE.style.color="white";
-    menuE.style.background="#2c2c2c";
+    menuListElement.style.color="white";
+    menuListElement.style.background="#2c2c2c";
     for (let item of imgs) {item.classList.add("darkMe");}
     seeksliderEl.classList.add('darkMeSlider');
     volumeEl.classList.add('darkMeSlider');
     listaEl.classList.add("darkMe2");
     infoEl.classList.add("darkMe2");
-    listaVideoBar.classList.add("darkMe");    
+    videoPlaylistElement.classList.add("darkMe");    
     for (i = 0; i < elements.length; i++) { elements[i].style.background = "#838383";}  
   }  
 }
 //Get current date/time for unpause at time menu
 const dateNow = new Date();
 let dateNowFormated= new Date().toISOString().slice(0, -8);
-document.getElementById("meeting-time").value=dateNowFormated;
-document.getElementById("meeting-time").min=dateNowFormated;
+unPause_time.value=dateNowFormated;
+unPause_time.min=dateNowFormated;
 console.log(dateNowFormated);
 console.log("Checkpoint 9");
 
@@ -1256,19 +1315,19 @@ function loadTrack(index)
   resetValues();
   if (track_list[track_index].type.includes("video"))
   {
-    videoEl.style.display="block";
-    lista2El.style.display="block";
+    videoContainerElement.style.display="block";
+    videoPlaylistSideButtonElement.style.display="block";
     track_art.style.display="none";
   }
   else
   {
-    videoEl.style.display="none";
-    lista2El.style.display="none";
+    videoContainerElement.style.display="none";
+    videoPlaylistSideButtonElement.style.display="none";
     track_art.style.display="block";
   }
   // Load a new track
-  curr_track.src = track_list[track_index].path;
-  curr_track.load();
+  audioVideoElement.src = track_list[track_index].path;
+  audioVideoElement.load();
   // Update details of the track
   track_art.src= track_list[track_index].image ;
   track_name.textContent = track_list[track_index].name;
@@ -1280,20 +1339,20 @@ function loadTrack(index)
   // Move to the next track if the current one finishes playing
 }
 //Track error event listner
-curr_track.addEventListener('error', function() 
+audioVideoElement.addEventListener('error', function() 
 {
   console.log("Video error");
   console.log(event);
-  if(isNaN(curr_track.duration) && track_list[track_index].path.includes(".mp4") && VideoErr==0 && curr_track.src!=error_track_src)
+  if(isNaN(audioVideoElement.duration) && track_list[track_index].path.includes(".mp4") && VideoErr==0 && audioVideoElement.src!=error_track_src)
   {
-    error_track_src=curr_track.src;
+    error_track_src=audioVideoElement.src;
     VideoErr=1;
-    alert("Mp4 is broken, and will be fixed. Melo_fixed will be added to the name of the file");
+    customAlert("Mp4 is broken, and will be fixed. Melo_fixed will be added to the name of the file");
     fixMp4(track_list[track_index].path);
   } 
 },false);
 //Track loaded data event listener
-curr_track.addEventListener('loadeddata', function() {console.log("Video loaded");VideoErr=0;}, false);
+audioVideoElement.addEventListener('loadeddata', function() {console.log("Video loaded");VideoErr=0;  seekTrimEnd();}, false);
 
 console.log("Checkpoint 10");
 
@@ -1308,7 +1367,7 @@ function openMusic()
   listaEl.style.display="flex";
   choiceMenuEl.style.display="flex";
   choiceMenuEl.styledisplay="block";
-  videoEl.style.display="none";
+  videoContainerElement.style.display="none";
 }
 console.log("Checkpoint 11");
 //Open video list view
@@ -1319,8 +1378,8 @@ function openVideo()
   console.log("openVideo");
   if (track_list[track_index].type.includes("video"))
   {
-    videoEl.style.display="block";
-    lista2El.style.display="block";
+    videoContainerElement.style.display="block";
+    videoPlaylistSideButtonElement.style.display="block";
   }
   playerGEl.style.display="block";
   infoEl.style.display="flex";
@@ -1333,6 +1392,7 @@ function resetValues()
 {
   curr_time.textContent = "00:00";
   total_duration.textContent = "00:00";
+  time_trim_end.textContent="00:00";
   seek_slider.value = 0;
 }
 //Play/pause toggle function
@@ -1343,7 +1403,7 @@ function playpauseTrack() {
 //Play track and change icon to pause
 function playTrack() 
 {
-  curr_track.play();
+  audioVideoElement.play();
   isPlaying = true;
   playpause.src = "set/pause.png";
 }
@@ -1352,7 +1412,7 @@ console.log("Checkpoint 12");
 //Pause track and change icon to play
 function pauseTrack() 
 {
-  curr_track.pause();
+  audioVideoElement.pause();
   isPlaying = false;
   playpause.src = "set/play.png";
 }
@@ -1373,13 +1433,13 @@ function padZero(number) {return number < 10 ? '0' + number : number;}
 //Seeking on slider input function
 function seekTo() 
 {
-  seekto = curr_track.duration * (seek_slider.value / 500);
-  curr_track.currentTime = seekto;
+  seekto = audioVideoElement.duration * (seek_slider.value / 500);
+  audioVideoElement.currentTime = seekto;
 }
 //Right thumb of video trimming slider
 function seekTrimEnd()
 {
-  seekEndDuration=(curr_track.duration/500)*seek_trim_end.value;
+  seekEndDuration=audioVideoElement.duration*(seek_trim_end.value/500);
   console.log("seekEndDuration:"+seekEndDuration+"seek_trim_end:"+seek_trim_end.value);
   let seekEndMinutes = Math.floor(seekEndDuration/ 60);
   let seekEndSeconds = Math.floor(seekEndDuration - seekEndMinutes * 60);
@@ -1393,7 +1453,8 @@ function seekTrimEnd()
 //Left thumb of video trimming slider
 function seekTrimStart()
 {
-  seekStartDuration=(curr_track.duration/500)*seek_trim_start.value;
+  seekStartDuration=audioVideoElement.duration*(seek_trim_start.value/500);
+  audioVideoElement.currentTime = seekStartDuration;
   console.log("seekEndDuration:"+seekStartDuration+"seek_trim_end:"+seek_trim_start.value);
   let seekStartMinutes = Math.floor(seekStartDuration/ 60);
   let seekStartSeconds = Math.floor(seekStartDuration - seekStartMinutes * 60);
@@ -1411,7 +1472,7 @@ function seekTrimColor()
   seek_trim_start.style.background='linear-gradient(to right, rgb(8, 8, 8, 0.44) 0%, rgb(8, 8, 8, 0.44) '+seek_trim_start_prc+'%, rgb(255 122 129) '+seek_trim_start_prc+'%, rgb(255 102 129) '+seek_trim_end_prc+'%, rgb(8, 8, 8, 0.44) '+seek_trim_end_prc+'%, rgb(8, 8, 8, 0.44) 100%)';
 }
 //Set volume on volume slider input
-function setVolume() {curr_track.volume = volume_slider.value / 100;}
+function setVolume() {audioVideoElement.volume = volume_slider.value / 100;}
   
 console.log("Checkpoint 13");
 //Auto move seekslider while track is playing
@@ -1419,15 +1480,15 @@ function seekUpdate()
 {
   let seekPosition = 0;
   // Check if the current track duration is a legible number
-  if (!isNaN(curr_track.duration)) 
+  if (!isNaN(audioVideoElement.duration)) 
   {
-    seekPosition = curr_track.currentTime * (500 / curr_track.duration);
+    seekPosition = audioVideoElement.currentTime * (500 / audioVideoElement.duration);
     seek_slider.value = seekPosition;
     // Calculate the time left and the total duration
-    let currentMinutes = Math.floor(curr_track.currentTime / 60);
-    let currentSeconds = Math.floor(curr_track.currentTime - currentMinutes * 60);
-    let durationMinutes = Math.floor(curr_track.duration / 60);
-    let durationSeconds = Math.floor(curr_track.duration - durationMinutes * 60);
+    let currentMinutes = Math.floor(audioVideoElement.currentTime / 60);
+    let currentSeconds = Math.floor(audioVideoElement.currentTime - currentMinutes * 60);
+    let durationMinutes = Math.floor(audioVideoElement.duration / 60);
+    let durationSeconds = Math.floor(audioVideoElement.duration - durationMinutes * 60);
     // Adding a zero to the single digit time values
     if (currentSeconds < 10) { currentSeconds = "0" + currentSeconds; }
     if (durationSeconds < 10) { durationSeconds = "0" + durationSeconds; }
@@ -1441,8 +1502,8 @@ function seekUpdate()
 function overleymentFunction (pelement) 
 {
   overleyment.style.display="none";
-  listaVideoBar.style.display="none";
-  const eleArray=[volumeb,menuE];
+  videoPlaylistElement.style.display="none";
+  const eleArray=[volumeb,menuListElement];
   overleyment.style.display="none";
   eleArray.forEach((element) => {if(element!=pelement){element.style.animation="fade-out 0.4s"}});
 }
@@ -1456,13 +1517,39 @@ function closeall()
   {
   volumeb.style.animation="fade-out 0.4s";
   }
-  if(menuE.style.display=='block')
+  if(menuListElement.style.display=='block')
   {
-  menuE.style.animation="fade-out 0.4s";
+  menuListElement.style.animation="fade-out 0.4s";
   }
 }
 //Display unpause at the time dialog
 function unPauseTimeF(){unPauseAtTimeEl.style.display="flex";}
+//Unpause or play at given date and time
+function watchTime(targetTime) 
+{
+  const currentTime = new Date();
+  const fixedDate = new Date(targetTime + ':00.000Z');
+  const totalDays=fixedDate.getDay()-currentTime.getDay();
+  const totalHours=fixedDate.getHours()-currentTime.getHours();
+  const totalMinutes=fixedDate.getMinutes()-currentTime.getMinutes();
+  customAlert("Play/pause in: "+totalDays+" Days "+totalHours+" Hours "+totalMinutes+" Minutes");
+  function updateStatus() 
+  {
+    const currentTime = new Date();
+    const isoString = currentTime.toISOString();
+    const currentTimeString = isoString.slice(0,-8);
+    if (currentTimeString === targetTime) {
+      console.log( `Current time (${currentTimeString}) is equal to target time (${targetTime})!`);
+      playpauseTrack();
+    } else {
+      console.log( `Current time: ${currentTimeString}`);
+    }
+  }
+  updateStatus();
+  setInterval(updateStatus, 60000);
+}
+console.log(unPause_time.value)
+
 
 console.log("Error 15");
 
@@ -1477,18 +1564,17 @@ if (e.animationName === 'fade-in') {e.target.classList.add('did-fade-in');}
 //Watch out for animations end, and add certain class to mark it
 document.addEventListener('animationend', function (e) 
 {
-if (e.animationName === 'fade-out') {volumeb.style.display="none";menuE.style.display="none";}
+if (e.animationName === 'fade-out') {volumeb.style.display="none";menuListElement.style.display="none";}
 });
 
 console.log("Checkpoint 16");
 
 //Eventlistner for doubleclik on video to maximize the window
-videoEl.addEventListener('dblclick', function (e) 
+videoContainerElement.addEventListener('dblclick', function (e) 
 {
   if(win.isKioskMode==false){win.enterKioskMode();isMax=1;}
   else if(win.isKioskMode==true){win.leaveKioskMode();isMax=0;}
 });
-
 //Track mouse position for window dragging function START
 function trackMousePosition() 
 {
@@ -1616,7 +1702,7 @@ console.log("Checkpoint 19");
 //Context menu START
 if (document.addEventListener) 
 {
-  videoEl.addEventListener('contextmenu', function(e) 
+  videoContainerElement.addEventListener('contextmenu', function(e) 
   {
     contextMenuVideo.style.display="block";
     contextMenuVideo.style.left=e.clientX+"px";
@@ -1624,7 +1710,7 @@ if (document.addEventListener)
     e.preventDefault();
   }, false);
 } 
-else {videoEl.attachEvent('oncontextmenu', function() {window.event.returnValue = false;});}
+else {videoContainerElement.attachEvent('oncontextmenu', function() {window.event.returnValue = false;});}
 
 document.addEventListener('click', function(e) {contextMenuVideo.style.display="none";}, false);
 //Context menu END
@@ -1644,16 +1730,20 @@ async function updateApp()
   text.forEach (t => {textFinal=textFinal+t;}) 
   fs.writeFileSync('update_test.html',textFinal) //change for distribution
   console.log(text);
-  alert("Update complete. Restart the app to see changes");
+  customAlert("Update complete. Restart the app to see changes");
 }
 
 console.log("Checkpoint 20");
 
 //Video trimming function
-function doTrimConvert(filePath,formatInput,formatOutput)
+function doTrimConvert(filePath,formatInput,formatOutput,isTrim)
 {
-  let duration=Math.floor(seekEndDuration-seekStartDuration);
-  let outputFile=filePath.split('.')[0];
+  let duration=audioVideoElement.duration;
+  if(isTrim){
+  duration=Math.floor(seekEndDuration-seekStartDuration);
+  }
+  let lastIndex=filePath.lastIndexOf('.');
+  outputFile=filePath.substring(0, lastIndex);
   console.log("outputFile:"+outputFile);
   const command = ffmpeg()
   /*  .inputOption([
@@ -1681,7 +1771,7 @@ function doTrimConvert(filePath,formatInput,formatOutput)
   .on('end', () => 
   {
     console.log('FFmpeg has finished.');
-    alert('Conversion/Trimming finished');
+    customAlert('Conversion/Trimming finished');
     document.getElementById('conversion').style.display="none";
   })
   .on('error', (error) => 
@@ -1718,15 +1808,15 @@ function fixMp4(filePath,formatInput,formatOutput)
       })
     }
     track_list[track_index].path=outputFile+'_MeloFixed.mp4';
-    curr_track.src=track_list[track_index].path;
-    /* curr_track.load(); */
-    curr_track.play();
+    audioVideoElement.src=track_list[track_index].path;
+    /* audioVideoElement.load(); */
+    audioVideoElement.play();
     /* renameFile(); */
-    alert("Mp4 is fixed. _Melofixed is added to the name of the file");
+    customAlert("Mp4 is fixed. _Melofixed is added to the name of the file");
   })
   .on('error', (error) => 
   {
-    alert("Failed to fix this mp4");
+    customAlert("Failed to fix this mp4");
     VideoErr=0;
   });
   console.log(command.run());
@@ -1746,12 +1836,12 @@ function fixMp4(filePath,formatInput,formatOutput)
               }
           }
           else {
-            function setTrack(){curr_track.src="";curr_track.src = track_list[track_index].path;return true;}
+            function setTrack(){audioVideoElement.src="";audioVideoElement.src = track_list[track_index].path;return true;}
             setTimeout(() => {
             console.log("Setting current_track.src  "+ setTrack());
-            console.log("Current track source?:  "+curr_track.src);
-            console.log("Loading curr_track "+ curr_track.load());
-            console.log("Playing curr_track "+ curr_track.play());
+            console.log("Current track source?:  "+audioVideoElement.src);
+            console.log("Loading audioVideoElement "+ audioVideoElement.load());
+            console.log("Playing audioVideoElement "+ audioVideoElement.play());
             }, 5000);
             VideoErr=0;
           }
@@ -1773,11 +1863,11 @@ function hideElementsAndCursor()
   {
     document.getElementById('slider_container_Id').classList.add('hidden');
     document.getElementById('homeButtonsId').classList.add('hidden');
-    curr_track.style.cursor = 'none';
+    audioVideoElement.style.cursor = 'none';
   }
   else
   {
-    curr_track.style.cursor = 'none';
+    audioVideoElement.style.cursor = 'none';
   }
 }
 function resetTimeout() 
@@ -1791,7 +1881,7 @@ document.addEventListener('mousemove', function()
     resetTimeout();
     document.getElementById('slider_container_Id').classList.remove('hidden');
     document.getElementById('homeButtonsId').classList.remove('hidden');
-    curr_track.style.cursor = 'auto';
+    audioVideoElement.style.cursor = 'auto';
 });
 document.addEventListener('mouseout', function() {resetTimeout();});
 resetTimeout();
