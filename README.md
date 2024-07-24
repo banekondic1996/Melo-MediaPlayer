@@ -9,8 +9,8 @@ Current stage:
 24.01.2024 - After long time, i decided to continue the project. App is now running using NW.js
 27.01.2024 - Videos can be trimmed and converted now, drag and drop works, responsive design is added, update button added (not final), context menu added
 </pre>
-**Project to-do and problems:** <a href="https://github.com/users/banekondic1996/projects/5/views/2">link</a>
-
+**Link to download:** <a href="https://github.com/banekondic1996/Melo/releases/tag/development">link</a><br>
+**Project to-do and problems:** <a href="https://github.com/users/banekondic1996/projects/5/views/2">link</a><br>
 Images of UI:
 1. Video play, with video trimming support
 ![image](https://github.com/banekondic1996/Melo/assets/22860264/8440a346-a98b-475e-baeb-f9cbc41fb9b3)
