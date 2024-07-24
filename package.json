@@ -1,0 +1,23 @@
+{
+  "name": "Melo player",
+  "main": "src/index.html",
+  "description": "Melo player",
+  "scripts": {
+    "start": "node index.js",
+    "start-nw": "nw src/ ",
+    "build-nw": "nwbuild --platform win --arch x64 --outDir dist/src --glob=false src"
+  },
+  "dependencies": {
+    "ffmpeg-ffprobe-static": "^6.1.1-rc.5",
+    "ffmpeg-static": "^5.2.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "mpv.js": "^0.3.0",
+    "mpv.js-vanilla": "^0.3.4",
+    "nw": "^0.83.0",
+    "sortablejs": "^1.15.2"
+  },
+  "devDependencies": {
+    "nw-builder": "^4.5.3",
+    "nw-dev": "^3.0.1"
+  }
+}
