@@ -8,7 +8,7 @@ Current stage:
 31.09.2022 - Added new panels, shortcuts, improved design, video/audio playlist seperation, unpause menu built, image zoom slider added
 24.01.2024 - After long time, i decided to continue the project. App is now running using NW.js
 27.01.2024 - Videos can be trimmed and converted now, drag and drop works, responsive design is added, update button added (not final), context menu added
-25.07.2024 - Added option to convert to GIF, fixed styling of menus, fixed video triming bug, fixed conversion from .avi to .mp4, new alert message style, fixed loading files from folder, fixed sound icon, created                 installer
+25.07.2024 - Added option to convert to GIF, fixed styling of menus, fixed video triming bug, fixed conversion from .avi to .mp4, new alert message style, fixed loading files from folder, fixed sound icon, created   installer
 </pre>
 
 **Project to-do and problems:** <a href="https://github.com/users/banekondic1996/projects/5/views/2">link</a>
