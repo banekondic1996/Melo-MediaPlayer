@@ -242,7 +242,7 @@
     position: absolute;
     width: 176px;
     height: 149px;
-    background-color: rgb(228, 228, 228);
+    background-color: rgb(228 228 228 / 90%);
     opacity: 0.5;
     border: none;
     border-radius: 10px;
@@ -473,14 +473,12 @@
   }
   .inputDialog{
     display: none;
-    top: 40%;
-    left: 35%;
-    bottom: 40%;
-    right: 35%;
+    top: calc(50% - 103px);
+    left: calc(50% - 139px);
     position: absolute;
-    background-color: #cfcfcf;
-    height: 150px;
-    width: 200px;
+    background-color: #cfcfcfad;
+    height: 200px;
+    width: 280px;
     margin: auto;
     z-index: 1000;
     border-radius: 15px;
@@ -488,7 +486,19 @@
     flex-wrap: wrap;
     align-content: space-around;
     justify-content: center;
-    padding-top:10px
+    padding-top: 10px;
+    backdrop-filter: blur(3px);
+  }
+  .inputDialog input[type="button"]{
+    margin:8px;
+    border:none;
+    opacity: 0.8;
+  }
+  .inputDialog input[type="button"]:hover{
+    opacity: 1;
+  }
+  .inputDialog input[type="button"]:active{
+    opacity: 1;
   }
   .buttonTime{
     height: 43px;
@@ -552,7 +562,8 @@
     position: absolute;
     width: 134px;
     height: 199px;
-    background-color: rgb(228, 228, 228);
+    background-color: rgb(228 228 228 / 72%);
+    backdrop-filter: blur(4px);
     opacity: 0.8;
     border: none;
     border-radius: 10px;
@@ -594,15 +605,16 @@
     background: #0404048f;
     position: absolute;
     top: 45%;
+    left: calc(50% - 150px);
     padding-inline: 80px;
-    height: 80px;
-    width: auto;
+    height: 100px;
+    width: 150px;
     z-index: 10000;
     backdrop-filter: blur(10px);
     margin: auto;
   }
   #message{
-    margin: 10px;
+    margin: auto;
     text-align: center;
     font-size: 1em;
     border-radius: 10px;
@@ -685,7 +697,7 @@
     </div>
       <div class="messageDialog" id="messageDialogID">
         <div id="message">This is the message</div>
-        <div style="text-align: center;">
+        <div style="text-align: center;margin:auto">
           <input id="messageButtonId" type="button" value="Ok">
         </div>
       </div>
@@ -744,8 +756,8 @@
             <input type="range" min="1" max="500" value="500" id="seeksliderTrimEndId" class="trim_slider darkMeSlider" oninput="seekTrimColor();seekTrimEnd();audioVideoElement.pause();audioVideoElement.currentTime = seekEndDuration;" style="bottom: 16px;height:3px;left: 141px;">
             </div>    
             <div class="duration" id="durationTrimEndId" style="color: white;margin-right: 18px "><span id="timeTrimEndId">00:00</span></div> 
-            <input type="button" onclick="doTrimConvert(track_list[track_index].path,'mp4','mp4',true);console.log(track_list[track_index].path.toString())" value="Trim" style="margin-right: 14px;width: 50px;height: 22px;border-radius: 10px;margin-left: 1px;margin-right:0px;">
-            <input type="button" value="Close" onclick="slider_container_trim.style.display='none';" style="margin-right: 14px;width: 50px;height: 22px;border-radius: 10px;margin-right:28px;margin-left: 10px;">
+            <input type="button" onclick="doTrimConvert(track_list[track_index].path,'mp4',true);console.log(track_list[track_index].path.toString())" value="Trim" style="margin-right: 14px;width: 50px;height: 22px;border-radius: 10px;margin-left: 1px;margin-right:0px;border: none;box-shadow: 0px 0px 2px 1px #6e6e6ea1;">
+            <input type="button" value="Close" onclick="slider_container_trim.style.display='none';" style="margin-right: 14px;width: 50px;height: 22px;border-radius: 10px;margin-right:28px;margin-left: 10px;border: none;box-shadow: 0px 0px 2px 1px #6e6e6ea1;">
           </div>
           <div class="slider_container" id="slider_container_Id">
             <div class="buttons">
@@ -815,10 +827,14 @@
           <option value="mp4">Mp4 (video)</option>
           <option value="avi">Avi (video)</option>
           <option value="mov">Mov (video)</option> 
+          <option value="gif">GIF (picture)</option>
           <option value="mp3">Mp3 (audio)</option>
         </select>
-        <input type="button" value="Convert" style="height: 40px;border-radius: 10px;" onclick="convertDialog.style.display='none';/* seekTrimEnd() */;doTrimConvert(track_list[track_index].path,'mp4',document.getElementById('select-format').value)">
+        <div style="text-align: center;">
+        <input type="button" value="Convert" style="height: 40px;border-radius: 10px;" onclick="convertDialog.style.display='none';/* seekTrimEnd() */;doTrimConvert(track_list[track_index].path,document.getElementById('select-format').value)">
+        <input type="button" value="Close" style="height: 40px;border-radius: 10px;" onclick="convertDialog.style.display='none';">
         </div>
+      </div>
       </div>
       <div id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="display:none;background:rgba(158, 20, 20, 0.582);width:100%;height:100%;position: absolute;z-index:9000;left:0px;top:0px">
   </div>
@@ -853,13 +869,19 @@ console.log("Checkpoint 1");
 function useFolder(files){
   for (let i=0;i<files.length;i++)
   {
-    if(files[i].type.includes("audio") || files[i].type.includes("video") && !files[i].type.includes("tts") ){
-      ffmpeg.ffprobe(files[i].path,function(err, metadata) {
-        console.log(metadata);
-      });
+    if(files[i].type.includes("audio") || files[i].type.includes("video") && !files[i].type.includes("tts") )
+    {
+      /* const pendingPromise = new Promise((resolve) => {
+        ffmpeg.ffprobe(files[i].path,function(err, data) {
+            duration=data.format.duration;
+            console.log(data.format.duration);
+            resolve("success")
+        })
+      }); */
       console.log(files[i])
+      /* pendingPromise.then(function(){ */
       let found_file=0;
-      let theFile=newFileObj(files[i].name,files[i].path,files[i].type);
+      let theFile=newFileObj(files[i].name,files[i].path,files[i].type,"");
       track_list.forEach(function(element,index) 
         {
           if (theFile==element.path)
@@ -874,6 +896,7 @@ function useFolder(files){
           track_list.push(theFile);
           track_index=track_list.length-1;
         }
+      /* }); */
     } 
   }
   clearList();
@@ -898,7 +921,7 @@ function dropHandler(ev)
         let nameLen=splitArg.length-1;
         let nameArg=splitArg[nameLen];
         let photoFPath = file.path.substring(0, file.path.length-nameArg.length);
-        let theFile=newFileObj(nameArg,file.path,file.type);
+        let theFile=newFileObj(nameArg,file.path,file.type,"");
         let found_file=0;
         //To avoid duplicates in loaded tracks
         track_list.forEach(function(element,index) 
@@ -1002,7 +1025,9 @@ let pos = { top: 0, left: 0, x: 0, y: 0 };
 var isMax=0;
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegStatic = require('ffmpeg-static');
+const ffprobeStatic=require('ffmpeg-ffprobe-static');
 ffmpeg.setFfmpegPath(ffmpegStatic);
+ffmpeg.setFfprobePath(ffprobeStatic.ffprobePath);
 const fs = require ('fs');
 let listOfPaths=[];
 const fileObj={
@@ -1016,9 +1041,10 @@ const fileObj={
 //Declerations END
 console.log("Checkpoint 3");
 // Define desired object
-function newFileObj(name,path,type)
+
+function newFileObj(name,path,type,duration)
 {
-  return {"name": name, "artist": "","image":"set/default.jpg","path":path,"duration":"","type":type};
+  return {"name": name, "artist": "","image":"set/default.jpg","path":path,"duration":duration,"type":type};
 }
 let track_list = [
   {
@@ -1621,7 +1647,7 @@ if(pathElm)
     let theFile;
     if(pathArg.includes('.mp4') || pathArg.includes('.avi'))
     {
-      theFile=newFileObj(nameArg,pathArg,'video');
+      theFile=newFileObj(nameArg,pathArg,'video',"");
       track_list.push(theFile);
       //video_list.push(theFile);
       console.log("pathElm lenght is:"+pathArg.length+"index is: "+index);
@@ -1635,7 +1661,7 @@ if(pathElm)
     }
     if(pathArg.includes('.mp3') || pathArg.includes('.flac') || pathArg.includes('.wav') )
     {
-      theFile=newFileObj(nameArg,pathArg,'audio');
+      theFile=newFileObj(nameArg,pathArg,'audio',"");
       track_list.push(theFile);
       if(pathElm.length-1==index)
       {
@@ -1660,11 +1686,11 @@ nw.App.on('open', (args)=>{
   let theFile;
   if(pathArg.includes('.mp4') || pathArg.includes('.avi'))
   {
-    theFile=newFileObj(nameArg,pathArg,'video');
+    theFile=newFileObj(nameArg,pathArg,'video',"");
   }
   if(pathArg.includes('.mp3') || pathArg.includes('.flac') || pathArg.includes('.wav') )
   {
-    theFile=newFileObj(nameArg,pathArg,'audio');
+    theFile=newFileObj(nameArg,pathArg,'audio',"");
   }
   console.log("App opened via file" + args);
   let found_file=0;
@@ -1734,51 +1760,69 @@ async function updateApp()
 }
 
 console.log("Checkpoint 20");
-
+let ffmpegOn=false;
 //Video trimming function
-function doTrimConvert(filePath,formatInput,formatOutput,isTrim)
+function doTrimConvert(filePath,formatOutput,isTrim)
 {
-  let duration=audioVideoElement.duration;
+  let duration;
+  let options=['-ab', '192k'];
+  let codec= 'h264_amf';
+  const pendingPromise = new Promise((resolve) => {
+    ffmpeg.ffprobe(filePath,function(err, data) {
+        duration=data.format.duration;
+        console.log(data.format.duration);
+        resolve("success")
+    })
+  });
+  pendingPromise.then(function(){
   if(isTrim){
   duration=Math.floor(seekEndDuration-seekStartDuration);
   }
   let lastIndex=filePath.lastIndexOf('.');
   outputFile=filePath.substring(0, lastIndex);
+  let formatInput=filePath.substring(lastIndex+1,);
+  console.log("inputFormat:"+formatInput);
   console.log("outputFile:"+outputFile);
-  const command = ffmpeg()
-  /*  .inputOption([
-      "-hwaccel d3d11va",
-  ]) */
-  .videoCodec('h264_amf')
-  .input(filePath)
-  .inputFormat(formatInput)
-  .outputFormat(formatOutput)
-  .outputOptions(['-ab', '192k'])
-  .seek(time_trim_start.innerHTML)
-  .duration(duration)
-  .output(outputFile+"_converted."+formatOutput)
-  .on('progress', (progress) => 
-  { 
-    console.log(progress.timemark);
-    let progressCTime=progress.timemark.split(':');
-    let progressDuration=parseInt(progressCTime[0]*60)+parseInt(progressCTime[1]*60)+parseInt(progressCTime[2]);
-    let progressTime=(parseInt(progressDuration)/duration)*100;
-    console.log("Duration fixed:"+duration);
-    console.log("Progress duration in sec: "+progressDuration);
-    document.getElementById('conversion').style.display="block";
-    document.getElementById('conversion').value=progressTime;
-  })
-  .on('end', () => 
-  {
-    console.log('FFmpeg has finished.');
-    customAlert('Conversion/Trimming finished');
-    document.getElementById('conversion').style.display="none";
-  })
-  .on('error', (error) => 
-  {
-    console.error(error);
-  });
-  console.log(command.run());
+  if(ffmpegOn==false){
+    if(formatOutput.includes("gif")) {options=['-vf', 'scale=640:-1:flags=lanczos,fps=15'];codec='gif';}
+    ffmpegOn=true;
+    const command = ffmpeg()
+    /*  .inputOption([
+        "-hwaccel d3d11va",
+    ]) */
+    .videoCodec(codec)
+    .input(filePath)
+    .inputFormat(formatInput)
+    .outputFormat(formatOutput)
+    .outputOptions(options)
+    .seek(time_trim_start.innerHTML)
+    .duration(duration)
+    .output(outputFile+"_converted."+formatOutput)
+    .on('progress', (progress) => 
+    { 
+      console.log(progress.timemark);
+      let progressCTime=progress.timemark.split(':');
+      let progressDuration=parseInt(progressCTime[0]*60)+parseInt(progressCTime[1]*60)+parseInt(progressCTime[2]);
+      let progressTime=(parseInt(progressDuration)/duration)*100;
+      console.log("Duration fixed:"+duration);
+      console.log("Progress duration in sec: "+progressDuration);
+      document.getElementById('conversion').style.display="block";
+      document.getElementById('conversion').value=progressTime;
+    })
+    .on('end', (data) => 
+    {
+      console.log(data);
+      console.log('FFmpeg has finished.');
+      customAlert('Conversion/Trimming finished');
+      ffmpegOn=false;
+      document.getElementById('conversion').style.display="none";
+    })
+    .on('error', (error) => 
+    {
+      console.error(error);
+    });
+    console.log(command.run());
+  }});
 }
 console.log("Checkpoint 21");
 //Fix broken MP4 function START
