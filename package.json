@@ -8,6 +8,8 @@
     "build-nw": "nwbuild --platform win --arch x64 --outDir dist/src --glob=false src"
   },
   "dependencies": {
+    "butterchurn": "^2.6.7",
+    "butterchurn-presets": "^2.4.7",
     "ffmpeg-ffprobe-static": "^6.1.1-rc.5",
     "ffmpeg-static": "^5.2.0",
     "fluent-ffmpeg": "^2.1.2",
