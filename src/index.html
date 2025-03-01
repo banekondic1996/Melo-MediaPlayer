@@ -880,25 +880,25 @@
       <div id="overleyId" onmouseover="overleymentFunction(overleyment)"></div>
       <div class="list2 menuList" id="menuID" onclick="closeall()" style="display: none;">
         <table>
-          <tr onclick="document.getElementById('saveListID').click()">
+          <tr onclick="document.getElementById('saveListID').click();">
+            <input type="file" id="saveListID"  nwsaveas="playlist.json" onchange="savePlaylist(this.value)" style="display:none;"/>
             <td> <img src="set/save.png" class="lMode" width="18px" height="auto"></td>
             <td><label>
               Save playlist
-              <input type="file" id="saveListID" nwsaveas style="position: fixed; top: -100%"/>
             </label></td>
           </tr>
-          <tr onclick="document.getElementById('loadListID').click()">
+          <tr onclick="document.getElementById('loadListID').click();">
+            <input type="file" id="loadListID" accept=".json" onchange="loadPlaylist(event)" style="display:none;">
             <td> <img src="set/open.png" class="lMode" width="18px" height="auto"></td>
             <td><label>
               Load playlist
-              <input type="file" id="loadListID" accept=".json" onchange="loadPlaylist(event)" style="position: fixed; top: -100%">
             </label></td>
           </tr>
           <tr onclick="document.getElementById('useFolderID').click()">
+            <input type="file" id="useFolderID" onchange="useFolder(files)" style="display:none;" webkitdirectory="">
             <td> <img src="set/folder.png" class="lMode" width="18px" height="auto"></td>
             <td><label>
               Use folder
-              <input type="file" id="useFolderID" onchange="useFolder(files)" style="position: fixed; top: -100%" webkitdirectory="">
             </label></td>
           </tr>
           <tr onclick="darkmode()">
@@ -1699,7 +1699,7 @@ function watchTime(targetTime)
 console.log(unPause_time.value)
 
 //Save playlist START
-function savePlaylist() {
+function savePlaylist(path) {
     try {
         // Check if the playlist has valid data
         if (!Array.isArray(track_list) || track_list.length === 0) {
@@ -1712,20 +1712,19 @@ function savePlaylist() {
         console.log("JSON Data:", playlistJson); // Debug log
 
         // Choose a file path using NW.js dialog
-        const savePath = nw.Dialog.saveFileDialog({
+      /*   const savePath = nw.Dialog.saveFileDialog({
             defaultPath: path.join(nw.App.dataPath, 'playlist.json'),
             filters: [{ name: 'JSON Files', extensions: ['json'] }]
-        });
-
-        if (!savePath) {
+        }); */
+        console.log("Savepath is: "+ path)
+        if (!path) {
             alert("Save operation canceled.");
             return;
         }
-
         // Write the JSON to the chosen file
-        fs.writeFileSync(savePath, playlistJson, 'utf8');
-        alert(`Playlist saved successfully to: ${savePath}`);
-    } catch (error) {
+        fs.writeFileSync(path, playlistJson, 'utf8');
+        alert(`Playlist saved successfully to: ${path}`);
+       } catch (error) {
         console.error("Error saving playlist:", error);
         alert("An error occurred while saving the playlist. Check the console for details.");
     }
