@@ -7,8 +7,8 @@
     <!--   <script src="../node_modules/nw-dev/lib/dev.js"></script> -->
     <style>
   *{
-    user-select: none;       
-    -webkit-user-drag: none;    
+    user-select: none;
+    -webkit-user-drag: none;
   }
   body {
     background-color: rgb(255, 255, 255);
@@ -86,20 +86,20 @@
     height:10px;
   }
   ::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 1px grey; 
+    box-shadow: inset 0 0 1px grey;
     border-radius: 10px;
   }
   .darkMe2::-webkit-scrollbar-thumb {
-    background: gray; 
+    background: gray;
     border-radius: 10px;
   }
   /* If light mode is on, change slider color */
   ::-webkit-scrollbar-thumb {
-    background: #dcdcdc; 
+    background: #dcdcdc;
     border-radius: 10px;
   }
 /*   ::-webkit-scrollbar-thumb:hover {
-    background: #dcdcdc; 
+    background: #dcdcdc;
   } */
   /*Video container */
   .videoContainer {
@@ -355,7 +355,7 @@
   .repeat{
     position: absolute;
     right: 34px;
-    bottom: 10px; 
+    bottom: 10px;
     z-index:1000;
   }
   /* Shuffle button */
@@ -409,7 +409,7 @@
   }
   /* Dark/Light mode CSS for text*/
   .darkMe2{
-    color:#e7e7e7;                       
+    color:#e7e7e7;
   }
   /* Dark/Light mode CSS for slider*/
   .darkMeSlider{
@@ -504,7 +504,7 @@
   .hidden {
     opacity: 0;
     pointer-events: none; /* Ensure no interaction with hidden elements */
-    transition: opacity 1s ease; 
+    transition: opacity 1s ease;
   }
   .inputDialog{
     display: none;
@@ -620,7 +620,7 @@
     pointer-events: none;
   }
   .trim_slider_up{
-    background:linear-gradient(to right, rgb(8, 8, 8, 0.44) 0%, rgb(8, 8, 8, 0.44) 0%, rgb(255 102 129) 0%, rgb(255 102 129) 100%, rgb(8, 8, 8, 0.44) 100%, rgb(8, 8, 8, 0.44) 100%); 
+    background:linear-gradient(to right, rgb(8, 8, 8, 0.44) 0%, rgb(8, 8, 8, 0.44) 0%, rgb(255 102 129) 0%, rgb(255 102 129) 100%, rgb(8, 8, 8, 0.44) 100%, rgb(8, 8, 8, 0.44) 100%);
     border: #a9a9a98f;
     border-style: solid;
     border-width: 0.1px;
@@ -628,7 +628,7 @@
   #trimBlock input[type=range]::-webkit-slider-thumb {
     pointer-events: all;
   }
-  #conversion{ 
+  #conversion{
     display:none;
     width: 50px;
     position: absolute;
@@ -672,7 +672,7 @@
   .focus{
     opacity: 1;
     pointer-events: all;
-    transition: opacity 1s ease; 
+    transition: opacity 1s ease;
   }
   @media only screen and (max-width: 600px) {
   #titleBarId{
@@ -834,21 +834,21 @@
   <!-- <embed type="application/x-mpvjs" style="width: 100%; height: 100%;background-color: black;" width="98.3%" onclick="playpauseTrack()">
   </embed> -->
       <div class="player" id="playerId">
-          <div class="videoContainer" id="videoContainerID" style="display:none;overflow: hidden;">                                    
+          <div class="videoContainer" id="videoContainerID" style="display:none;overflow: hidden;">
               <video type="video/mp4" style="width: 100%; height: 100%;background-color: black;"id="audioVideoElementID" width="98.3%" onclick="playpauseTrack()">
               </video>
-              <!-- <img class="lMode" id="playpauseId" src="set/pause2.png"  width="54px" height="auto"> -->   
+              <!-- <img class="lMode" id="playpauseId" src="set/pause2.png"  width="54px" height="auto"> -->
           </div>
           <div class="lista lMode" id="videoPlaylistSideButtonID" onmouseover="videoPlaylistSideButton()"><img width="32px" height="auto"></div>
           <progress id="conversion" value="0" max="100" style="width: 50px;"></progress>
           <div class="slider_container" id="slider_container_trim_Id" style="display:none;background: rgba(8, 8, 8, 0.44);bottom: 38.5px;">
             <!--  <progress id="conversion" value="0" max="100" style="width: 50px;"> 0% </progress> -->
-            <div class="duration" id="durationTrimStartId" style="color: white;margin-left: 90px;margin-right: 14px;"><span id="timeTrimStartId">00:00</span></div>  
+            <div class="duration" id="durationTrimStartId" style="color: white;margin-left: 90px;margin-right: 14px;"><span id="timeTrimStartId">00:00</span></div>
             <div id="trimBlock" style="display: flex;width: 100%;">
-            <input type="range" min="0" max="499" value="0" id="seeksliderTrimStartId" class="trim_slider trim_slider_up darkMeSlider" oninput="seekTrimColor();seekTrimStart();audioVideoElement.pause();" style="bottom: 15px;height:3px;left: 141px;">  
+            <input type="range" min="0" max="499" value="0" id="seeksliderTrimStartId" class="trim_slider trim_slider_up darkMeSlider" oninput="seekTrimColor();seekTrimStart();audioVideoElement.pause();" style="bottom: 15px;height:3px;left: 141px;">
             <input type="range" min="1" max="500" value="500" id="seeksliderTrimEndId" class="trim_slider darkMeSlider" oninput="seekTrimColor();seekTrimEnd();audioVideoElement.pause();audioVideoElement.currentTime = seekEndDuration;" style="bottom: 16px;height:3px;left: 141px;">
-            </div>    
-            <div class="duration" id="durationTrimEndId" style="color: white;margin-right: 18px "><span id="timeTrimEndId">00:00</span></div> 
+            </div>
+            <div class="duration" id="durationTrimEndId" style="color: white;margin-right: 18px "><span id="timeTrimEndId">00:00</span></div>
             <input type="button" onclick="doTrimConvert(track_list[track_index].path,'mp4',true);console.log(track_list[track_index].path.toString())" value="Trim" style="margin-right: 14px;width: 50px;height: 22px;border-radius: 10px;margin-left: 1px;margin-right:0px;border: none;box-shadow: 0px 0px 2px 1px #6e6e6ea1;">
             <input type="button" value="Close" onclick="slider_container_trim.style.display='none';" style="margin-right: 14px;width: 50px;height: 22px;border-radius: 10px;margin-right:28px;margin-left: 10px;border: none;box-shadow: 0px 0px 2px 1px #6e6e6ea1;">
           </div>
@@ -865,12 +865,12 @@
               <img class="menu lMode" onclick="openMenu();" src="set/menu12.png"  width="22px" height="auto">
             </div>
             <div class="duration" id="durationCId"><span class="current-time">00:00</span></div>  <input type="range" min="1" max="500" value="0" id="seeksliderId" class="seek_slider" onInput="seekTo()">
-            <div class="duration" id="durationEId" style="margin-right: 130px;"><span class="total-duration">00:00</span></div> 
+            <div class="duration" id="durationEId" style="margin-right: 130px;"><span class="total-duration">00:00</span></div>
             <div class="yes">
               <div class="overley" id="overleyId" onmouseover="overleymentFunction(overleyment)"></div>
               <div style="display:none;" id="volume2"><input type="range" min="1" max="100" value="99" class="volume_slider" id="volumesliderId" onchange="setVolume()"></div>
             </div>
-          </div> 
+          </div>
       </div>
       <div class="list2 videoSidePlaylist" id="videoPlaylistID" style="display:none;">
         <table id="videoBarLista">
@@ -933,7 +933,7 @@
         <select id="select-format" style="width:150px;height:40px;margin-bottom: 10px;border-radius: 5px;">
           <option value="mp4">Mp4 (video)</option>
           <option value="avi">Avi (video)</option>
-          <option value="mov">Mov (video)</option> 
+          <option value="mov">Mov (video)</option>
           <option value="gif">GIF (picture)</option>
           <option value="mp3">Mp3 (audio)</option>
         </select>
@@ -970,7 +970,7 @@ console.log(event);
 document.addEventListener("keyup", (event) => {
 if(event.code=='ArrowLeft'){audioVideoElement.currentTime-=10;audioVideoElement.play();}
 if(event.code=='ArrowRight'){audioVideoElement.currentTime+=10;audioVideoElement.play();}
-});   
+});
 //Keyboard shortcuts END
 console.log("Checkpoint 1");
 //Use folder function START
@@ -990,7 +990,7 @@ function useFolder(files){
       /* pendingPromise.then(function(){ */
       let found_file=0;
       let theFile=newFileObj(files[i].name,files[i].path,files[i].type,"");
-      track_list.forEach(function(element,index) 
+      track_list.forEach(function(element,index)
         {
           if (theFile==element.path)
           {
@@ -1005,7 +1005,7 @@ function useFolder(files){
           track_index=track_list.length-1;
         }
       /* }); */
-    } 
+    }
   }
   clearList();
   populateVideo();
@@ -1013,16 +1013,16 @@ function useFolder(files){
 }
 //Use folder function END
 //Drop handling START
-document.addEventListener('dragover', function () {document.getElementById("drop_zone").style.display="block";}); 
-function dropHandler(ev) 
+document.addEventListener('dragover', function () {document.getElementById("drop_zone").style.display="block";});
+function dropHandler(ev)
 {
   console.log("File(s) dropped");
   ev.preventDefault();
-  if (ev.dataTransfer.items) 
+  if (ev.dataTransfer.items)
   {
-    [...ev.dataTransfer.items].forEach((item, i) => 
+    [...ev.dataTransfer.items].forEach((item, i) =>
     {
-      if (item.kind === "file") 
+      if (item.kind === "file")
       {
         const file = item.getAsFile();
         let splitArg=pathArgSpliter(file.path);
@@ -1034,7 +1034,7 @@ function dropHandler(ev)
         else{theFile=newFileObj(nameArg,"file://"+file.path,file.type,"");}
         let found_file=0;
         //To avoid duplicates in loaded tracks
-        track_list.forEach(function(element,index) 
+        track_list.forEach(function(element,index)
         {
           if (theFile.path==element.path)
           {
@@ -1047,13 +1047,13 @@ function dropHandler(ev)
           console.log("Push non repeated file");
           track_list.push(theFile);
           track_index=track_list.length-1;
-        } 
+        }
       }
     });
-  } 
-  else 
+  }
+  else
   {
-    [...ev.dataTransfer.files].forEach((file, i) => 
+    [...ev.dataTransfer.files].forEach((file, i) =>
     {
       console.log(`… file[${i}].name = ${file.path}`);
     });
@@ -1064,10 +1064,10 @@ function dropHandler(ev)
   if(last_track.type.includes('audio')){openMusic();}
   if(last_track.type.includes('video')){openVideo();}
   loadTrack(track_index);
-  playTrack(); 
+  playTrack();
 }
 console.log("Checkpoint 2");
-function dragOverHandler(ev) 
+function dragOverHandler(ev)
 {
   console.log("File(s) in drop zone");
   ev.preventDefault();
@@ -1077,10 +1077,10 @@ function dragOverHandler(ev)
 var win = nw.Window.get();
 win.resizeTo(1200,720);
 win.setPosition("center");
-//win.showDevTools(); 
+//win.showDevTools();
 //Window customisation SEND
 //Decleration  START
-let isDeveloper=true;
+let isDeveloper=false;
 let customAlertElement=document.getElementById("alertID")
 let now_playing = document.querySelector(".now-playing");
 let track_art = document.querySelector(".track-art");
@@ -1109,7 +1109,7 @@ let shufferN=0;
 let isPlaying = false;
 let updateTimer;
 let repeatEl=document.getElementById('repeatId');
-let shuffleEl=document.getElementById('shuffleId'); 
+let shuffleEl=document.getElementById('shuffleId');
 let listaEl=document.getElementById('listaGId');
 let videoPlaylistElement=document.getElementById('videoPlaylistID');
 let volumeb=document.getElementById('volume2');
@@ -1139,10 +1139,16 @@ let overChoiceMenu=false;
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegStatic = require('ffmpeg-static');
 const ffprobeStatic=require('ffmpeg-ffprobe-static');
-if (process.platform == "windows") {
+if (process.platform == "linux" || process.platform == "darwin") {
 ffmpeg.setFfmpegPath("/usr/bin/ffmpeg");
 ffmpeg.setFfprobePath("/usr/bin/ffprobe");
 }
+else{
+ffmpeg.setFfmpegPath(ffmpegStatic);
+ffmpeg.setFfprobePath(ffprobeStatic.ffprobePath);
+}
+ffmpeg.setFfmpegPath(ffmpegStatic);
+ffmpeg.setFfprobePath(ffprobeStatic.ffprobePath);
 const fs = require ('fs');
 let listOfPaths=[];
 const fileObj={
@@ -1169,7 +1175,7 @@ let track_list = [];
 if(isDeveloper){track_list.push({
     name: "Mr. Plenty – Part Time AI cover",
     artist: "Mr. Plenty",
-    image: "https://images.pexels.com/photos/2264753/pexels-photo-2264753.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=250&w=250",
+    image: "/set/default.jpg",
     path: "media/Mr. Plenty – Part Time AI cover.mp3",
     duration: "3:23",
     type:"audio/mpeg",
@@ -1177,7 +1183,7 @@ if(isDeveloper){track_list.push({
   {
     name: "Shipping Lanes",
     artist: "Chad Crouch",
-    image: "https://images.pexels.com/photos/1717969/pexels-photo-1717969.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=250&w=250",
+    image: "/set/default.jpg",
     path: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     duration:"2:19",
     type:"video/mp4",
@@ -1204,13 +1210,13 @@ function WindowMinMax()
 }
 //Populate music list (table)
 function populateMusic()
-{         
+{
   tabelaG.innerHTML=` <tr style="color:black;">
       <th>Song</th>
       <th>Artist</th>
       <th>Duration</th>
     </tr>`;
-  track_list.forEach(function(element,index) 
+  track_list.forEach(function(element,index)
   {
     console.log("Element type is :"+ element.type);
     if(element.type)
@@ -1218,7 +1224,7 @@ function populateMusic()
       if (element.type.includes('audio'))
       {
         console.log(index);
-        tabelaG.innerHTML  = tabelaG.innerHTML + 
+        tabelaG.innerHTML  = tabelaG.innerHTML +
        `<tr onclick="loadTrack('`+ index +`');playTrack();">
         <td>`+element.name+`</td>
         <td>`+element.artist+`</td>
@@ -1226,7 +1232,7 @@ function populateMusic()
         </tr>`;
       }
     }
-  }); 
+  });
 }
 console.log("Checkpoint 5");
 //Populate video list (table)
@@ -1236,13 +1242,13 @@ function populateVideo()
     ` <tr style="color:black;">
       <th>Video</th>
       <th>Duration</th>
-      </tr>`;   
+      </tr>`;
   tabelaVideoBarLista.innerHTML=
       `<tr>
       <th>File name</th>
       <th>Duration</th>
       </tr>`;
-  track_list.forEach(function(element,index) 
+  track_list.forEach(function(element,index)
   {
     console.log("Element type is :"+element.type);
     if(element.type)
@@ -1250,7 +1256,7 @@ function populateVideo()
       if (element.type.includes('video'))
       {
       console.log(index);
-      tabelaG.innerHTML  = tabelaG.innerHTML + 
+      tabelaG.innerHTML  = tabelaG.innerHTML +
       `<tr onclick="loadTrack('`+ index +`');playTrack();">
       <td>`+element.name+`</td>
       <td>`+element.duration+`</td>
@@ -1262,21 +1268,21 @@ function populateVideo()
       </tr>`;
       }
     }
-}); 
+});
 }
 console.log("Checkpoint 6");
 //Clear table
 function clearList(){tabelaG.innerHTML="";}
-//Volume slider show 
+//Volume slider show
 function volumeH()
 {
   overleyment.style.display="block";
   volumeb.style.animation="fade-in 0.4s"
   volumeb.style.display='block';
-} 
+}
 //Volume slider show/hide
 function volumeC(){
-  switch(volumeb.style.display) 
+  switch(volumeb.style.display)
   {
   case 'none':
     overleyment.style.display="block";
@@ -1287,25 +1293,25 @@ function volumeC(){
     overleyment.style.display="none";
     volumeb.style.animation="fade-out 0.4s"
     break;
-  } 
+  }
 }
 //Show sidebar list in video view, activate overlay for autohide
 function videoPlaylistSideButton()
 {
-  switch(videoPlaylistElement.style.display) 
+  switch(videoPlaylistElement.style.display)
   {
   case 'none':
     overleyment.style.display="block";
     videoPlaylistElement.style.display='block';
     break;
-  } 
+  }
 }
 console.log("Checkpoint 7");
-//Main menu 
+//Main menu
 function openMenu()
 {
   overleyment.style.display="block";
-  switch(menuListElement.style.display) 
+  switch(menuListElement.style.display)
   {
   case 'none':
     menuListElement.style.display='block';
@@ -1314,7 +1320,7 @@ function openMenu()
   case 'block':
     menuListElement.style.animation="fade-out 0.4s";
     break;
-  } 
+  }
 }
 //Get random number for random shuffle
 function getRandomInt(max) {return Math.floor(Math.random() * max);}
@@ -1322,7 +1328,7 @@ function getRandomInt(max) {return Math.floor(Math.random() * max);}
 //Shuffle button toggle function
 function shuffle()
 {
-  switch(shuffleEl.style.display) 
+  switch(shuffleEl.style.display)
   {
     case 'none':
       shuffleEl.style.display='block';
@@ -1337,7 +1343,7 @@ function shuffle()
       audioVideoElement.removeEventListener("ended", shufflePlay);
       audioVideoElement.addEventListener("ended", nextTrack);
       break;
-  } 
+  }
 }
 //Shuffle tracks at random function
 function shufflePlay()
@@ -1359,7 +1365,7 @@ console.log("Checkpoint 8");
 //Repeat button toggle
 function repeat()
 {
-  switch(repeatEl.style.display) 
+  switch(repeatEl.style.display)
   {
     case 'none':
       repeatEl.style.display='block';
@@ -1374,14 +1380,14 @@ function repeat()
       audioVideoElement.removeEventListener("ended", playTrack);
       audioVideoElement.addEventListener("ended", nextTrack);
       break;
-  } 
+  }
 }
 //Dark mode function
 function darkmode()
 {
   var imgs = document.getElementsByClassName("lMode");
   var elements = document.querySelectorAll("div.list>tr:nth-child(even)");
-  switch(document.body.style.backgroundColor) 
+  switch(document.body.style.backgroundColor)
   {
   case 'white':
     document.getElementById('choiceMenuId').style.color="white";
@@ -1421,7 +1427,7 @@ function darkmode()
     volumeEl.classList.remove('darkMeSlider');
     listaEl.classList.remove("darkMe2");
     infoEl.classList.remove("darkMe2");
-    videoPlaylistElement.classList.remove("darkMe");   
+    videoPlaylistElement.classList.remove("darkMe");
     break;
 
   default:
@@ -1441,9 +1447,9 @@ function darkmode()
     volumeEl.classList.add('darkMeSlider');
     listaEl.classList.add("darkMe2");
     infoEl.classList.add("darkMe2");
-    videoPlaylistElement.classList.add("darkMe");    
-    for (i = 0; i < elements.length; i++) { elements[i].style.background = "#838383";}  
-  }  
+    videoPlaylistElement.classList.add("darkMe");
+    for (i = 0; i < elements.length; i++) { elements[i].style.background = "#838383";}
+  }
 }
 //Get current date/time for unpause at time menu
 const dateNow = new Date();
@@ -1455,7 +1461,7 @@ console.log("Checkpoint 9");
 
 //Track loading function
 let error_track_src="";
-function loadTrack(index) 
+function loadTrack(index)
 {
   track_index=index;
   clearInterval(updateTimer);
@@ -1486,7 +1492,7 @@ function loadTrack(index)
   // Move to the next track if the current one finishes playing
 }
 //Track error event listner
-audioVideoElement.addEventListener('error', function() 
+audioVideoElement.addEventListener('error', function()
 {
   console.log("Video error");
   console.log(event);
@@ -1496,7 +1502,7 @@ audioVideoElement.addEventListener('error', function()
     VideoErr=1;
     customAlert("Mp4 is broken, and will be fixed. Melo_fixed will be added to the name of the file");
     fixMp4(track_list[track_index].path);
-  } 
+  }
 },false);
 //Track loaded data event listener
 audioVideoElement.addEventListener('loadeddata', function() {console.log("Video loaded");VideoErr=0;  seekTrimEnd();}, false);
@@ -1536,7 +1542,7 @@ function openVideo()
   if(visualizerOn){visualizerSwitch()};
 }
 // Reset track duration/current time values
-function resetValues() 
+function resetValues()
 {
   curr_time.textContent = "00:00";
   total_duration.textContent = "00:00";
@@ -1549,7 +1555,7 @@ function playpauseTrack() {
   else pauseTrack();
 }
 //Play track and change icon to pause
-function playTrack() 
+function playTrack()
 {
   audioVideoElement.play();
   isPlaying = true;
@@ -1558,20 +1564,20 @@ function playTrack()
 
 console.log("Checkpoint 12");
 //Pause track and change icon to play
-function pauseTrack() 
+function pauseTrack()
 {
   audioVideoElement.pause();
   isPlaying = false;
   playpause.src = "set/play.png";
 }
 //Go to next track function
-function nextTrack() 
+function nextTrack()
 {
   if (track_index < track_list.length - 1) {track_index += 1;}
   else {track_index = 0;loadTrack(track_index);playTrack();}
-}  
+}
 //Go to previous track function
-function prevTrack() 
+function prevTrack()
 {
   if (track_index > 0){track_index -= 1;}
   else {track_index = track_list.length;loadTrack(track_index);playTrack();}
@@ -1579,7 +1585,7 @@ function prevTrack()
 //Add zeros to duration number (if it's 9 sec, it will show 09 sec)
 function padZero(number) {return number < 10 ? '0' + number : number;}
 //Seeking on slider input function
-function seekTo() 
+function seekTo()
 {
   seekto = audioVideoElement.duration * (seek_slider.value / 500);
   audioVideoElement.currentTime = seekto;
@@ -1621,14 +1627,14 @@ function seekTrimColor()
 }
 //Set volume on volume slider input
 function setVolume() {audioVideoElement.volume = volume_slider.value / 100;}
-  
+
 console.log("Checkpoint 13");
 //Auto move seekslider while track is playing
-function seekUpdate() 
+function seekUpdate()
 {
   let seekPosition = 0;
   // Check if the current track duration is a legible number
-  if (!isNaN(audioVideoElement.duration)) 
+  if (!isNaN(audioVideoElement.duration))
   {
     seekPosition = audioVideoElement.currentTime * (500 / audioVideoElement.duration);
     seek_slider.value = seekPosition;
@@ -1647,7 +1653,7 @@ function seekUpdate()
   }
 }
 //Invisible overlay that hides elements when hovered
-function overleymentFunction (pelement) 
+function overleymentFunction (pelement)
 {
   overleyment.style.display="none";
   videoPlaylistElement.style.display="none";
@@ -1673,7 +1679,7 @@ function closeall()
 //Display unpause at the time dialog
 function unPauseTimeF(){unPauseAtTimeEl.style.display="flex";}
 //Unpause or play at given date and time
-function watchTime(targetTime) 
+function watchTime(targetTime)
 {
   const currentTime = new Date();
   const fixedDate = new Date(targetTime + ':00.000Z');
@@ -1681,7 +1687,7 @@ function watchTime(targetTime)
   const totalHours=fixedDate.getHours()-currentTime.getHours();
   const totalMinutes=fixedDate.getMinutes()-currentTime.getMinutes();
   customAlert("Play/pause in: "+totalDays+" Days "+totalHours+" Hours "+totalMinutes+" Minutes");
-  function updateStatus() 
+  function updateStatus()
   {
     const currentTime = new Date();
     const isoString = currentTime.toISOString();
@@ -1773,13 +1779,13 @@ console.log("Error 15");
 populateMusic();
 
 //Watch out for animation start, and add certain class to mark it
-document.addEventListener('animationstart', function (e) 
+document.addEventListener('animationstart', function (e)
 {
-if (e.animationName === 'fade-in') {e.target.classList.add('did-fade-in');} 
+if (e.animationName === 'fade-in') {e.target.classList.add('did-fade-in');}
 });
 
 //Watch out for animations end, and add certain class to mark it
-document.addEventListener('animationend', function (e) 
+document.addEventListener('animationend', function (e)
 {
 if (e.animationName === 'fade-out') {volumeb.style.display="none";menuListElement.style.display="none";}
 });
@@ -1787,29 +1793,29 @@ if (e.animationName === 'fade-out') {volumeb.style.display="none";menuListElemen
 console.log("Checkpoint 16");
 
 //Eventlistner for doubleclik on video to maximize the window
-videoContainerElement.addEventListener('dblclick', function (e) 
+videoContainerElement.addEventListener('dblclick', function (e)
 {
   if(win.isKioskMode==false){win.enterKioskMode();isMax=1;}
   else if(win.isKioskMode==true){win.leaveKioskMode();isMax=0;}
 });
 //Track mouse position for window dragging function START
-function trackMousePosition() 
+function trackMousePosition()
 {
   let titleBar=document.getElementById('titleBarId');
   let isMouseDownTitleBar = false;
   let cX=0;
   let cY=0;
 
-  function handleMouseMove(event) 
+  function handleMouseMove(event)
   {
-    if (isMouseDownTitleBar && isMax!=1) 
+    if (isMouseDownTitleBar && isMax!=1)
     {
       const xM = event.screenX-cX;
       const yM = event.screenY-cY;
       win.moveTo(xM, yM);
     }
   }
-  titleBar.addEventListener('mousedown', function () 
+  titleBar.addEventListener('mousedown', function ()
   {
     cX=event.clientX+5;
     cY=event.clientY+30;
@@ -1832,7 +1838,7 @@ win.focus();
 //If arguments are passed on app start
 if(pathElm)
 {
-  (pathElm).forEach(function(pathArg,index) 
+  (pathElm).forEach(function(pathArg,index)
   {
     let splitArg=pathArgSpliter(fileArg);
     let nameLen=splitArg.length-1;
@@ -1899,7 +1905,7 @@ nw.App.on('open', (args)=>{
   if(track_list[track_index].type.includes('video')){openVideo();}
   //Load and play last track
   loadTrack(track_index);
-  playTrack();   
+  playTrack();
   /*   let last_track=track_list[track_index];
     return new Promise(resolve => {
     resolve();
@@ -1921,23 +1927,23 @@ reSize();
 console.log("Checkpoint 19");
 
 //Context menu START
-if (document.addEventListener) 
+if (document.addEventListener)
 {
-  videoContainerElement.addEventListener('contextmenu', function(e) 
+  videoContainerElement.addEventListener('contextmenu', function(e)
   {
     contextMenuVideo.style.display="block";
     contextMenuVideo.style.left=e.clientX+"px";
     contextMenuVideo.style.top=e.clientY+"px";
     e.preventDefault();
   }, false);
-} 
+}
 else {videoContainerElement.attachEvent('oncontextmenu', function() {window.event.returnValue = false;});}
 
 document.addEventListener('click', function(e) {contextMenuVideo.style.display="none";}, false);
 //Context menu END
 let response;
 //Update app function
-async function updateApp() 
+async function updateApp()
 {
   let url="https://github.com/banekondic1996/Melo/archive/refs/heads/main.zip";
   let destinationPath="main.zip"
@@ -1995,8 +2001,8 @@ function doTrimConvert(filePath,formatOutput,isTrim)
     command = ffmpeg()
     /*  .inputOption([
         "-hwaccel d3d11va",
-    ]) */
-     //.videoCodec(codec) //Disabled on Linux in order to conversion to work
+    ])*/
+    /*.videoCodec(codec)*/ //Disabled on Linux in order to conversion to work
     .input(filePath)
     .inputFormat(formatInput)
     .outputFormat(formatOutput)
@@ -2004,8 +2010,8 @@ function doTrimConvert(filePath,formatOutput,isTrim)
     .seek(time_trim_start.innerHTML)
     .duration(duration)
     .output(outputFile+formatOutput)
-    .on('progress', (progress) => 
-    { 
+    .on('progress', (progress) =>
+    {
       console.log(progress.timemark);
       let progressCTime=progress.timemark.split(':');
       let progressDuration=parseInt(progressCTime[0]*60)+parseInt(progressCTime[1]*60)+parseInt(progressCTime[2]);
@@ -2015,7 +2021,7 @@ function doTrimConvert(filePath,formatOutput,isTrim)
       document.getElementById('conversion').style.display="block";
       document.getElementById('conversion').value=progressTime;
     })
-    .on('end', (data) => 
+    .on('end', (data) =>
     {
       console.log(data);
       console.log('FFmpeg has finished.');
@@ -2023,13 +2029,13 @@ function doTrimConvert(filePath,formatOutput,isTrim)
       ffmpegOn=false;
       document.getElementById('conversion').style.display="none";
     })
-    .on('error', (error) => 
+    .on('error', (error) =>
     {
       console.error(error);
     });
     console.log(command.run());
   }});
- 
+
 }
 console.log("Checkpoint 21");
 //Fix broken MP4 function START
@@ -2044,18 +2050,18 @@ function fixMp4(filePath,formatInput,formatOutput)
   .withVideoCodec('copy')
   .withAudioCodec('copy')
   .output(outputFile+'_MeloFixed.mp4') // outputFile+'.mp4'
-  .on('progress', (progress) => 
-  { 
-    if (progress) {} 
-  })
-  .on('end', () => 
+  .on('progress', (progress) =>
   {
-    if (fs.existsSync(inputFile)) 
+    if (progress) {}
+  })
+  .on('end', () =>
+  {
+    if (fs.existsSync(inputFile))
     {
-      fs.unlink(inputFile, (err) => 
+      fs.unlink(inputFile, (err) =>
       {
         if (err) { console.log(err);}
-        console.log('deleted');   
+        console.log('deleted');
       })
     }
     track_list[track_index].path=outputFile+'_MeloFixed.mp4';
@@ -2065,7 +2071,7 @@ function fixMp4(filePath,formatInput,formatOutput)
     /* renameFile(); */
     customAlert("Mp4 is fixed. _Melofixed is added to the name of the file");
   })
-  .on('error', (error) => 
+  .on('error', (error) =>
   {
     customAlert("Failed to fix this mp4");
     VideoErr=0;
@@ -2108,7 +2114,7 @@ let isOverList=false;
 //Auto hide elements function START
 const inactivityTimeout = 700; //Time until hiding
 let timeoutId;
-function hideElementsAndCursor() 
+function hideElementsAndCursor()
 {
   if(isMax==1)
   {
@@ -2128,13 +2134,13 @@ function hideElementsAndCursor()
     audioVideoElement.style.cursor = 'none';
   }
 }
-function resetTimeout() 
+function resetTimeout()
 {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(hideElementsAndCursor, inactivityTimeout);
 }
 console.log("Checkpoint 23");
-document.addEventListener('mousemove', function() 
+document.addEventListener('mousemove', function()
 {
     resetTimeout();
     document.getElementById('slider_container_Id').classList.remove('hidden');
@@ -2147,7 +2153,7 @@ document.addEventListener('mousemove', function()
 });
 document.addEventListener('mouseout', function() {resetTimeout();
   if(visualizerOn){
-    
+
   }
 });
 let choiceMenuContainer=document.getElementById('choiceMenuContainerID');
