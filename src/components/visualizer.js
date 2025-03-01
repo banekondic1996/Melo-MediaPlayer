@@ -14,7 +14,7 @@ sourceNode.connect(analyser);
 analyser.connect(analyser.context.destination);
 
 //Set analyser properties
-analyser.fftSize = 256;  // Controls the frequency resolution
+analyser.fftSize = 256;   // Controls the frequency resolution
 const bufferLength = analyser.frequencyBinCount;
 const dataArray = new Uint8Array(bufferLength);
 
@@ -65,7 +65,8 @@ else if(visualizerOn){visualizerOn=false;canvas.remove();listaEl.classList.remov
  let animationID
  function drawComplexVisualizer(){
   if(!visualizerOn){context=null; return;}
-  requestAnimationFrame(() => drawComplexVisualizer());
+  cancelAnimationFrame(animationID-1);
+  animationID=requestAnimationFrame(() => drawComplexVisualizer());
   // render a frame
   visualizer.render();
  }

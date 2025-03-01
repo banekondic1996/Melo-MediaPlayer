@@ -25,7 +25,14 @@
     top: 0px;
     opacity: 0.6;
   }
+  .listaContainer{
+    position: absolute;
+    width: 400px;
+    height: 90%;
+    right: 0px;
+  }
   .listaVisualizerMin{
+    position: fixed !important;
     width: 400px;
     left: auto !important;
   }
@@ -245,7 +252,7 @@
   }
  /*  Container for list of loaded tracks */
   .list{
-    position: absolute;
+    position: fixed;
     display: flex;
     background-color: rgb(224 224 224 / 37%);
     border-radius: 10px;
@@ -758,11 +765,13 @@
     </div>
   </div>
   <div class="infoplay" id="infoId"><img class="track-art"><div class="floatdetails" id="floatdetailsId"><div class="track-name" style="opacity:1;">Track Name</div> &nbsp&nbsp<span style="font-size: 1.3rem;padding-bottom: 4px;">-</span>&nbsp&nbsp<div class="track-artist" style="opacity:1;">Track Artist</div></div></div>
+  <div class="listaContainer" id="listaContainerID" onmouseover="isOverList=true" onmouseleave="isOverList=false">
   <div class="list bgBlur" id="listaGId">
     <table id="tabelaId">
 
     </table>
   </div>
+</div>
   <div id="choiceMenuContainerID" style="display: flex;height: auto;bottom: 52px;width: 300px;position: absolute;top: 372px;flex-direction: column;" onmouseover="overChoiceMenu=true;" onmouseleave="overChoiceMenu=false">
   <div class="choiceMenu bgBlur" id="choiceMenuId" style="color: white;
   display: flex;
@@ -942,6 +951,7 @@
       <input type="button" value="Ok" onclick="this.parentElement.parentElement.classList.add('hide')">
     </div>
   </div>
+  <div id="mpv-container"></div>
   <!-- Main script for the player -->
     <script>
 //Keyboard shortcuts START
@@ -2095,7 +2105,7 @@ function fixMp4(filePath,formatInput,formatOutput)
 //win.showDevTools(); //debuging only, will crash nw.js non sdk version, you have to download nw.js sdk package
 
 console.log("Checkpoint 22");
-
+let isOverList=false;
 //Auto hide elements function START
 const inactivityTimeout = 700; //Time until hiding
 let timeoutId;
@@ -2105,6 +2115,13 @@ function hideElementsAndCursor()
   {
     document.getElementById('slider_container_Id').classList.add('hidden');
     document.getElementById('homeButtonsId').classList.add('hidden');
+    audioVideoElement.style.cursor = 'none';
+  }
+  if(visualizerOn && !isOverList && !overChoiceMenu){
+    infoEl.style.opacity="0.2";
+    listaEl.style.opacity="0.2";
+    choiceMenuEl.style.opacity="0.2";
+    choiceMenuEl2.style.opacity="0.2";
     audioVideoElement.style.cursor = 'none';
   }
   else
@@ -2131,33 +2148,38 @@ document.addEventListener('mousemove', function()
 });
 document.addEventListener('mouseout', function() {resetTimeout();
   if(visualizerOn){
-    choiceMenuEl.style.opacity="0.5";
-    choiceMenuEl2.style.opacity="0.5";
-    infoEl.style.opacity="0.5";
-    listaEl.style.opacity="0.5";
+    
   }
 });
-
 let choiceMenuContainer=document.getElementById('choiceMenuContainerID');
-function addEventsToChoiceMenu(){
-  choiceMenuContainer.addEventListener('mouseleave', function() {
-    setTimeout(()=>{
-      if(visualizerOn){
+let listaContainterEl=document.getElementById('listaContainerID');
+setInterval(()=>{
+  if(visualizerOn && (!isOverList && !overChoiceMenu)){
       choiceMenuEl.classList.add('hide');
       choiceMenuEl2.classList.add('hide');
-      track_art.classList.add('hide');}},5000);
-});
+      track_art.classList.add('hide');
+      listaEl.classList.add('hide');
+  }
+},5000);
+function addEventsToChoiceMenu(){
 choiceMenuContainer.addEventListener('mouseenter', function() {
   if(visualizerOn){
     unHideElementsForVisual();
   }
 });
+listaContainterEl.addEventListener('mouseenter', function() {
+  console.log("mouse in");
+  if(visualizerOn){
+    unHideElementsForVisual();
+  }
+});
 };
-//Unhide elements hidden when visualizator on
+//Unhide left side elements hidden when visualizator on
 function unHideElementsForVisual(){
     choiceMenuEl.classList.remove('hide');
     choiceMenuEl2.classList.remove('hide');
     track_art.classList.remove('hide');
+    listaEl.classList.remove('hide');
 }
 resetTimeout();
 //Auto hide elements function END
@@ -2165,19 +2187,19 @@ let playlistWindowOptions = { "title": "Playlist", "frame": false, "fullscreen":
       "height": 600};
 var playlistWindow;
 //Open new window function
-function newWindow(url,options)
+function newWindow(url,options,append)
 {
-  playlistWindow=nw.Window.open("/playlist.html",options,function(newWindow)
+  playlistWindow=nw.Window.open(url,options,function(newWindow)
     {
         playlistWindow = newWindow;
         playlistWindow.once('loaded', function(){
         playlistWindow.setAlwaysOnTop=true;
-        playlistWindow.window.document.body.appendChild(listaEl)
+        playlistWindow.window.document.body.appendChild(append);
         /* topWindow.append(listaEl); */
         });
     });
 }
-
+/* const MPVPlayer=require('mpv.js'); */
 
 </script>
 <script src="components/visualizer.js"></script>
