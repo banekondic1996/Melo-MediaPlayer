@@ -2,6 +2,7 @@
   "name": "Melo player",
   "main": "src/",
   "description": "Melo player",
+  "version": "2.0",
   "scripts": {
     "start": "node index.js",
     "start-nw": "nw src/",
