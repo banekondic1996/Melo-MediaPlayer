@@ -1,10 +1,10 @@
 {
   "name": "Melo player",
-  "main": "src/index.html",
+  "main": "src/",
   "description": "Melo player",
   "scripts": {
     "start": "node index.js",
-    "start-nw": "nw src/ ",
+    "start-nw": "nw src/",
     "build-nw": "nwbuild --platform win --arch x64 --outDir dist/src --glob=false src"
   },
   "dependencies": {
