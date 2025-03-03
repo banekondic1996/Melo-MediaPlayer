@@ -6,6 +6,9 @@
     <title>Melo player</title>
     <!--   <script src="../node_modules/nw-dev/lib/dev.js"></script> -->
     <style>
+    :root {
+    --selected: #c3c3c34a;
+    }
   *{
     user-select: none;
     -webkit-user-drag: none;
@@ -154,6 +157,12 @@
   .prev-track:hover,
   .next-track:hover {
     opacity: 1.0;
+  }
+  #seekSliderContainer{
+    width: 100%;
+    align-items: center;
+    height: 35px;
+    display: flex;
   }
   .slider_container {
     width: 100%;
@@ -477,7 +486,7 @@
   #titleBarId{
     display: block;
     position: absolute;
-    width: 70%;
+    width: calc(100% - 185px);
     height: 32px;
   }
   .choiceMenu{
@@ -674,10 +683,15 @@
     pointer-events: all;
     transition: opacity 1s ease;
   }
+  .selected{
+    background: var(--selected);
+  }
   @media only screen and (max-width: 600px) {
   #titleBarId{
-    width: 25%;
-    left: 30px;
+    
+  }
+  #seekSliderContainer{
+    position: absolute!important;
   }
   .seek_slider{
       position: absolute!important;
@@ -756,7 +770,7 @@
       </div>
   <div class="anal" id="barId">
     <div id="titleBarId"></div>
-    <div class="homeButtons" id="homeButtonsId">
+    <div class="homeButtons" id="homeButtonsId" onmouseover="overVideoElements=true" onmouseleave="overVideoElements=false">
       <img src="set/music.png" class="lMode" oncontextmenu="newWindow();" onClick="openMusic()" width="16px" height="auto"></td>
       <img src="set/video.png" class="lMode" oncontextmenu="newWindow();" onClick="openVideo()" width="16px" height="auto"></td>
       <img class="wcontrols2 lMode" src="set/min.png" onclick="win.minimize()" width="16px" height="auto">
@@ -784,15 +798,15 @@
     </div>
     <div style="display:flex;position: relative;height: 100%;width: 100%;">
     <table>
-      <tr onClick="openMusic()">
+      <tr id='musicCategoryBtnId' onClick="openMusic()">
         <td style="width: 30px;">  <img src="set/music.png" class="lMode" width="22px" height="auto"></td>
         <td>Music</td>
       </tr>
-      <tr onClick="openVideo()">
+      <tr id='videoCategoryBtnId' onClick="openVideo()">
         <td>  <img src="set/video.png"  class="lMode" width="22px" height="auto"></td>
         <td>Video</td>
       </tr>
-      <tr onClick="openRadio()">
+      <tr onClick="customAlert('Not available yet');">
         <td>  <img src="set/radio.png" class="lMode" width="22px" height="auto"></td>
         <td>Radio list</td>
       </tr>
@@ -814,10 +828,6 @@
       <tr onclick="visualizerSwitch()" oncontextmenu="presetMenu.show();">
         <td> <img src="set/visualizer.png" class="lMode darkMe" width="22px" height="auto"></td>
         <td>Visualizer<img src="set/settings.png" class="lMode darkMe" width="22px" height="auto" style="position: absolute;right: 5px;top: 10px;" onclick="event.stopPropagation();presetMenu.show();"></td>
-      </tr>
-      <tr onclick="visualizerTypeSwitch()" style="opacity: 0.3;">
-        <td>  <img src="set/test.png" class="lMode darkMe" width="22px" height="auto"></td>
-        <td>Split View</td>
       </tr>
       <tr onclick="" style="opacity: 0.3;">
         <td>  <img src="set/test.png" class="lMode darkMe" width="22px" height="auto"></td>
@@ -852,7 +862,7 @@
             <input type="button" onclick="doTrimConvert(track_list[track_index].path,'mp4',true);console.log(track_list[track_index].path.toString())" value="Trim" style="margin-right: 14px;width: 50px;height: 22px;border-radius: 10px;margin-left: 1px;margin-right:0px;border: none;box-shadow: 0px 0px 2px 1px #6e6e6ea1;">
             <input type="button" value="Close" onclick="slider_container_trim.style.display='none';" style="margin-right: 14px;width: 50px;height: 22px;border-radius: 10px;margin-right:28px;margin-left: 10px;border: none;box-shadow: 0px 0px 2px 1px #6e6e6ea1;">
           </div>
-          <div class="slider_container" id="slider_container_Id">
+          <div class="slider_container" id="slider_container_Id" onmouseover="overVideoElements=true" onmouseleave="overVideoElements=false">
             <div class="buttons">
               <div class="prev-track" onclick="prevTrack()"><img src="set/up.png" class="lMode" width="22px" height="auto"></div>
               <div class="next-track" onclick="nextTrack()"><img src="set/down.png" class="lMode" width="22px" height="auto"></div>
@@ -864,7 +874,8 @@
               <img class="repeat lMode"  onclick="repeat();closeall()" src="set/repeat.png"  width="22px" height="auto">
               <img class="menu lMode" onclick="openMenu();" src="set/menu12.png"  width="22px" height="auto">
             </div>
-            <div class="duration" id="durationCId"><span class="current-time">00:00</span></div>  <input type="range" min="1" max="500" value="0" id="seeksliderId" class="seek_slider" onInput="seekTo()">
+            <div class="duration" id="durationCId"><span class="current-time">00:00</span></div> <div id="seekSliderContainer">
+              <input type="range" min="1" max="500" value="0" id="seeksliderId" class="seek_slider" onInput="seekTo()"></div>
             <div class="duration" id="durationEId" style="margin-right: 130px;"><span class="total-duration">00:00</span></div>
             <div class="yes">
               <div class="overley" id="overleyId" onmouseover="overleymentFunction(overleyment)"></div>
@@ -872,13 +883,13 @@
             </div>
           </div>
       </div>
-      <div class="list2 videoSidePlaylist" id="videoPlaylistID" style="display:none;">
+      <div class="list2 videoSidePlaylist" id="videoPlaylistID" style="display:none;" onmouseover="overVideoElements=true" onmouseleave="overVideoElements=false">
         <table id="videoBarLista">
 
         </table>
       </div>
       <div id="overleyId" onmouseover="overleymentFunction(overleyment)"></div>
-      <div class="list2 menuList" id="menuID" onclick="closeall()" style="display: none;">
+      <div class="list2 menuList" id="menuID" onclick="closeall()" style="display: none;"  onmouseover="overVideoElements=true" onmouseleave="overVideoElements=false">
         <table>
           <tr onclick="document.getElementById('saveListID').click();">
             <input type="file" id="saveListID"  nwsaveas="playlist.json" onchange="savePlaylist(this.value)" style="display:none;"/>
@@ -923,7 +934,7 @@
       <table>
       <tr onclick="convertDialog.style.display='flex';"><td>Convert</td></tr>
       <tr onclick="slider_container_trim.style.display='flex';seekTrimEnd();"><td>Trim</td></tr>
-      <tr onclick=""><td>Fix video</td></tr>
+      <tr onclick="pipVideo()"><td>Pip video</td></tr>
       <tr onclick=""><td>Load all media from folder</td></tr>
       <tr><td>Remove</td></tr>
       </table>
@@ -1080,7 +1091,7 @@ win.setPosition("center");
 //win.showDevTools();
 //Window customisation SEND
 //Decleration  START
-let isDeveloper=false;
+let isDeveloper=true;
 let customAlertElement=document.getElementById("alertID")
 let now_playing = document.querySelector(".now-playing");
 let track_art = document.querySelector(".track-art");
@@ -1147,8 +1158,6 @@ else{
 ffmpeg.setFfmpegPath(ffmpegStatic);
 ffmpeg.setFfprobePath(ffprobeStatic.ffprobePath);
 }
-ffmpeg.setFfmpegPath(ffmpegStatic);
-ffmpeg.setFfprobePath(ffprobeStatic.ffprobePath);
 const fs = require ('fs');
 let listOfPaths=[];
 const fileObj={
@@ -1199,12 +1208,12 @@ function WindowMinMax()
 {
   if(isMax==1)
   {
-    if(win.isKioskMode==true) {win.leaveKioskMode();isMax=0;}
+    if(win.isKioskMode==true) {win.leaveKioskMode();isMax=0;win.setResizable(true);}
     else {win.unmaximize();isMax=0;}
   }
   else
   {
-    if(videoContainerElement.style.display=="block"){win.enterKioskMode();isMax=1;}
+    if(videoContainerElement.style.display=="block"){win.enterKioskMode();isMax=1;win.setResizable(false);}
     else{win.maximize();isMax=1;}
   }
 }
@@ -1225,7 +1234,7 @@ function populateMusic()
       {
         console.log(index);
         tabelaG.innerHTML  = tabelaG.innerHTML +
-       `<tr onclick="loadTrack('`+ index +`');playTrack();">
+       `<tr onclick="loadTrack('`+ index +`');playTrack();resetSelectionHighlight(this);this.classList.add('selected')">
         <td>`+element.name+`</td>
         <td>`+element.artist+`</td>
         <td>`+element.duration+`</td>
@@ -1257,12 +1266,12 @@ function populateVideo()
       {
       console.log(index);
       tabelaG.innerHTML  = tabelaG.innerHTML +
-      `<tr onclick="loadTrack('`+ index +`');playTrack();">
+      `<tr onclick="loadTrack('`+ index +`');playTrack();resetSelectionHighlight(this);this.classList.add('selected')">
       <td>`+element.name+`</td>
       <td>`+element.duration+`</td>
       </tr>`;
       tabelaVideoBarLista.innerHTML=tabelaVideoBarLista.innerHTML +
-      `<tr oncontextmenu="track_list.splice('`+index+`',1);populateVideo();" onclick="loadTrack('`+ index +`');playTrack();">
+      `<tr oncontextmenu="track_list.splice('`+index+`',1);populateVideo();" onclick="loadTrack('`+ index +`');playTrack();resetSelectionHighlight(this);this.classList.add('selected')">
       <td>`+element.name+`</td>
       <td>`+element.duration+`</td>
       </tr>`;
@@ -1390,6 +1399,7 @@ function darkmode()
   switch(document.body.style.backgroundColor)
   {
   case 'white':
+    document.documentElement.style.setProperty('--selected', '#0000004a');
     document.getElementById('choiceMenuId').style.color="white";
     document.getElementById('choiceMenuId2').style.color="white";
     document.getElementById('floatdetailsId').style.color="white";
@@ -1411,6 +1421,7 @@ function darkmode()
     break;
 
   case 'black':
+    document.documentElement.style.setProperty('--selected', '#c3c3c34a');
     document.getElementById('choiceMenuId').style.color="black";
     document.getElementById('choiceMenuId2').style.color="black";
     document.getElementById('floatdetailsId').style.color="black";
@@ -1431,6 +1442,7 @@ function darkmode()
     break;
 
   default:
+    document.documentElement.style.setProperty('--selected', '#0000004a');
     document.getElementById('choiceMenuId').style.color="white";
     document.getElementById('choiceMenuId2').style.color="white";
     document.getElementById('floatdetailsId').style.color="white";
@@ -1512,6 +1524,8 @@ console.log("Checkpoint 10");
 //Open music list view
 function openMusic()
 {
+  document.getElementById('videoCategoryBtnId').classList.remove('selected');
+  document.getElementById('musicCategoryBtnId').classList.add('selected');
   clearList();
   populateMusic();
   console.log("openMusic")
@@ -1526,6 +1540,8 @@ console.log("Checkpoint 11");
 //Open video list view
 function openVideo()
 {
+  document.getElementById('musicCategoryBtnId').classList.remove('selected');
+  document.getElementById('videoCategoryBtnId').classList.add('selected');
   clearList();
   populateVideo();
   console.log("openVideo");
@@ -1652,6 +1668,29 @@ function seekUpdate()
     total_duration.textContent = durationMinutes + ":" + durationSeconds;
   }
 }
+//Seek slider container events
+const container = document.getElementById("seekSliderContainer");
+  let isDraggingSeek = false;
+  function updateSlider(event) {
+    const rect = container.getBoundingClientRect();
+    const offsetX = event.clientX - rect.left;
+    const percentage = Math.max(0, Math.min(1, offsetX / rect.width));
+    seek_slider.value = percentage * (seek_slider.max - seek_slider.min);
+    seek_slider.dispatchEvent(new Event("input")); // Trigger input event
+  }
+  container.addEventListener("mousedown", (event) => {
+    isDraggingSeek = true;
+    updateSlider(event);
+  });
+
+  document.addEventListener("mousemove", (event) => {
+    if (isDraggingSeek) {
+      updateSlider(event);
+    }
+  });
+  document.addEventListener("mouseup", () => {
+    isDraggingSeek = false;
+  });
 //Invisible overlay that hides elements when hovered
 function overleymentFunction (pelement)
 {
@@ -1795,8 +1834,8 @@ console.log("Checkpoint 16");
 //Eventlistner for doubleclik on video to maximize the window
 videoContainerElement.addEventListener('dblclick', function (e)
 {
-  if(win.isKioskMode==false){win.enterKioskMode();isMax=1;}
-  else if(win.isKioskMode==true){win.leaveKioskMode();isMax=0;}
+  if(win.isKioskMode==false){win.enterKioskMode();isMax=1;win.setResizable(false);}
+  else if(win.isKioskMode==true){win.leaveKioskMode();isMax=0;win.setResizable(true);}
 });
 //Track mouse position for window dragging function START
 function trackMousePosition()
@@ -2111,12 +2150,13 @@ function fixMp4(filePath,formatInput,formatOutput)
 
 console.log("Checkpoint 22");
 let isOverList=false;
+let overVideoElements=false;
 //Auto hide elements function START
 const inactivityTimeout = 700; //Time until hiding
 let timeoutId;
 function hideElementsAndCursor()
 {
-  if(isMax==1)
+  if(isMax==1 && !overVideoElements)
   {
     document.getElementById('slider_container_Id').classList.add('hidden');
     document.getElementById('homeButtonsId').classList.add('hidden');
@@ -2124,6 +2164,7 @@ function hideElementsAndCursor()
   }
   if(visualizerOn && !isOverList && !overChoiceMenu){
     infoEl.style.opacity="0.2";
+    infoEl.style.mixBlendMode='plus-lighter';
     listaEl.style.opacity="0.2";
     choiceMenuEl.style.opacity="0.2";
     choiceMenuEl2.style.opacity="0.2";
@@ -2148,6 +2189,7 @@ document.addEventListener('mousemove', function()
     choiceMenuEl.style.opacity="1";
     choiceMenuEl2.style.opacity="1";
     infoEl.style.opacity="1";
+    infoEl.style.mixBlendMode='';
     listaEl.style.opacity="1";
     audioVideoElement.style.cursor = 'auto';
 });
@@ -2166,7 +2208,7 @@ setInterval(()=>{
       listaEl.classList.add('hide');
   }
 },5000);
-function addEventsToChoiceMenu(){
+function addEventsForVisualizer(){
 choiceMenuContainer.addEventListener('mouseenter', function() {
   if(visualizerOn){
     unHideElementsForVisual();
@@ -2178,6 +2220,7 @@ listaContainterEl.addEventListener('mouseenter', function() {
     unHideElementsForVisual();
   }
 });
+canvas.addEventListener('dblclick',function(){WindowMinMax();})
 };
 //Unhide left side elements hidden when visualizator on
 function unHideElementsForVisual(){
@@ -2188,6 +2231,20 @@ function unHideElementsForVisual(){
 }
 resetTimeout();
 //Auto hide elements function END
+//Pip video
+async function pipVideo(){
+  let videoElement = document.body.querySelector('video');
+  try {
+      if (!document.pictureInPictureElement) {
+          win.minimize();
+          await videoElement.requestPictureInPicture();
+      } else {
+          await document.exitPictureInPicture();
+      }
+  } catch (error) {
+      console.error("Error enabling PiP:", error);
+  }
+}
 let playlistWindowOptions = { "title": "Playlist", "frame": false, "fullscreen": false, "transparent": false, "resizable": true, "show": true, "always_on_top": true,"width": 400,
       "height": 600};
 var playlistWindow;
@@ -2204,26 +2261,203 @@ function newWindow(url,options,append)
         });
     });
 }
+//Reset selection highlights
+function resetSelectionHighlight(el){
+  el.parentElement.parentElement.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
+}
 /* const MPVPlayer=require('mpv.js'); */
-
 </script>
 <script src="components/visualizer.js"></script>
 <script src="components/selectActionMenu.js"></script>
-<script>
-/* const _=require('lodash');
-let presets=[];
-Object.assign(presets, butterchurnPresets.getPresets());
-presets = _(presets).toPairs().sortBy(([k, v]) => k.toLowerCase()).fromPairs().value();
-        presetKeys = _.keys(presets);
-        presetIndex = Math.floor(Math.random() * presetKeys.length);
+<!---------------------------- HLS Test -------------------------------------------->
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+<!-- <script>
+let video=document.createElement('video');
+  video.id=('video');
+  video.style="height: 100%;width: 100%;top: 0px;z-index: 999999;position: absolute;display: block;background: black;";
+  video.setAttribute("controls","controls");
+  video.setAttribute("autoplay","autoplay");
+  document.body.append(video);
+  let videoSrc = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
+  if (Hls.isSupported()) {
+    var hls = new Hls();
+    hls.loadSource(videoSrc);
+    hls.attachMedia(video);
+  }
+  // HLS.js is not supported on platforms that do not have Media Source
+  // Extensions (MSE) enabled.
+  //
+  // When the browser has built-in HLS support (check using `canPlayType`),
+  // we can provide an HLS manifest (i.e. .m3u8 URL) directly to the video
+  // element through the `src` property. This is using the built-in support
+  // of the plain video element, without using HLS.js.
+  else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+    video.src = videoSrc;
+  }
+  function playHLS(filePath,isTrim)
+{
+  let timeHLS=0;
+  let duration;
+  let options=['-ab', '192k'];
+  let codec= 'h264_amf';
+  const pendingPromise = new Promise((resolve) => {
+    ffmpeg.ffprobe(filePath,function(err, data) {
+        duration=data.format.duration;
+        console.log(data.format.duration);
+        resolve("success")
+    })
+  });
+  pendingPromise.then(function()
+  {
+    if(isTrim){duration=Math.floor(seekEndDuration-seekStartDuration);}
+    let lastIndex=filePath.lastIndexOf('.');
+    outputFile=filePath.substring(0, lastIndex)+"_hls"+".";
+    let formatInput=filePath.substring(lastIndex+1,);
+    console.log("inputFormat:"+formatInput);
+    console.log("outputFile:"+outputFile+"m3u8");
+      if(ffmpegOn)
+      {
+        ffmpegOn=false;
+        command.kill('SIGSTOP');
+        console.log(fileInProcess);
+        fs.unlinkSync(fileInProcess);
+      }
+      if(ffmpegOn==false)
+      {
+        ffmpegOn=true;
+        fileInProcess=outputFile+"m3u8";
+        command = ffmpeg()
+        /*  .inputOption([
+            "-hwaccel d3d11va",
+        ])*/
+        /*.videoCodec(codec)*/ //Disabled on Linux in order to conversion to work
+        .input(filePath)
+        .inputFormat(formatInput)
+        .inputOptions(['-re'])
+        .outputFormat('hls')
+        .outputOptions(['-ab', '192k','-preset superfast',
+        ,'-hls_flags single_file','-hls_list_size 0','-hls_playlist_type vod','-f hls'])
+        .seek(timeHLS)
+        /*  .seek(time_trim_start.innerHTML) */
+        .duration(40)
+        .output(outputFile+'m3u8')
+        .on('data',(data)=>console.log(data))
+        .on('progress', (progress) =>
+        {
+        if (progress.percent){console.log(`Processing: ${Math.floor(progress.percent)}% done`);}
+        })
+        .on('end', (data) =>
+        {
+          console.log('FFmpeg has finished.');
+          customAlert('HLS conversion finished');
+          ffmpegOn=false;
+          document.getElementById('conversion').style.display="none";
+        })
+        .on('error', (error) =>
+        {
+          console.error(error);
+        });
+        console.log(command.run());
+        timeHLS++;
+        hls.loadSource(outputFile+'m3u8');
+        hls.attachMedia(video); 
+      }
 
-        var presetSelect = document.getElementsByClassName('presetSelect');
-        for(var i = 0; i < presetKeys.length; i++) {
-            var opt = document.createElement('option');
-            opt.innerHTML = presetKeys[i].substring(0,60) + (presetKeys[i].length > 60 ? '...' : '');
-            opt.value = i;
-            presetSelect[0].appendChild(opt);
-        } */
-</script>
+  });
+}
+
+function transcodeAndStream(inputPath) {
+    const mediaSource = new MediaSource();
+    video.src = URL.createObjectURL(mediaSource);
+    mediaSource.addEventListener('sourceopen', () => {
+        const mimeType = 'video/mp4; codecs="avc1.42001e, mp4a.40.2"'; // H.264 + AAC
+        if (!MediaSource.isTypeSupported(mimeType)) {
+            console.error('MIME type not supported:', mimeType);
+            return;
+        }
+
+        const sourceBuffer = mediaSource.addSourceBuffer(mimeType);
+        const chunkQueue = []; // Queue to hold chunks
+        let isProcessing = false;
+
+        // Function to process the next chunk in the queue
+        function processNextChunk() {
+            if (chunkQueue.length === 0 || isProcessing) return;
+
+            isProcessing = true;
+            const chunk = chunkQueue.shift();
+
+            try {
+                sourceBuffer.appendBuffer(chunk);
+            } catch (err) {
+                console.error('Error appending buffer:', err);
+                isProcessing = false;
+            }
+        }
+
+        // Listen for when the buffer is ready for the next append
+        sourceBuffer.addEventListener('updateend', () => {
+            isProcessing = false;
+            if (mediaSource.readyState === 'open') {
+                processNextChunk(); // Process the next chunk if available
+            }
+        });
+
+        sourceBuffer.addEventListener('error', (e) => {
+            console.error('SourceBuffer error:', e);
+        });
+
+        // Start FFmpeg transcoding and streaming
+        ffmpeg(inputPath)
+            .videoCodec('libx264')
+            .audioCodec('aac')
+            .format('hls')
+            .outputOptions([
+                '-movflags frag_keyframe+empty_moov', // Enable streaming
+                '-preset ultrafast', // Faster encoding for real-time
+                '-bsf:v h264_mp4toannexb', // H.264 Annex B
+                '-dash_segment_type mp4', // Ensure MP4 fragments
+            ])
+            .pipe() // Stream output
+            .on('data', (chunk) => {
+                // Convert chunk to Uint8Array if needed
+                const data = chunk instanceof Uint8Array ? chunk : new Uint8Array(chunk);
+                chunkQueue.push(data);
+
+                // Start processing if not already doing so
+                if (!isProcessing && mediaSource.readyState === 'open') {
+                    processNextChunk();
+                }
+            })
+            .on('end', () => {
+                console.log('FFmpeg streaming finished');
+                // Wait for all chunks to be processed before ending the stream
+                const checkQueue = setInterval(() => {
+                    if (chunkQueue.length === 0 && !isProcessing) {
+                        clearInterval(checkQueue);
+                        if (mediaSource.readyState === 'open') {
+                            mediaSource.endOfStream();
+                        }
+                    }
+                }, 100);
+            })
+            .on('error', (err) => {
+                console.error('FFmpeg error:', err);
+                if (mediaSource.readyState === 'open') {
+                    mediaSource.endOfStream('decode');
+                }
+            });
+    });
+
+    mediaSource.addEventListener('sourceended', () => {
+        console.log('MediaSource ended');
+    });
+    hls.loadSource(video.src);
+    hls.attachMedia(video);
+}
+
+
+</script> -->
+<!---------------------------- HLS Test END -------------------------------------------->
 </body>
 </html>
