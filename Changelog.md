@@ -17,11 +17,14 @@ Version 2.0
 </pre>
 To fix in next version:
 <pre>
--Load playlists only once with seprate lists
+-On track end it should go to next track for songs, but for videos default would be repeat
+-Drag player when holding video
+-Make update button do the update
+-Load playlists only once with separate lists
 -When using drag and drop select highlight last track as selected
 -When changing between video/music tabs keep selection highlight of current track
 -Visualizer resolution
--Frequency analzer
+-Frequency analyzer
 -Fix buttons when small window
 -Make code more efficient, cause it's all over the place
 </pre>
