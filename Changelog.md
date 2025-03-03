@@ -23,4 +23,5 @@ To fix in next version:
 -Visualizer resolution
 -Frequency analzer
 -Fix buttons when small window
+-Make code more efficient, cause it's all over the place
 </pre>
