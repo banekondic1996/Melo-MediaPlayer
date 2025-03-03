@@ -25,7 +25,7 @@ butterchurnPresets=require('butterchurn-presets');
 let visualizer;
 
 //Visualizer switch
- let visualizerOn=false;
+ visualizerOn=false;
  let complexVisuals=true;
  //Simple or complex visuals switch
  function visualizerTypeSwitch(){
@@ -40,11 +40,14 @@ let visualizer;
   canvas.id='visualizer';
   /* canvas.className="visualizerMin"; */ //Small visualizer
   document.body.appendChild(canvas);
-  addEventsToChoiceMenu();
+  //Adds events to hides menus when visualizer is on
+  addEventsForVisualizer();
   if(complexVisuals){
       visualizer = butterchurn.default.createVisualizer(analyser.context, canvas, {
-        width: 800,
-        height: 600,
+        width: 300,
+        height: 150,
+        pixelRatio: window.devicePixelRatio || 1,
+        textureRatio: 1,
       });
       visualizer.connectAudio(analyser);
       // load a preset
@@ -52,7 +55,7 @@ let visualizer;
      /*  const preset = presets['Flexi, martin + geiss - dedicated to the sherwin maxawow']; */
       visualizer.loadPreset(presets[presetKeys[presetSelectEl.value]], 1) // 2nd argument is the number of seconds to blend presets
       // resize visualizer
-      visualizer.setRendererSize(1600, 1200);
+      /* visualizer.setRendererSize(1300, 600); */
       drawComplexVisualizer();
   }
   else{
@@ -70,7 +73,7 @@ else if(visualizerOn){visualizerOn=false;canvas.remove();listaEl.classList.remov
   // render a frame
   visualizer.render();
  }
- //Simple visualizer
+ //Simple visualizer (for test)
  function drawSimpleVisualizer() {
   if(!visualizerOn){context=null; return;}
   requestAnimationFrame(() => drawSimpleVisualizer());
