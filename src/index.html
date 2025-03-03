@@ -1147,6 +1147,7 @@ let unPause_time=document.getElementById("unPause-time");
 let pos = { top: 0, left: 0, x: 0, y: 0 };
 var isMax=0;
 let overChoiceMenu=false;
+let visualizerOn=false;
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegStatic = require('ffmpeg-static');
 const ffprobeStatic=require('ffmpeg-ffprobe-static');
@@ -1879,7 +1880,7 @@ if(pathElm)
 {
   (pathElm).forEach(function(pathArg,index)
   {
-    let splitArg=pathArgSpliter(fileArg);
+    let splitArg=pathArgSpliter(pathArg);
     let nameLen=splitArg.length-1;
     let nameArg=splitArg[nameLen];
     let theFile;
