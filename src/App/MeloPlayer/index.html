@@ -130,6 +130,7 @@
   }
   .track-name {
     font-size: 1.6em;
+    text-shadow: 0px 0px 2px black;
   }
   .track-artist {
     font-size: 1.3rem;
@@ -517,8 +518,9 @@
   }
   .inputDialog{
     display: none;
-    top: calc(50% - 103px);
-    left: calc(50% - 139px);
+    position-area: center;
+    /* top: calc(50% - 103px);
+    left: calc(50% - 139px); */
     position: absolute;
     background-color: #cfcfcfad;
     height: 200px;
@@ -604,11 +606,12 @@
   th{
     background: gainsboro;
   }
-  .contextMenuVideo{
+  .contextMenu{
     display: none;
     position: absolute;
-    width: 134px;
-    height: 199px;
+    width: fit-content;
+    height: fit-content;
+    max-width: 130px;
     background-color: rgb(228 228 228 / 72%);
     backdrop-filter: blur(4px);
     opacity: 0.8;
@@ -618,7 +621,7 @@
     z-index: 222;
     text-align: center;
   }
-  .contextMenuVideo td{
+  .contextMenu td{
     text-align: center;
   }
   .trim_slider{
@@ -692,10 +695,11 @@
   }
   #seekSliderContainer{
     position: absolute!important;
+    height: 0px;
   }
   .seek_slider{
       position: absolute!important;
-      bottom: 38px!important;
+      bottom: 23px!important;
   }
   .trim_slider{
       bottom: 30px!important;
@@ -743,6 +747,12 @@
     top: 0px !important;
     left: 0px !important;
   }
+  .infoplay{
+    width: auto !important;
+  }
+  .buttons{
+    margin-bottom: 2%;
+  }
  }
   @media only screen and (max-height: 650px){
   .videoSidePlaylist{
@@ -751,7 +761,15 @@
   .lMode{
     display: block;
   }
+}
+@media only screen and (max-height: 550px) {
+/*   .track-art{
+    display: none !important;
   }
+  #choiceMenuContainerID{
+    top:146px !important;
+  } */
+}
 </style>
 </head>
   <body>
@@ -829,7 +847,7 @@
         <td> <img src="set/visualizer.png" class="lMode darkMe" width="22px" height="auto"></td>
         <td>Visualizer<img src="set/settings.png" class="lMode darkMe" width="22px" height="auto" style="position: absolute;right: 5px;top: 10px;" onclick="event.stopPropagation();presetMenu.show();"></td>
       </tr>
-      <tr onclick="" style="opacity: 0.3;">
+      <tr onclick="document.getElementById('frequencyAnalyzerID').style.display='block'" style="opacity: 0.3;">
         <td>  <img src="set/test.png" class="lMode darkMe" width="22px" height="auto"></td>
         <td>Frequency analyser</td>
       </tr>
@@ -930,13 +948,18 @@
           </tr> -->
         </table>
       </div>
-      <div class="contextMenuVideo" id="contextMenuVideoId">
-      <table>
+      <div class="contextMenu" id="contextMenuVideoId" onmouseleave="this.style.display='none'">
+      <table style="display: contents;">
       <tr onclick="convertDialog.style.display='flex';"><td>Convert</td></tr>
       <tr onclick="slider_container_trim.style.display='flex';seekTrimEnd();"><td>Trim</td></tr>
       <tr onclick="pipVideo()"><td>Pip video</td></tr>
-      <tr onclick=""><td>Load all media from folder</td></tr>
-      <tr><td>Remove</td></tr>
+      <tr onclick="customAlert('Not available yet')"><td>Load all media from folder</td></tr>
+      <tr onclick="customAlert('Not available yet')"><td>Remove from playlist</td></tr>
+      </table>
+      </div>
+      <div class="contextMenu" id="contextMenuCanvasId" onclick="contextMenuCanvas.style.display='none';" onmouseleave="contextMenuCanvas.style.display='none';">
+      <table style="display: contents;">
+      <tr onclick="alwaysOnTopSwitch();"><td>Always on top</td></tr>
       </table>
       </div>
       <div class="inputDialog" id="convertId">
@@ -1091,13 +1114,14 @@ win.setPosition("center");
 //win.showDevTools();
 //Window customisation SEND
 //Decleration  START
-let isDeveloper=true;
+let isDeveloper=false;
 let customAlertElement=document.getElementById("alertID")
 let now_playing = document.querySelector(".now-playing");
 let track_art = document.querySelector(".track-art");
 let track_name = document.querySelector(".track-name");
 let track_artist = document.querySelector(".track-artist");
 let contextMenuVideo=document.getElementById("contextMenuVideoId");
+let contextMenuCanvas=document.getElementById("contextMenuCanvasId");
 let playpause = document.getElementById("playpause");
 let unPauseAtTimeEl = document.getElementById("unPauseAtTimeId");
 let next_btn = document.querySelector(".next-track");
@@ -1149,6 +1173,7 @@ var isMax=0;
 let overChoiceMenu=false;
 let visualizerOn=false;
 let holdingVideo=false;
+let alwaysOnTop=false;
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegStatic = require('ffmpeg-static');
 const ffprobeStatic=require('ffmpeg-ffprobe-static');
@@ -1570,7 +1595,7 @@ function resetValues()
 //Play/pause toggle function
 function playpauseTrack() {
   if (!isPlaying) playTrack();
-  pauseTrack();
+  else {pauseTrack()};
 }
 //Play track and change icon to pause
 function playTrack()
@@ -1869,22 +1894,23 @@ function trackMousePosition()
     isMouseDownTitleBar = true;
     win.setResizable(false);
   });
- /*      audioVideoElement.addEventListener('mousedown', function ()
+  //Function to play/pause video when dragging window by grabing video START
+/*       audioVideoElement.addEventListener('mousedown', function ()
       {
       cX=event.clientX+5;
       cY=event.clientY+30;
       holdingVideo=true;
       win.setResizable(false);
       }); */
+//END
   document.addEventListener('mouseup', function (){isMouseDownTitleBar = false; holdingVideo=false;win.setResizable(true);});
   document.addEventListener('mousemove', handleMouseMove);
 }
 //Track mouse position for window dragging function END
 console.log("Checkpoint 17");
-audioVideoElement.addEventListener('mousedown', function ()
-{pauseTrack()});
-audioVideoElement.addEventListener('mouseup', function ()
-{playTrack()});
+//Function to play/pause video when dragging window by grabing video
+/* audioVideoElement.addEventListener('mousedown', function ()
+{setTimeout(()=>{if(!holdingVideo){playpauseTrack()}},200)}); */
 // Call the function to start tracking mouse position
 trackMousePosition();
 //Toggle dark mode
@@ -2193,7 +2219,7 @@ function hideElementsAndCursor()
     audioVideoElement.style.cursor = 'none';
   }
   if(visualizerOn && !isOverList && !overChoiceMenu){
-    infoEl.style.opacity="0.2";
+    infoEl.style.opacity="0.4";
     infoEl.style.mixBlendMode='plus-lighter';
     listaEl.style.opacity="0.2";
     choiceMenuEl.style.opacity="0.2";
@@ -2236,6 +2262,8 @@ setInterval(()=>{
       choiceMenuEl2.classList.add('hide');
       track_art.classList.add('hide');
       listaEl.classList.add('hide');
+      infoEl.style.width="500px";
+      infoEl.style.justifyContent="left";
   }
 },5000);
 function addEventsForVisualizer(){
@@ -2250,10 +2278,20 @@ listaContainterEl.addEventListener('mouseenter', function() {
     unHideElementsForVisual();
   }
 });
+canvas.addEventListener('click',function(){
+  playpauseTrack();
+})
 canvas.addEventListener('dblclick',function(){
   if(win.isKioskMode==true) {win.leaveKioskMode();isMax=0;win.setResizable(true);}
   else if(win.isKioskMode==false) {win.enterKioskMode();isMax=1;win.setResizable(false);}
 })
+canvas.addEventListener('contextmenu', function(e)
+  {
+    contextMenuCanvas.style.display="block";
+    contextMenuCanvas.style.left=e.clientX+"px";
+    contextMenuCanvas.style.top=e.clientY+"px";
+    e.preventDefault();
+  }, false);
 };
 //Unhide left side elements hidden when visualizator on
 function unHideElementsForVisual(){
@@ -2261,6 +2299,8 @@ function unHideElementsForVisual(){
     choiceMenuEl2.classList.remove('hide');
     track_art.classList.remove('hide');
     listaEl.classList.remove('hide');
+    infoEl.style.width="auto";
+    infoEl.style.justifyContent="center";
 }
 resetTimeout();
 //Auto hide elements function END
@@ -2278,6 +2318,19 @@ async function pipVideo(){
       console.error("Error enabling PiP:", error);
   }
 }
+//End
+//Set window always on top switch
+function alwaysOnTopSwitch(){
+  if(!alwaysOnTop){
+    win.setAlwaysOnTop(true);
+    alwaysOnTop=true;
+  }
+  else if(alwaysOnTop){
+    win.setAlwaysOnTop(false);
+    alwaysOnTop=false;
+  }
+}
+//New window options
 let playlistWindowOptions = { "title": "Playlist", "frame": false, "fullscreen": false, "transparent": false, "resizable": true, "show": true, "always_on_top": true,"width": 400,
       "height": 600};
 var playlistWindow;
@@ -2302,8 +2355,9 @@ function resetSelectionHighlight(el){
 </script>
 <script src="components/visualizer.js"></script>
 <script src="components/selectActionMenu.js"></script>
+<!-- <script src="components/frequencyAnalyzer.js"></script> -->
 <!---------------------------- HLS Test -------------------------------------------->
-<script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script> -->
 <!-- <script>
 let video=document.createElement('video');
   video.id=('video');
