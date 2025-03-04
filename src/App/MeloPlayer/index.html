@@ -26,13 +26,16 @@
     position: absolute;
     display: flex;
     top: 0px;
-    opacity: 0.6;
+    filter:brightness(0.6);
   }
   .listaContainer{
     position: absolute;
     width: 400px;
     height: 90%;
     right: 0px;
+  }
+  .searchVisualizerMin{
+    width: auto !important;
   }
   .listaVisualizerMin{
     position: fixed !important;
@@ -88,6 +91,9 @@
     width: 10px;
     height:10px;
   }
+  .scrollContainer:hover::-webkit-scrollbar-thumb {
+    width: 20px;
+  }
   ::-webkit-scrollbar-track {
     box-shadow: inset 0 0 1px grey;
     border-radius: 10px;
@@ -130,7 +136,6 @@
   }
   .track-name {
     font-size: 1.6em;
-    text-shadow: 0px 0px 2px black;
   }
   .track-artist {
     font-size: 1.3rem;
@@ -319,19 +324,29 @@
     text-align: left;
     padding: 8px;
   }
-  tr:hover {
+  #playlistMusicId tr,#playlistVideoId tr{
+    display: flex;
+    width: 100%;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+  thead th{
+    margin:auto;
+    padding: 0px !important;
+  }
+  tbody tr:hover {
     background-color: rgb(48, 48, 48);
     color: white;
     user-select: none;
   }
-  tr:active {
+  tbody tr:active {
     background-color: rgb(170, 64, 64);
     color: white;
   }
-  tr:nth-child(even):hover {
+  tbody tr:nth-child(even):hover {
     background-color: rgb(48, 48, 48);
   }
-  tr:nth-child(even):active {
+  tbody tr:nth-child(even):active {
     background-color: rgb(170, 64, 64);
   }
   .lista{
@@ -689,6 +704,15 @@
   .selected{
     background: var(--selected);
   }
+  #playlistSearchId{
+    border: 1px solid #80808066;
+    border-radius: 20px;
+    padding-inline: 10px;
+    text-align: center;
+    height: 20px;
+    width: calc(100vw - 500px);
+    background: none;
+  }
   @media only screen and (max-width: 600px) {
   #titleBarId{
     
@@ -732,9 +756,11 @@
   .choiceMenu{
     display:none!important;
   }
-
   }
   @media only screen and (max-width: 600px){
+    #playlistSearchId{
+      width: calc(100vw - 200px);
+    }
     .listaVisualizerMin{
     right: 5px;
     width: auto !important;
@@ -787,10 +813,10 @@
         </div>
       </div>
   <div class="anal" id="barId">
-    <div id="titleBarId"></div>
+    <div id="titleBarId" ondblclick="WindowMinMax()"></div>
     <div class="homeButtons" id="homeButtonsId" onmouseover="overVideoElements=true" onmouseleave="overVideoElements=false">
-      <img src="set/music.png" class="lMode" oncontextmenu="newWindow();" onClick="openMusic()" width="16px" height="auto"></td>
-      <img src="set/video.png" class="lMode" oncontextmenu="newWindow();" onClick="openVideo()" width="16px" height="auto"></td>
+      <img src="set/music.png" class="lMode" oncontextmenu="" onClick="openMusic()" width="16px" height="auto"></td>
+      <img src="set/video.png" class="lMode" oncontextmenu=";" onClick="openVideo()" width="16px" height="auto"></td>
       <img class="wcontrols2 lMode" src="set/min.png" onclick="win.minimize()" width="16px" height="auto">
       <img class="wcontrols2 lMode"src="set/max.png" onclick="WindowMinMax()" width="16px" height="auto">
       <img class="wcontrols2 lMode"src="set/close.png" onclick="win.close()"  width="16px" height="auto">
@@ -798,9 +824,24 @@
   </div>
   <div class="infoplay" id="infoId"><img class="track-art"><div class="floatdetails" id="floatdetailsId"><div class="track-name" style="opacity:1;">Track Name</div> &nbsp&nbsp<span style="font-size: 1.3rem;padding-bottom: 4px;">-</span>&nbsp&nbsp<div class="track-artist" style="opacity:1;">Track Artist</div></div></div>
   <div class="listaContainer" id="listaContainerID" onmouseover="isOverList=true" onmouseleave="isOverList=false">
-  <div class="list bgBlur" id="listaGId">
-    <table id="tabelaId">
-
+  <div class="list bgBlur" style="overflow: hidden;display: flex;" id="playlistContainerId">
+    <table id="playlistMusicTableId" style="display: none;flex-direction: column;height: 100%;">
+      <thead style="background: gainsboro;">
+        <tr style="color:black;position: sticky;display: flex;height:35px;width: 100%;top: 0;justify-content: space-between;">
+        <th onclick="sortTable(0,playlistMusic)">Song</th>
+        <th><input type="text" class="" id="playlistSearchId" onkeyup="searchPlaylist(playlistMusic,this)"></th>
+        <th onclick="sortTable(1,playlistMusic)">Duration</th>
+      </tr></thead>
+      <tbody style="height: 100%;overflow: auto;" id="playlistMusicId"></tbody>
+    </table>
+    <table id="playlistVideoTableId" style="display: none;flex-direction: column;height: 100%;">
+      <thead style="background: gainsboro;">
+        <tr style="color:black;position: sticky;display: flex;height:35px;width: 100%;top: 0;justify-content: space-between;">
+        <th onclick="sortTable(0,playlistVideo)">Video</th>
+        <th><input type="text" class="" id="playlistSearchId" onkeyup="searchPlaylist(playlistVideo,this)"></th>
+        <th onclick="sortTable(1,playlistVideo)">Duration</th>
+      </tr></thead>
+      <tbody style="height: 100%;overflow: auto;" id="playlistVideoId"></tbody>
     </table>
   </div>
 </div>
@@ -847,13 +888,17 @@
         <td> <img src="set/visualizer.png" class="lMode darkMe" width="22px" height="auto"></td>
         <td>Visualizer<img src="set/settings.png" class="lMode darkMe" width="22px" height="auto" style="position: absolute;right: 5px;top: 10px;" onclick="event.stopPropagation();presetMenu.show();"></td>
       </tr>
+      <tr onclick="" style="opacity: 0.3;">
+        <td>  <img src="set/test.png" class="lMode darkMe" width="22px" height="auto"></td>
+        <td>Equalizer</td>
+      </tr>
       <tr onclick="document.getElementById('frequencyAnalyzerID').style.display='block'" style="opacity: 0.3;">
         <td>  <img src="set/test.png" class="lMode darkMe" width="22px" height="auto"></td>
         <td>Frequency analyser</td>
       </tr>
       <tr onclick="" style="opacity: 0.3;">
         <td>  <img src="set/test.png" class="lMode darkMe" width="22px" height="auto"></td>
-        <td>Equalizer</td>
+        <td>Frequency generator</td>
       </tr>
     </tbody></table>
   </div>
@@ -1011,6 +1056,7 @@ console.log("Checkpoint 1");
 function useFolder(files){
   for (let i=0;i<files.length;i++)
   {
+
     if(files[i].type.includes("audio") || files[i].type.includes("video") && !files[i].type.includes("tts") )
     {
       /* const pendingPromise = new Promise((resolve) => {
@@ -1022,28 +1068,17 @@ function useFolder(files){
       }); */
       console.log(files[i])
       /* pendingPromise.then(function(){ */
-      let found_file=0;
       let theFile=newFileObj(files[i].name,files[i].path,files[i].type,"");
-      track_list.forEach(function(element,index)
-        {
-          if (theFile==element.path)
-          {
-            found_file=1;
-            track_index=index;
-          }
-        });
-      if(found_file==0)
-        {
-          console.log("Push non repeated file");
-          track_list.push(theFile);
-          track_index=track_list.length-1;
-        }
+      //To avoid duplicates in loaded tracks
+      let found_file=0;
+      track_list.forEach((element,index)=>{if (files[i].path==element.path)  {found_file=1;track_index=index;}});
+      if(found_file==0){console.log("Push non repeated file"); track_list.push(theFile);track_index=track_list.length-1;}  
       /* }); */
     }
   }
   clearList();
-  populateVideo();
-  populateMusic();
+  populateVideo(); //Populate video playlist table
+  populateMusic(); //Populate video playlist table
 }
 //Use folder function END
 //Drop handling START
@@ -1064,24 +1099,22 @@ function dropHandler(ev)
         let nameArg=splitArg[nameLen];
         let photoFPath = file.path.substring(0, file.path.length-nameArg.length);
         let theFile;
-        if (process.platform == "windows") {theFile=newFileObj(nameArg,file.path,file.type,"");}
-        else{theFile=newFileObj(nameArg,"file://"+file.path,file.type,"");}
-        let found_file=0;
+        let duration;
+
+          /* ffmpeg.ffprobe(file.path,function(err, data) {
+              duration=data.format.duration;
+              console.log("Song "+nameArg);
+              console.log("Song duration "+data.format.duration);
+              resolve("success")
+          }) */
+        
+        console.log('duration again'+duration);
+        theFile=newFileObj(nameArg,file.path,file.type,"");
         //To avoid duplicates in loaded tracks
-        track_list.forEach(function(element,index)
-        {
-          if (theFile.path==element.path)
-          {
-            found_file=1;
-            track_index=index;
-          }
-        });
-        if(found_file==0)
-        {
-          console.log("Push non repeated file");
-          track_list.push(theFile);
-          track_index=track_list.length-1;
-        }
+        let found_file=0;
+        track_list.forEach((element,index)=>{if (theFile.path==element.path) {found_file=1;track_index=index;}});
+        if(found_file==0){ console.log("Push non repeated file");track_list.push(theFile);track_index=track_list.length-1;}
+       
       }
     });
   }
@@ -1095,6 +1128,9 @@ function dropHandler(ev)
   document.getElementById("drop_zone").style.display="none";
   let last_track=track_list[track_index];
   console.log(last_track);
+  clearList();
+  populateMusic();
+  populateVideo();
   if(last_track.type.includes('audio')){openMusic();}
   if(last_track.type.includes('video')){openVideo();}
   loadTrack(track_index);
@@ -1114,7 +1150,7 @@ win.setPosition("center");
 //win.showDevTools();
 //Window customisation SEND
 //Decleration  START
-let isDeveloper=false;
+let isDeveloper=true;
 let customAlertElement=document.getElementById("alertID")
 let now_playing = document.querySelector(".now-playing");
 let track_art = document.querySelector(".track-art");
@@ -1138,6 +1174,7 @@ let playerGEl=document.getElementById("playerId");
 let curr_time = document.querySelector(".current-time");
 let total_duration = document.querySelector(".total-duration");
 let menuListElement=document.getElementById('menuID');
+let playlistSearchEl=document.getElementById('playlistSearchId');
 let track_index = 0;
 let repeatN=0;
 let shufferN=0;
@@ -1145,7 +1182,7 @@ let isPlaying = false;
 let updateTimer;
 let repeatEl=document.getElementById('repeatId');
 let shuffleEl=document.getElementById('shuffleId');
-let listaEl=document.getElementById('listaGId');
+let playlistContainerEl=document.getElementById('playlistContainerId');
 let videoPlaylistElement=document.getElementById('videoPlaylistID');
 let volumeb=document.getElementById('volume2');
 let infoEl=document.getElementById('infoId');
@@ -1153,7 +1190,10 @@ let prevThumbnail=0;
 let seeksliderEl=document.getElementById('seeksliderId');
 let volumeEl=document.getElementById('volumesliderId');
 let audioVideoElement = document.getElementById('audioVideoElementID');
-let tabelaG=document.getElementById('tabelaId');
+let playlistMusic=document.getElementById('playlistMusicId');
+let playlistVideo=document.getElementById('playlistVideoId');
+let playlistMusicTable=document.getElementById('playlistMusicTableId');
+let playlistVideoTable=document.getElementById('playlistVideoTableId');
 let tabelaVideoBarLista=document.getElementById('videoBarLista');
 let scaleValue=1;
 var overleyment = document.getElementById('overleyId');
@@ -1205,6 +1245,7 @@ function pathArgSpliter(filePath){
 // Define desired object
 function newFileObj(name,path,type,duration)
 {
+  if (process.platform != "windows") {path="file://"+path;}
   return {"name": name, "artist": "","image":"set/default.jpg","path":path,"duration":duration,"type":type};
 }
 let track_list = [];
@@ -1247,11 +1288,6 @@ function WindowMinMax()
 //Populate music list (table)
 function populateMusic()
 {
-  tabelaG.innerHTML=` <tr style="color:black;">
-      <th>Song</th>
-      <th>Artist</th>
-      <th>Duration</th>
-    </tr>`;
   track_list.forEach(function(element,index)
   {
     console.log("Element type is :"+ element.type);
@@ -1260,10 +1296,9 @@ function populateMusic()
       if (element.type.includes('audio'))
       {
         console.log(index);
-        tabelaG.innerHTML  = tabelaG.innerHTML +
-       `<tr onclick="loadTrack('`+ index +`');playTrack();resetSelectionHighlight(this);this.classList.add('selected')">
+        playlistMusic.innerHTML  = playlistMusic.innerHTML +
+       `<tr trackIndex='`+index+`'' onclick="loadTrack('`+ index +`');playTrack();resetSelectionHighlightPlaylist();this.classList.add('selected')">
         <td>`+element.name+`</td>
-        <td>`+element.artist+`</td>
         <td>`+element.duration+`</td>
         </tr>`;
       }
@@ -1274,11 +1309,6 @@ console.log("Checkpoint 5");
 //Populate video list (table)
 function populateVideo()
 {
-  tabelaG.innerHTML=
-    ` <tr style="color:black;">
-      <th>Video</th>
-      <th>Duration</th>
-      </tr>`;
   tabelaVideoBarLista.innerHTML=
       `<tr>
       <th>File name</th>
@@ -1292,13 +1322,13 @@ function populateVideo()
       if (element.type.includes('video'))
       {
       console.log(index);
-      tabelaG.innerHTML  = tabelaG.innerHTML +
-      `<tr onclick="loadTrack('`+ index +`');playTrack();resetSelectionHighlight(this);this.classList.add('selected')">
+      playlistVideo.innerHTML  = playlistVideo.innerHTML +
+      `<tr trackIndex='`+index+`'' onclick="loadTrack('`+ index +`');playTrack();applySelectionHighlightPlaylist();">
       <td>`+element.name+`</td>
       <td>`+element.duration+`</td>
       </tr>`;
       tabelaVideoBarLista.innerHTML=tabelaVideoBarLista.innerHTML +
-      `<tr oncontextmenu="track_list.splice('`+index+`',1);populateVideo();" onclick="loadTrack('`+ index +`');playTrack();resetSelectionHighlight(this);this.classList.add('selected')">
+      `<tr trackIndex='`+index+`'' oncontextmenu="track_list.splice('`+index+`',1);populateVideo();" onclick="loadTrack('`+ index +`');playTrack();applySelectionHighlightPlaylist();">
       <td>`+element.name+`</td>
       <td>`+element.duration+`</td>
       </tr>`;
@@ -1308,7 +1338,7 @@ function populateVideo()
 }
 console.log("Checkpoint 6");
 //Clear table
-function clearList(){tabelaG.innerHTML="";}
+function clearList(){playlistMusic.innerHTML="";playlistVideo.innerHTML=""}
 //Volume slider show
 function volumeH()
 {
@@ -1441,7 +1471,7 @@ function darkmode()
     for (let item of imgs) {item.classList.add("darkMe");}
     seeksliderEl.classList.add('darkMeSlider');
     volumeEl.classList.add('darkMeSlider');
-    listaEl.classList.add("darkMe2");
+    playlistContainerEl.classList.add("darkMe2");
     infoEl.classList.add("darkMe2");
     videoPlaylistElement.classList.add("darkMe");
     for (i = 0; i < elements.length; i++) {elements[i].style.background = "#838383";}
@@ -1463,7 +1493,7 @@ function darkmode()
     for (let item of imgs) {item.classList.remove("darkMe");}
     seeksliderEl.classList.remove('darkMeSlider');
     volumeEl.classList.remove('darkMeSlider');
-    listaEl.classList.remove("darkMe2");
+    playlistContainerEl.classList.remove("darkMe2");
     infoEl.classList.remove("darkMe2");
     videoPlaylistElement.classList.remove("darkMe");
     break;
@@ -1484,7 +1514,7 @@ function darkmode()
     for (let item of imgs) {item.classList.add("darkMe");}
     seeksliderEl.classList.add('darkMeSlider');
     volumeEl.classList.add('darkMeSlider');
-    listaEl.classList.add("darkMe2");
+    playlistContainerEl.classList.add("darkMe2");
     infoEl.classList.add("darkMe2");
     videoPlaylistElement.classList.add("darkMe");
     for (i = 0; i < elements.length; i++) { elements[i].style.background = "#838383";}
@@ -1544,21 +1574,25 @@ audioVideoElement.addEventListener('error', function()
   }
 },false);
 //Track loaded data event listener
-audioVideoElement.addEventListener('loadeddata', function() {console.log("Video loaded");VideoErr=0;  seekTrimEnd();}, false);
-
+audioVideoElement.addEventListener('loadeddata', function() {
+  console.log("Video loaded");
+  VideoErr=0;  
+  seekTrimEnd();
+  }, false);
+  audioVideoElement.addEventListener("ended", nextTrack);
 console.log("Checkpoint 10");
 
 //Open music list view
 function openMusic()
 {
+  playlistVideoTable.style.display='none';
   document.getElementById('videoCategoryBtnId').classList.remove('selected');
   document.getElementById('musicCategoryBtnId').classList.add('selected');
-  clearList();
-  populateMusic();
   console.log("openMusic")
   playerGEl.style.display="block";
   infoEl.style.display="flex";
-  listaEl.style.display="flex";
+  playlistContainerEl.style.display="flex";
+  playlistMusicTable.style.display="flex";
   choiceMenuEl.style.display="flex";
   choiceMenuEl.styledisplay="block";
   videoContainerElement.style.display="none";
@@ -1567,10 +1601,9 @@ console.log("Checkpoint 11");
 //Open video list view
 function openVideo()
 {
+  playlistMusicTable.style.display='none';
   document.getElementById('musicCategoryBtnId').classList.remove('selected');
   document.getElementById('videoCategoryBtnId').classList.add('selected');
-  clearList();
-  populateVideo();
   console.log("openVideo");
   if (track_list[track_index].type.includes("video"))
   {
@@ -1579,7 +1612,8 @@ function openVideo()
   }
   playerGEl.style.display="block";
   infoEl.style.display="flex";
-  listaEl.style.display="flex";
+  playlistContainerEl.style.display="flex";
+  playlistVideoTable.style.display="flex";
   choiceMenuEl.style.display="flex";
   choiceMenuEl.styledisplay="block";
   if(visualizerOn){visualizerSwitch()};
@@ -1616,14 +1650,16 @@ function pauseTrack()
 //Go to next track function
 function nextTrack()
 {
-  if (track_index < track_list.length - 1) {track_index += 1;}
+  if (track_list.length>1 && track_index<track_list.length-1) {track_index += 1;loadTrack(track_index);playTrack();}
   else {track_index = 0;loadTrack(track_index);playTrack();}
+  applySelectionHighlightPlaylist();
 }
 //Go to previous track function
 function prevTrack()
 {
-  if (track_index > 0){track_index -= 1;}
-  else {track_index = track_list.length;loadTrack(track_index);playTrack();}
+  if (track_list.length>1 && track_index!=0){track_index -= 1;loadTrack(track_index);playTrack();}
+  else {track_index = track_list.length-1;loadTrack(track_index);playTrack();}
+  applySelectionHighlightPlaylist();
 }
 //Add zeros to duration number (if it's 9 sec, it will show 09 sec)
 function padZero(number) {return number < 10 ? '0' + number : number;}
@@ -1773,68 +1809,54 @@ console.log(unPause_time.value)
 //Save playlist START
 function savePlaylist(path) {
     try {
-        // Check if the playlist has valid data
-        if (!Array.isArray(track_list) || track_list.length === 0) {
-            alert("Playlist is empty. Add tracks before saving.");
-            return;
-        }
-
-        // Convert the playlist to JSON
-        const playlistJson = JSON.stringify(track_list, null, 2);
-        console.log("JSON Data:", playlistJson); // Debug log
-
-        // Choose a file path using NW.js dialog
-      /*   const savePath = nw.Dialog.saveFileDialog({
-            defaultPath: path.join(nw.App.dataPath, 'playlist.json'),
-            filters: [{ name: 'JSON Files', extensions: ['json'] }]
-        }); */
-        console.log("Savepath is: "+ path)
-        if (!path) {
-            alert("Save operation canceled.");
-            return;
-        }
-        // Write the JSON to the chosen file
-        fs.writeFileSync(path, playlistJson, 'utf8');
-        alert(`Playlist saved successfully to: ${path}`);
-       } catch (error) {
+          // Check if the playlist has valid data
+          if (!Array.isArray(track_list) || track_list.length === 0) 
+          {
+              alert("Playlist is empty. Add tracks before saving.");
+              return;
+          }
+          // Convert the playlist to JSON
+          const playlistJson = JSON.stringify(track_list, null, 2);
+          console.log("JSON Data:", playlistJson); // Debug log
+          console.log("Savepath is: "+ path)
+          //If path not given
+          if (!path) {alert("Save operation canceled."); return;}
+          // Write the JSON to the chosen file
+          fs.writeFileSync(path, playlistJson, 'utf8');
+          alert(`Playlist saved successfully to: ${path}`);
+       } 
+    catch (error) 
+    {
         console.error("Error saving playlist:", error);
         alert("An error occurred while saving the playlist. Check the console for details.");
     }
 }
 //Save playlist END
 
-//Load playlist START
+//Load saved playlist via file START
 function loadPlaylist(event) {
     const file = event.target.files[0];
-    if (!file) {
-        alert("No file selected.");
-        return;
-    }
-
+    if (!file) {  alert("No file selected."); return;}
     const reader = new FileReader();
-
-    reader.onload = function(e) {
-        try {
+    reader.onload = function(e) 
+    {
+        try
+        {
             // Parse the JSON file
             const loadedPlaylist = JSON.parse(e.target.result);
-
             // Validate the data format (check for required properties)
-            if (Array.isArray(loadedPlaylist) && loadedPlaylist.every(track => track.name && track.path)) {
+            if (Array.isArray(loadedPlaylist) && loadedPlaylist.every(track => track.name && track.path)) 
+            {
                 track_list = loadedPlaylist; // Update the track_list
                 alert("Playlist loaded successfully!");
-
                 // Refresh the displayed playlist
-                clearList();
-                populateMusic();
-                populateVideo();
-            } else {
-                alert("Invalid playlist format.");
-            }
-        } catch (error) {
-            alert("Error loading playlist: " + error.message);
+                clearList(); //Clear all playlist tables
+                populateMusic(); //Populate music playlist table
+                populateVideo(); //Populate music playlist table
+            } else {alert("Invalid playlist format.");} 
         }
+        catch (error) {alert("Error loading playlist: " + error.message);}
     };
-
     // Read the file as text
     reader.readAsText(file);
 }
@@ -1843,6 +1865,8 @@ function loadPlaylist(event) {
 console.log("Error 15");
 
 populateMusic();
+populateVideo();
+openMusic();
 
 //Watch out for animation start, and add certain class to mark it
 document.addEventListener('animationstart', function (e)
@@ -1937,7 +1961,9 @@ if(pathElm)
       console.log("pathElm lenght is:"+pathArg.length+"index is: "+index);
       if(pathElm.length-1==index)
       {
+        if(track_list.length>0){
         track_index=track_list.length-1;
+        }
         openVideo();
         loadTrack(track_index);
         playTrack();
@@ -1949,7 +1975,9 @@ if(pathElm)
       track_list.push(theFile);
       if(pathElm.length-1==index)
       {
+        if(track_list.length>0){
         track_index=track_list.length-1;
+        }
         loadTrack(track_index);
         playTrack();
       }
@@ -2221,7 +2249,7 @@ function hideElementsAndCursor()
   if(visualizerOn && !isOverList && !overChoiceMenu){
     infoEl.style.opacity="0.4";
     infoEl.style.mixBlendMode='plus-lighter';
-    listaEl.style.opacity="0.2";
+    playlistContainerEl.style.opacity="0.2";
     choiceMenuEl.style.opacity="0.2";
     choiceMenuEl2.style.opacity="0.2";
     audioVideoElement.style.cursor = 'none';
@@ -2246,7 +2274,7 @@ document.addEventListener('mousemove', function()
     choiceMenuEl2.style.opacity="1";
     infoEl.style.opacity="1";
     infoEl.style.mixBlendMode='';
-    listaEl.style.opacity="1";
+    playlistContainerEl.style.opacity="1";
     audioVideoElement.style.cursor = 'auto';
 });
 document.addEventListener('mouseout', function() {resetTimeout();
@@ -2261,7 +2289,7 @@ setInterval(()=>{
       choiceMenuEl.classList.add('hide');
       choiceMenuEl2.classList.add('hide');
       track_art.classList.add('hide');
-      listaEl.classList.add('hide');
+      playlistContainerEl.classList.add('hide');
       infoEl.style.width="500px";
       infoEl.style.justifyContent="left";
   }
@@ -2298,7 +2326,7 @@ function unHideElementsForVisual(){
     choiceMenuEl.classList.remove('hide');
     choiceMenuEl2.classList.remove('hide');
     track_art.classList.remove('hide');
-    listaEl.classList.remove('hide');
+    playlistContainerEl.classList.remove('hide');
     infoEl.style.width="auto";
     infoEl.style.justifyContent="center";
 }
@@ -2343,13 +2371,98 @@ function newWindow(url,options,append)
         playlistWindow.once('loaded', function(){
         playlistWindow.setAlwaysOnTop=true;
         playlistWindow.window.document.body.appendChild(append);
-        /* topWindow.append(listaEl); */
+        /* topWindow.append(playlistContainerEl); */
         });
     });
 }
 //Reset selection highlights
 function resetSelectionHighlight(el){
-  el.parentElement.parentElement.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
+  el.parentElement.parentElement.parentElement.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
+}
+//Reset selection in playlist
+function resetSelectionHighlightPlaylist(){
+  playlistContainerEl.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
+  tabelaVideoBarLista.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
+}
+//Apply selection highlight to current playing track
+function applySelectionHighlightPlaylist(){
+  resetSelectionHighlightPlaylist();
+  document.body.querySelectorAll('tr[trackIndex="'+track_index+'"]').forEach((el) => {
+  el.classList.add('selected');
+  el.scrollIntoView();
+  });
+}
+//Search table function for playlist
+function searchPlaylist(table,input) {
+  var input, filter, table, tr, td, i, txtValue;
+  filter = input.value.toUpperCase();
+  tr = table.getElementsByTagName("tr");
+  // Loop through all table rows, and hide those who don't match the search query
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+//Sort playlist
+function sortTable(n,table) {
+  let rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+  switching = true;
+  // Set the sorting direction to ascending:
+  dir = "asc";
+  /* Make a loop that will continue until
+  no switching has been done: */
+  while (switching) {
+    // Start by saying: no switching is done:
+    switching = false;
+    rows = table.rows;
+    /* Loop through all table rows (except the
+    first, which contains table headers): */
+    for (i = 1; i < (rows.length - 1); i++) {
+      // Start by saying there should be no switching:
+      shouldSwitch = false;
+      /* Get the two elements you want to compare,
+      one from current row and one from the next: */
+      x = rows[i].getElementsByTagName("TD")[n];
+      y = rows[i + 1].getElementsByTagName("TD")[n];
+      /* Check if the two rows should switch place,
+      based on the direction, asc or desc: */
+      if (dir == "asc") {
+        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+          // If so, mark as a switch and break the loop:
+          shouldSwitch = true;
+          break;
+        }
+      } else if (dir == "desc") {
+        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+          // If so, mark as a switch and break the loop:
+          shouldSwitch = true;
+          break;
+        }
+      }
+    }
+    if (shouldSwitch) {
+      /* If a switch has been marked, make the switch
+      and mark that a switch has been done: */
+      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+      switching = true;
+      // Each time a switch is done, increase this count by 1:
+      switchcount ++;
+    } else {
+      /* If no switching has been done AND the direction is "asc",
+      set the direction to "desc" and run the while loop again. */
+      if (switchcount == 0 && dir == "asc") {
+        dir = "desc";
+        switching = true;
+      }
+    }
+  }
 }
 /* const MPVPlayer=require('mpv.js'); */
 </script>

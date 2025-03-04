@@ -35,7 +35,9 @@ let visualizer;
  function visualizerSwitch(){
   if(!visualizerOn){
   visualizerOn=true;
-  listaEl.classList.add('listaVisualizerMin');
+  playlistContainerEl.classList.add('listaVisualizerMin');
+  playlistSearchEl.classList.add('searchVisualizerMin')
+  infoEl.style.backgroundColor="transparent"
   canvas = document.createElement("canvas");
   canvas.id='visualizer';
   /* canvas.className="visualizerMin"; */ //Small visualizer
@@ -64,7 +66,7 @@ let visualizer;
     drawSimpleVisualizer();
   }
 }
-else if(visualizerOn){visualizerOn=false;canvas.remove();listaEl.classList.remove('listaVisualizerMin');unHideElementsForVisual();}
+else if(visualizerOn){visualizerOn=false;canvas.remove();playlistContainerEl.classList.remove('listaVisualizerMin');playlistSearchEl.classList.remove('searchVisualizerMin');infoEl.style.backgroundColor='rgb(224 224 224 / 37%)';unHideElementsForVisual();}
  }
  //Complex visualizer
  let animationID

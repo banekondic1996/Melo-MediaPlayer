@@ -1,11 +1,12 @@
 class SelectActionMenu {
-    constructor(id, options, onSelect,actionName,confirmName,actionBtnBool) {
+    constructor(id, options, onSelect,actionName,confirmName,actionBtnBool,appendElement) {
         this.id = id;
         this.options = options;
         this.onSelect = onSelect; // Function to execute when "SelectActionAction" is clicked
         this.actionName=actionName;
         this.confirmName=confirmName;
         this.actionBtnBool=actionBtnBool;
+        this.appendElement=appendElement;
         this.createMenu();
     }
     createMenu() {
@@ -18,6 +19,7 @@ class SelectActionMenu {
         const label = document.createElement("label");
         label.innerText = this.actionName;
         label.style.paddingBottom = "2px";
+        if(typeof this.appendElement=='undefined'){
         // Create dropdown
         this.selectAction = document.createElement("select");
         this.selectAction.id="presetSelectID";
@@ -32,6 +34,12 @@ class SelectActionMenu {
             opt.textContent = option.label;
             this.selectActionn.appendChild(opt);
         });
+        this.dialog.appendChild(label);
+        this.dialog.appendChild(this.selectAction);
+        }
+        else{
+            this.dialog.appendChild(this.appendElement);
+        }
         // Create Convert button
         const actionBtn = document.createElement("input");
         actionBtn.type = "button";
@@ -55,8 +63,6 @@ class SelectActionMenu {
         const btnContainer = document.createElement("div");
         btnContainer.style = "text-align: center;";
         //Append to document
-         this.dialog.appendChild(label);
-         this.dialog.appendChild(this.selectAction);
          if(this.actionBtnBool){btnContainer.appendChild(actionBtn)};
          btnContainer.appendChild(closeBtn);
          this.dialog.appendChild(btnContainer);
@@ -77,6 +83,7 @@ const presetMenu = new SelectActionMenu("presetMenuID", [], () => {
     console.log("Preset applied");
 },"Select preset:","Select",false);
 
+
 //Load presets into Select list
 let presets=[];
 Object.assign(presets, butterchurnPresets.getPresets());
@@ -89,4 +96,5 @@ for(var i = 0; i < presetKeys.length; i++) {
     opt.value = i;
     presetSelectEl.appendChild(opt);
 }
+presetSelectEl.value=94;
 presetSelectEl.onclick=()=>{console.log("Preset applied :"+presetKeys[presetSelectEl.value]);visualizer.loadPreset(presets[presetKeys[presetSelectEl.value]], 5.7);};
