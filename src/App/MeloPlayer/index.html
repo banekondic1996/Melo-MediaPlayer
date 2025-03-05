@@ -18,6 +18,9 @@
     margin:0px;
     transition: background-color .5s;
     overflow: hidden;
+    width: 100%;
+    height: 100%;
+    position: fixeds;
   }
   #visualizer {
     width: 100%;
@@ -284,7 +287,7 @@
   .list2{
     position: absolute;
     width: 176px;
-    height: 189px;
+    height: fit-content;
     background-color: rgb(228 228 228 / 90%);
     opacity: 0.5;
     border: none;
@@ -317,8 +320,7 @@
     font-family: arial, sans-serif;
     border-collapse: collapse;
     width: 100%;
-    position: absolute;
-    height:auto;
+    height:100%;
   }
   td, th {
     text-align: left;
@@ -714,9 +716,6 @@
     background: none;
   }
   @media only screen and (max-width: 600px) {
-  #titleBarId{
-    
-  }
   #seekSliderContainer{
     position: absolute!important;
     height: 0px;
@@ -799,6 +798,7 @@
 </style>
 </head>
   <body>
+    <script type="text/javascript" src="https://unpkg.com/mediainfo.js"></script>
     <div class="inputDialog" id="unPauseAtTimeId">
       <input type="datetime-local" id="unPause-time" name="unPause-time" max="2039-08-08T00:00">
     <div style="display: flex;margin: auto;height: auto;width: 85%;max-width: 188px;">
@@ -828,18 +828,18 @@
     <table id="playlistMusicTableId" style="display: none;flex-direction: column;height: 100%;">
       <thead style="background: gainsboro;">
         <tr style="color:black;position: sticky;display: flex;height:35px;width: 100%;top: 0;justify-content: space-between;">
-        <th onclick="sortTable(0,playlistMusic)">Song</th>
+        <th onclick="/* sortTable(0,playlistMusic) */">Song</th>
         <th><input type="text" class="" id="playlistSearchId" onkeyup="searchPlaylist(playlistMusic,this)"></th>
-        <th onclick="sortTable(1,playlistMusic)">Duration</th>
+        <th onclick="/* sortTable(1,playlistMusic) */">Duration</th>
       </tr></thead>
       <tbody style="height: 100%;overflow: auto;" id="playlistMusicId"></tbody>
     </table>
     <table id="playlistVideoTableId" style="display: none;flex-direction: column;height: 100%;">
       <thead style="background: gainsboro;">
         <tr style="color:black;position: sticky;display: flex;height:35px;width: 100%;top: 0;justify-content: space-between;">
-        <th onclick="sortTable(0,playlistVideo)">Video</th>
+        <th onclick="/* sortTable(0,playlistVideo) */">Video</th>
         <th><input type="text" class="" id="playlistSearchId" onkeyup="searchPlaylist(playlistVideo,this)"></th>
-        <th onclick="sortTable(1,playlistVideo)">Duration</th>
+        <th onclick="/* sortTable(1,playlistVideo) */">Duration</th>
       </tr></thead>
       <tbody style="height: 100%;overflow: auto;" id="playlistVideoId"></tbody>
     </table>
@@ -947,22 +947,25 @@
           </div>
       </div>
       <div class="list2 videoSidePlaylist" id="videoPlaylistID" style="display:none;" onmouseover="overVideoElements=true" onmouseleave="overVideoElements=false">
-        <table id="videoBarLista">
-
+        <table id="videoBarLista" style="position: absolute;height:auto;">
+          <tr>
+            <th>File name</th>
+            <th>Duration</th>
+          </tr>
         </table>
       </div>
       <div id="overleyId" onmouseover="overleymentFunction(overleyment)"></div>
       <div class="list2 menuList" id="menuID" onclick="closeall()" style="display: none;"  onmouseover="overVideoElements=true" onmouseleave="overVideoElements=false">
         <table>
           <tr onclick="document.getElementById('saveListID').click();">
-            <input type="file" id="saveListID"  nwsaveas="playlist.json" onchange="savePlaylist(this.value)" style="display:none;"/>
+            <input type="file" id="saveListID"  nwsaveas="playlist.melolist" onchange="savePlaylist(this.value)" style="display:none;"/>
             <td> <img src="set/save.png" class="lMode" width="18px" height="auto"></td>
             <td><label>
               Save playlist
             </label></td>
           </tr>
           <tr onclick="document.getElementById('loadListID').click();">
-            <input type="file" id="loadListID" accept=".json" onchange="loadPlaylist(event)" style="display:none;">
+            <input type="file" id="loadListID" accept=".melolist" onchange="loadPlaylist(event)" style="display:none;">
             <td> <img src="set/open.png" class="lMode" width="18px" height="auto"></td>
             <td><label>
               Load playlist
@@ -984,6 +987,10 @@
             <td>Unpause at time</td>
           </tr>
           <tr onclick="customAlert('Not working yet')">
+            <td>  <img src="set/settings.png" class="lMode" width="18px" height="auto"></td>
+            <td>Settings</td>
+          </tr>
+          <tr onclick="customAlert('Not working yet')">
             <td>  <img src="set/system-update.png" class="lMode" width="18px" height="auto"></td>
             <td>Update</td>
           </tr>
@@ -998,7 +1005,7 @@
       <tr onclick="convertDialog.style.display='flex';"><td>Convert</td></tr>
       <tr onclick="slider_container_trim.style.display='flex';seekTrimEnd();"><td>Trim</td></tr>
       <tr onclick="pipVideo()"><td>Pip video</td></tr>
-      <tr onclick="customAlert('Not available yet')"><td>Load all media from folder</td></tr>
+      <tr onclick="loadMediaFromCurrentFolder();"><td>Load all media from folder</td></tr>
       <tr onclick="customAlert('Not available yet')"><td>Remove from playlist</td></tr>
       </table>
       </div>
@@ -1030,10 +1037,10 @@
       <input type="button" value="Ok" onclick="this.parentElement.parentElement.classList.add('hide')">
     </div>
   </div>
-  <div id="mpv-container"></div>
+  <!-- <div id="mpv-container"></div> -->
   <!-- Main script for the player -->
     <script>
-//Keyboard shortcuts START
+//Global keyboard events START
 document.addEventListener("keydown", (event) => {
 if(event.code=='Space'){playpauseTrack();}
 if(event.code=='ArrowLeft'){audioVideoElement.pause();audioVideoElement.currentTime-=0.8;}
@@ -1045,35 +1052,33 @@ if(event.code=='Numpad2'){prevTrack();}
 if(event.code=='KeyF'){WindowMinMax();}
 console.log(event);
 });
-
 document.addEventListener("keyup", (event) => {
 if(event.code=='ArrowLeft'){audioVideoElement.currentTime-=10;audioVideoElement.play();}
 if(event.code=='ArrowRight'){audioVideoElement.currentTime+=10;audioVideoElement.play();}
 });
-//Keyboard shortcuts END
+//Global keyboard events END
 console.log("Checkpoint 1");
+//Load media from current folder
+function loadMediaFromCurrentFolder(){
+  let useFolderInput=document.getElementById('useFolderID');
+  let filePath=track_list[track_index].path; // Current track file path 
+  let splitArg=pathArgSpliter(filePath); // Split file path into segments
+  let nameLen=splitArg.length-1; // Name part index of string
+  let nameArg=splitArg[nameLen]; // The name of file
+  let index=0; // Starting trim index
+  if (process.platform != "windows") {index=7} // To trim "file://" from file path
+  let folderPath = filePath.substring(index, filePath.length-nameArg.length); // Final folder path
+  useFolderInput.nwworkingdir=folderPath; // Add default start directory to open folder dilog
+  useFolderInput.click(); // Simulate click to start open folder dilog
+}
 //Use folder function START
 function useFolder(files){
   for (let i=0;i<files.length;i++)
   {
-
     if(files[i].type.includes("audio") || files[i].type.includes("video") && !files[i].type.includes("tts") )
     {
-      /* const pendingPromise = new Promise((resolve) => {
-        ffmpeg.ffprobe(files[i].path,function(err, data) {
-            duration=data.format.duration;
-            console.log(data.format.duration);
-            resolve("success")
-        })
-      }); */
       console.log(files[i])
-      /* pendingPromise.then(function(){ */
-      let theFile=newFileObj(files[i].name,files[i].path,files[i].type,"");
-      //To avoid duplicates in loaded tracks
-      let found_file=0;
-      track_list.forEach((element,index)=>{if (files[i].path==element.path)  {found_file=1;track_index=index;}});
-      if(found_file==0){console.log("Push non repeated file"); track_list.push(theFile);track_index=track_list.length-1;}  
-      /* }); */
+      processFile(files[i].path);
     }
   }
   clearList();
@@ -1081,6 +1086,7 @@ function useFolder(files){
   populateMusic(); //Populate video playlist table
 }
 //Use folder function END
+
 //Drop handling START
 document.addEventListener('dragover', function () {document.getElementById("drop_zone").style.display="block";});
 function dropHandler(ev)
@@ -1094,29 +1100,17 @@ function dropHandler(ev)
       if (item.kind === "file")
       {
         const file = item.getAsFile();
-        let splitArg=pathArgSpliter(file.path);
-        let nameLen=splitArg.length-1;
-        let nameArg=splitArg[nameLen];
-        let photoFPath = file.path.substring(0, file.path.length-nameArg.length);
-        let theFile;
-        let duration;
-
-          /* ffmpeg.ffprobe(file.path,function(err, data) {
-              duration=data.format.duration;
-              console.log("Song "+nameArg);
-              console.log("Song duration "+data.format.duration);
-              resolve("success")
-          }) */
-        
-        console.log('duration again'+duration);
-        theFile=newFileObj(nameArg,file.path,file.type,"");
-        //To avoid duplicates in loaded tracks
-        let found_file=0;
-        track_list.forEach((element,index)=>{if (theFile.path==element.path) {found_file=1;track_index=index;}});
-        if(found_file==0){ console.log("Push non repeated file");track_list.push(theFile);track_index=track_list.length-1;}
-       
+        processFile(file.path); //New function to process files, seems slower
+        console.log("ev length");
+        console.log([...ev.dataTransfer.items].length);
+        console.log("current index");
+        console.log(i);
+        if([...ev.dataTransfer.items].length-1==i)
+        {
+          /* setTimeout(()=>loadMetaData(),500); */
+        }
       }
-    });
+    }); 
   }
   else
   {
@@ -1126,15 +1120,12 @@ function dropHandler(ev)
     });
   }
   document.getElementById("drop_zone").style.display="none";
-  let last_track=track_list[track_index];
-  console.log(last_track);
-  clearList();
-  populateMusic();
-  populateVideo();
-  if(last_track.type.includes('audio')){openMusic();}
-  if(last_track.type.includes('video')){openVideo();}
+  let trackType=track_list[track_index].type;
+  if(trackType.includes('audio')){openMusic();}
+  if(trackType.includes('video')){openVideo();}
   loadTrack(track_index);
   playTrack();
+  applySelectionHighlightPlaylist();
 }
 console.log("Checkpoint 2");
 function dragOverHandler(ev)
@@ -1217,11 +1208,13 @@ let alwaysOnTop=false;
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegStatic = require('ffmpeg-static');
 const ffprobeStatic=require('ffmpeg-ffprobe-static');
-if (process.platform == "linux" || process.platform == "darwin") {
+if (process.platform == "linux" || process.platform == "darwin") 
+{
 ffmpeg.setFfmpegPath("/usr/bin/ffmpeg");
 ffmpeg.setFfprobePath("/usr/bin/ffprobe");
 }
-else{
+else
+{
 ffmpeg.setFfmpegPath(ffmpegStatic);
 ffmpeg.setFfprobePath(ffprobeStatic.ffprobePath);
 }
@@ -1235,21 +1228,140 @@ const fileObj={
     duration: "",
     type:"",
 }
+//File types
+const fileTypes={
+  Audio:['.mp3','.m4a','flac','wav','aac'],
+  Video:['.mp4','.mov','.avi','webm','.ogg','.m4v','.mkv','.flv']
+}
 //Declerations END
 console.log("Checkpoint 3");
+//File path string splitter, depends on platform
 function pathArgSpliter(filePath){
   if (process.platform == "windows") {return filePath.split("\\");}
   else{return filePath.split("/");}
 }
-
 // Define desired object
 function newFileObj(name,path,type,duration)
 {
   if (process.platform != "windows") {path="file://"+path;}
   return {"name": name, "artist": "","image":"set/default.jpg","path":path,"duration":duration,"type":type};
 }
+/* const { Worker } = require("worker_threads");
+const worker = new Worker("./metadataWorker.js");
+worker.on("message", (data) => 
+{
+  if (data.success) 
+    {
+      console.log(`Metadata loaded:`, data.metadata);
+      updateTrackMetadata(data.metadata); // ✅ Update UI
+    } 
+  else {console.error("Metadata error:", data.error);}  
+});
+worker.on("error", (err) => console.error("Worker Error:", err));
+worker.on("exit", (code) => { if (code !== 0) console.error(`Worker stopped with exit code ${code}`);}); */
+ 
+// Process file and push into list (Not used yet, cause it's slower)
+async function processFile(filePath)
+{
+  let found_file=0;
+  track_list.forEach((element,index)=>{if (filePath==element.path) {found_file=1;track_index=index;return}});
+  if (process.platform != "windows") {filePath="file://"+filePath;} // If not on windows, adds needes string to file path
+  let splitArg=pathArgSpliter(filePath); // Split given file path into strings
+  let nameIndex=splitArg.length-1; // Index of file name in splited string array, last one is extension
+  let nameArg=splitArg[nameIndex];  // The name of file including file extension
+  let extArg=filePath.substring(filePath.lastIndexOf('.')) // The file extension
+  let fileType // The file type
+  nameArg=nameArg.substring(0,nameArg.lastIndexOf('.')) // The name of the file, removes extension if left
+  let duration; // The audio/video duration variable
+  let folderPath = filePath.substring(0, filePath.length-nameArg.length); // Path of folder that contains the file
+  let durationMinutes
+  let durationSeconds
+    track_list.forEach(function(element,index) { if (filePath==element.path){found_file=1;track_index=index;playTrack(track_index)}} );
+    if(found_file==0)
+    { 
+      track_index=track_list.length; // Not -1 cause file will be added and track_list length will increase by 1
+      // If extension is audio
+      if(fileTypes.Audio.includes(extArg)) 
+      {
+        fileType='audio';
+        playlistMusic.innerHTML  = playlistMusic.innerHTML +
+        `<tr trackIndex='`+track_index+`'' onclick="loadTrack('`+ track_index +`');playTrack();resetSelectionHighlightPlaylist();this.classList.add('selected')">
+        <td>`+nameArg+`</td>
+        <td class="track-duration" style='align-self: center;'></td>
+        </tr>`;
+      } 
+      // If extension is video
+      if(fileTypes.Video.includes(extArg)) 
+      {
+        fileType='video';
+        playlistVideo.innerHTML  = playlistVideo.innerHTML +
+        `<tr trackIndex='`+track_index+`'' onclick="loadTrack('`+ track_index +`');playTrack();applySelectionHighlightPlaylist(true);">
+        <td>`+nameArg+`</td>
+        <td class="track-duration" style='align-self: center;'></td>
+        </tr>`;
+        tabelaVideoBarLista.innerHTML=tabelaVideoBarLista.innerHTML +
+        `<tr trackIndex='`+track_index+`'' oncontextmenu="track_list.splice('`+track_index+`',1);populateVideo();" onclick="loadTrack('`+ track_index +`');playTrack();applySelectionHighlightPlaylist(true);">
+        <td>`+nameArg+`</td>
+        <td class="track-duration" style='align-self: center;'></td>
+        </tr>`;
+      } 
+      let theFile={"name": nameArg, "artist": "","image":"set/default.jpg","path":filePath,"duration":"","type":fileType};
+      console.log("Push non repeated file");
+      track_list.push(theFile);
+     /*  worker.postMessage({trackIndex: Number(track_index),filePath: filePath }); */
+     /*  loadMetaData(track_index); */
+      console.log(theFile);
+    }
+}
+/* function updateTrackMetadata(metadata) {
+  let track = track_list[metadata.trackIndex];
+  track.duration = metadata.duration;
+  // Assuming there's a UI element for duration update
+  let durationElement = document.querySelector(`tr[trackIndex='${metadata.trackIndex}'] .track-duration`);
+  if (durationElement) {
+    durationElement.textContent = metadata.duration;
+  }
+  console.log(`Updated track metadata:`, track);
+} */
+async function loadMetaData(trackIndex){
+  let duration;
+  let durationMinutes;
+  let durationSeconds;
+  ffmpeg.ffprobe(track_list[trackIndex].path,function(err, data) 
+    {
+      duration=data.format.duration;
+      console.log(data.format.duration);
+      durationMinutes = Math.floor(duration / 60);
+      durationSeconds = Math.floor(duration - durationMinutes * 60);
+      durationMinutes = padZero(parseInt(durationMinutes, 10));
+      durationSeconds= padZero(parseInt(durationSeconds, 10));
+      let el=document.body.querySelector('tr[trackIndex="'+trackIndex+'"]');
+      el.children[1].innerHTML=durationMinutes+":"+durationSeconds;
+      track_list[trackIndex].duration=durationMinutes+":"+durationSeconds;
+      console.log("duration metadata: "+duration);
+      }); 
+  /* document.body.querySelector('tr[trackIndex]').forEach((el) => 
+  {
+    ffmpeg.ffprobe(track_list[el.attributes.trackindex.value].path,function(err, data) 
+    {
+      duration=data.format.duration;
+      console.log(data.format.duration);
+      durationMinutes = Math.floor(duration / 60);
+      durationSeconds = Math.floor(duration - durationMinutes * 60);
+      durationMinutes = padZero(parseInt(durationMinutes, 10));
+      durationSeconds= padZero(parseInt(durationSeconds, 10));
+      el.children[1].innerHTML=durationMinutes+":"+durationSeconds
+      track_list[el.attributes.trackindex.value].duration=durationMinutes+":"+durationSeconds;
+      console.log("duration metadata: "+duration);
+
+      }); 
+  }); */
+}
 let track_list = [];
-if(isDeveloper){track_list.push({
+if(isDeveloper)
+{
+  track_list.push(
+    {
     name: "Mr. Plenty – Part Time AI cover",
     artist: "Mr. Plenty",
     image: "set/default.jpg",
@@ -1264,10 +1376,12 @@ if(isDeveloper){track_list.push({
     path: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     duration:"2:19",
     type:"video/mp4",
-  })}
+  });
+}
 console.log("Checkpoint 4");
 //Custom alert
-function customAlert(message){
+function customAlert(message)
+{
   customAlertElement.classList.remove('hide');
   customAlertElement.children[0].children[0].innerHTML=message;
 }
@@ -1299,7 +1413,7 @@ function populateMusic()
         playlistMusic.innerHTML  = playlistMusic.innerHTML +
        `<tr trackIndex='`+index+`'' onclick="loadTrack('`+ index +`');playTrack();resetSelectionHighlightPlaylist();this.classList.add('selected')">
         <td>`+element.name+`</td>
-        <td>`+element.duration+`</td>
+        <td class="track-duration" style='align-self: center;'>`+element.duration+`</td>
         </tr>`;
       }
     }
@@ -1309,11 +1423,6 @@ console.log("Checkpoint 5");
 //Populate video list (table)
 function populateVideo()
 {
-  tabelaVideoBarLista.innerHTML=
-      `<tr>
-      <th>File name</th>
-      <th>Duration</th>
-      </tr>`;
   track_list.forEach(function(element,index)
   {
     console.log("Element type is :"+element.type);
@@ -1323,14 +1432,14 @@ function populateVideo()
       {
       console.log(index);
       playlistVideo.innerHTML  = playlistVideo.innerHTML +
-      `<tr trackIndex='`+index+`'' onclick="loadTrack('`+ index +`');playTrack();applySelectionHighlightPlaylist();">
+      `<tr trackIndex='`+index+`'' onclick="loadTrack('`+ index +`');playTrack();applySelectionHighlightPlaylist(true);">
       <td>`+element.name+`</td>
-      <td>`+element.duration+`</td>
+      <td class="track-duration" style='align-self: center;'>`+element.duration+`</td>
       </tr>`;
       tabelaVideoBarLista.innerHTML=tabelaVideoBarLista.innerHTML +
-      `<tr trackIndex='`+index+`'' oncontextmenu="track_list.splice('`+index+`',1);populateVideo();" onclick="loadTrack('`+ index +`');playTrack();applySelectionHighlightPlaylist();">
+      `<tr trackIndex='`+index+`'' oncontextmenu="track_list.splice('`+index+`',1);populateVideo();" onclick="loadTrack('`+ index +`');playTrack();applySelectionHighlightPlaylist(true);">
       <td>`+element.name+`</td>
-      <td>`+element.duration+`</td>
+      <td class="track-duration" style='align-self: center;'>`+element.duration+`</td>
       </tr>`;
       }
     }
@@ -1338,7 +1447,7 @@ function populateVideo()
 }
 console.log("Checkpoint 6");
 //Clear table
-function clearList(){playlistMusic.innerHTML="";playlistVideo.innerHTML=""}
+function clearList(){playlistMusic.innerHTML="";playlistVideo.innerHTML="";tabelaVideoBarLista.innerHTML=""}
 //Volume slider show
 function volumeH()
 {
@@ -1565,22 +1674,16 @@ function loadTrack(index)
 audioVideoElement.addEventListener('error', function()
 {
   console.log("Video error");
-  console.log(event);
-  if(isNaN(audioVideoElement.duration) && track_list[track_index].path.includes(".mp4") && VideoErr==0 && audioVideoElement.src!=error_track_src)
+  if(isNaN(audioVideoElement.duration) && track_list[track_index].path.includes(".mp4") && audioVideoElement.src!=error_track_src)
   {
+    fixEncoding(track_list[track_index].path);
     error_track_src=audioVideoElement.src;
-    VideoErr=1;
-    customAlert("Mp4 is broken, and will be fixed. Melo_fixed will be added to the name of the file");
-    fixMp4(track_list[track_index].path);
+    setTimeout(()=>fixMedia(track_list[track_index].path),1500)
   }
 },false);
 //Track loaded data event listener
-audioVideoElement.addEventListener('loadeddata', function() {
-  console.log("Video loaded");
-  VideoErr=0;  
-  seekTrimEnd();
-  }, false);
-  audioVideoElement.addEventListener("ended", nextTrack);
+audioVideoElement.addEventListener('loadeddata', function() {console.log("Video loaded"); VideoErr=0; seekTrimEnd();}, false);
+audioVideoElement.addEventListener("ended", nextTrack);
 console.log("Checkpoint 10");
 
 //Open music list view
@@ -1651,14 +1754,14 @@ function pauseTrack()
 //Go to next track function
 function nextTrack()
 {
-  if (track_list.length>1 && track_index<track_list.length-1) {track_index += 1;loadTrack(track_index);playTrack();}
+  if (track_list.length>0 && track_index<track_list.length-1) {track_index=parseInt(track_index)+1;loadTrack(track_index);playTrack();}
   else {track_index = 0;loadTrack(track_index);playTrack();}
   applySelectionHighlightPlaylist();
 }
 //Go to previous track function
 function prevTrack()
 {
-  if (track_list.length>1 && track_index!=0){track_index -= 1;loadTrack(track_index);playTrack();}
+  if (track_list.length>0 && track_index!=0){track_index=parseInt(track_index)-1;loadTrack(track_index);playTrack();}
   else {track_index = track_list.length-1;loadTrack(track_index);playTrack();}
   applySelectionHighlightPlaylist();
 }
@@ -1853,7 +1956,7 @@ function loadPlaylist(event) {
                 // Refresh the displayed playlist
                 clearList(); //Clear all playlist tables
                 populateMusic(); //Populate music playlist table
-                populateVideo(); //Populate music playlist table
+                populateVideo(); //Populate video playlist table
             } else {alert("Invalid playlist format.");} 
         }
         catch (error) {alert("Error loading playlist: " + error.message);}
@@ -1864,7 +1967,6 @@ function loadPlaylist(event) {
 //Load playlist END
 
 console.log("Error 15");
-
 populateMusic();
 populateVideo();
 openMusic();
@@ -1933,7 +2035,7 @@ function trackMousePosition()
 }
 //Track mouse position for window dragging function END
 console.log("Checkpoint 17");
-//Function to play/pause video when dragging window by grabing video
+//Function to play/pause video when dragging window by grabing video, needs enabling other things too
 /* audioVideoElement.addEventListener('mousedown', function ()
 {setTimeout(()=>{if(!holdingVideo){playpauseTrack()}},200)}); */
 // Call the function to start tracking mouse position
@@ -1949,18 +2051,12 @@ if(pathElm)
 {
   (pathElm).forEach(function(pathArg,index)
   {
-    let splitArg=pathArgSpliter(pathArg);
-    let nameLen=splitArg.length-1;
-    let nameArg=splitArg[nameLen];
-    let theFile;
-    if (process.platform != "windows") {pathArg="file://"+pathArg;}
-    if(pathArg.includes('.mp4') || pathArg.includes('.avi') || pathArg.includes('.ts'))
+    processFile(pathArg);
+    console.log("launch arguments"+pathArg);
+    if(fileTypes.Video.some(format=>pathArg.includes(format)))
     {
-      theFile=newFileObj(nameArg,pathArg,'video',"");
-      track_list.push(theFile);
-      //video_list.push(theFile);
       console.log("pathElm lenght is:"+pathArg.length+"index is: "+index);
-      if(pathElm.length-1==index)
+      if(pathElm.length-1==index) //On last loaded file open video
       {
         if(track_list.length>0){
         track_index=track_list.length-1;
@@ -1970,10 +2066,8 @@ if(pathElm)
         playTrack();
       }
     }
-    if(pathArg.includes('.mp3') || pathArg.includes('.flac') || pathArg.includes('.wav') )
+    if(fileTypes.Audio.some(format=>pathArg.includes(format)))
     {
-      theFile=newFileObj(nameArg,pathArg,'audio',"");
-      track_list.push(theFile);
       if(pathElm.length-1==index)
       {
         if(track_list.length>0){
@@ -1991,39 +2085,21 @@ nw.App.on('open', (args)=>{
   win.focus();
   let textArg=args.toString();
   console.log("textArg "+textArg);
-  let pathArg=textArg.split('"')[5];
-  let splitArg=pathArgSpliter(pathArg);
-  if (process.platform != "windows") {pathArg="file://"+pathArg;}
-  console.log("splitArg "+splitArg);
-  let nameLen=splitArg.length-1;
-  let nameArg=splitArg[nameLen];
-  let theFile;
-  if(pathArg.includes('.mp4') || pathArg.includes('.avi') || pathArg.includes('.ts') )
+  let pathArg=textArg.split('"')[5]
+  console.log("pathArg while running:"+pathArg);
+  processFile(pathArg);
+  setTimeout(()=>
   {
-    theFile=newFileObj(nameArg,pathArg,'video',"");
-  }
-  if(pathArg.includes('.mp3') || pathArg.includes('.flac') || pathArg.includes('.wav') )
-  {
-    theFile=newFileObj(nameArg,pathArg,'audio',"");
-  }
-  console.log("App opened via file" + args);
-  let found_file=0;
-  //Go trough whole track list, if same file is found, play it
-  track_list.forEach(function(element,index) { if (theFile.path==element.path){found_file=1;track_index=index;}} );
-  //If file was not found i track list, it will be added to track list
-  if(found_file==0){console.log("Push non repeated file");track_list.push(theFile);track_index=track_list.length-1;}
-  //If last track is audio, open music view
-  if(track_list[track_index].type.includes('audio')){openMusic();}
-  //If last track is video, open video view
-  if(track_list[track_index].type.includes('video')){openVideo();}
-  //Load and play last track
-  loadTrack(track_index);
-  playTrack();
-  /*   let last_track=track_list[track_index];
-    return new Promise(resolve => {
-    resolve();
-  }); */
-  /* loadOpenedStuff(); */
+    console.log("App opened via file" + args);
+    //If last track is audio, open music view
+    if(track_list[track_index].type.includes('audio')){openMusic();}
+    //If last track is video, open video view
+    if(track_list[track_index].type.includes('video')){openVideo();}
+    //Load and play last track
+    loadTrack(track_index);
+    playTrack();
+    },550);
+  
 });
 //Open file with app END
 //On app maximize and minimize events to stop CPU/GPU from processing visualizations when not needed START
@@ -2108,7 +2184,7 @@ function doTrimConvert(filePath,formatOutput,isTrim)
   duration=Math.floor(seekEndDuration-seekStartDuration);
   }
   let lastIndex=filePath.lastIndexOf('.');
-  outputFile=filePath.substring(0, lastIndex)+"_converted"+getRandomInt(999)+".";
+  outputFile=filePath.substring(0, lastIndex)+"_converted"+getRandomInt(999)+"."+formatOutput;
   let formatInput=filePath.substring(lastIndex+1,);
   console.log("inputFormat:"+formatInput);
   console.log("outputFile:"+outputFile+formatOutput);
@@ -2121,7 +2197,7 @@ function doTrimConvert(filePath,formatOutput,isTrim)
  if(ffmpegOn==false){
     if(formatOutput.includes("gif")) {options=['-vf', 'scale=640:-1:flags=lanczos,fps=15'];codec='gif';}
     ffmpegOn=true;
-    fileInProcess=outputFile+formatOutput;
+    fileInProcess=outputFile;
     command = ffmpeg()
     /*  .inputOption([
         "-hwaccel d3d11va",
@@ -2133,7 +2209,7 @@ function doTrimConvert(filePath,formatOutput,isTrim)
     .outputOptions(options)
     .seek(time_trim_start.innerHTML)
     .duration(duration)
-    .output(outputFile+formatOutput)
+    .output(outputFile)
     .on('progress', (progress) =>
     {
       console.log(progress.timemark);
@@ -2162,72 +2238,88 @@ function doTrimConvert(filePath,formatOutput,isTrim)
 
 }
 console.log("Checkpoint 21");
+//Fix file path encoding for files with special characters
+function fixEncoding(filePath){
+  let splitArg=pathArgSpliter(filePath);
+  let nameLen=splitArg.length-1;
+  let nameArg=splitArg[nameLen];
+  let folderPath = filePath.substring(0, filePath.length-nameArg.length);
+  let nameEncoded = encodeURI(nameArg).replace(/#/g, "%23");
+  audioVideoElement.src=folderPath+nameEncoded;
+  playTrack();
+  console.log("File path encoding fixed");
+}
 //Fix broken MP4 function START
-function fixMp4(filePath,formatInput,formatOutput)
+function fixMedia(filePath,formatInput,formatOutput)
 {
-  numberFix+=1;
-  console.log("Fix:"+numberFix);
-  let outputFile=filePath.split('.')[0];
-  let inputFile=outputFile+'.mp4';
-  const command = ffmpeg()
-  .input(inputFile) // inputFile
-  .withVideoCodec('copy')
-  .withAudioCodec('copy')
-  .output(outputFile+'_MeloFixed.mp4') // outputFile+'.mp4'
-  .on('progress', (progress) =>
+  console.log('Media fix called')
+  if(isNaN(audioVideoElement.duration) && VideoErr==0 ){
+  if(!filePath.includes('_MeloFixed')) 
   {
-    if (progress) {}
-  })
-  .on('end', () =>
-  {
-    if (fs.existsSync(inputFile))
+    customAlert("Mp4 is broken, and will be fixed. Melo_fixed will be added to the name of the file");
+    numberFix+=1;
+    console.log("Fix:"+numberFix);
+    let outputFile=filePath.substring(0,filePath.lastIndexOf('.')) //File path without extension
+    let inputFile=filePath; //Full file path with extension
+    const command = ffmpeg()
+    .input(inputFile) // inputFile
+    .withVideoCodec('copy')
+    .withAudioCodec('copy')
+    .output(outputFile+'_MeloFixed.mp4') // outputFile+'.mp4'
+    .on('progress', (progress) =>
     {
-      fs.unlink(inputFile, (err) =>
+      if (progress) {}
+    })
+    .on('end', () =>
+    {
+      if (fs.existsSync(inputFile))
       {
-        if (err) { console.log(err);}
-        console.log('deleted');
-      })
-    }
-    track_list[track_index].path=outputFile+'_MeloFixed.mp4';
-    audioVideoElement.src=track_list[track_index].path;
-    /* audioVideoElement.load(); */
-    audioVideoElement.play();
-    /* renameFile(); */
-    customAlert("Mp4 is fixed. _Melofixed is added to the name of the file");
-  })
-  .on('error', (error) =>
-  {
-    customAlert("Failed to fix this mp4");
-    VideoErr=0;
-  });
-  console.log(command.run());
-  /*   function renameFile(sourcePath, destinationPath) {
-      fs.rename(outputFile+'_MeloFixed.mp4', outputFile+'.mp4',
-      (error) => {
-          if (error) {
-              if (error.code === 'EBUSY') {
-                // Retry after a delay
-                setTimeout(() => {
-                  console.log("Trying to rename file again");
-                  renameFile(outputFile+'_MeloFixed.mp4', outputFile+'.mp4');
-                }, 1000); // 1 second delay, adjust as needed
-              }
-              else{
-                console.log(error);
-              }
-          }
-          else {
-            function setTrack(){audioVideoElement.src="";audioVideoElement.src = track_list[track_index].path;return true;}
-            setTimeout(() => {
-            console.log("Setting current_track.src  "+ setTrack());
-            console.log("Current track source?:  "+audioVideoElement.src);
-            console.log("Loading audioVideoElement "+ audioVideoElement.load());
-            console.log("Playing audioVideoElement "+ audioVideoElement.play());
-            }, 5000);
-            VideoErr=0;
-          }
-        });
-    } */
+        fs.unlink(inputFile, (err) => 
+        { 
+          if (err) {console.log(err);} 
+          console.log('deleted');
+        })
+      }
+      if (process.platform != "windows") {outputFile="file://"+outputFile;}
+      track_list[track_index].path=outputFile+'_MeloFixed.mp4';
+      audioVideoElement.src=track_list[track_index].path;
+      /* audioVideoElement.load(); */
+      audioVideoElement.play();
+      /* renameFile(); */
+      customAlert("Mp4 is fixed. _Melofixed is added to the name of the file");
+    })
+    .on('error', (error) => {customAlert("Failed to fix this mp4");VideoErr=0;});
+    console.log(command.run());
+    /*   function renameFile(sourcePath, destinationPath) {
+        fs.rename(outputFile+'_MeloFixed.mp4', outputFile+'.mp4',
+        (error) => {
+            if (error) {
+                if (error.code === 'EBUSY') {
+                  // Retry after a delay
+                  setTimeout(() => {
+                    console.log("Trying to rename file again");
+                    renameFile(outputFile+'_MeloFixed.mp4', outputFile+'.mp4');
+                  }, 1000); // 1 second delay, adjust as needed
+                }
+                else{
+                  console.log(error);
+                }
+            }
+            else {
+              function setTrack(){audioVideoElement.src="";audioVideoElement.src = track_list[track_index].path;return true;}
+              setTimeout(() => {
+              console.log("Setting current_track.src  "+ setTrack());
+              console.log("Current track source?:  "+audioVideoElement.src);
+              console.log("Loading audioVideoElement "+ audioVideoElement.load());
+              console.log("Playing audioVideoElement "+ audioVideoElement.play());
+              }, 5000);
+              VideoErr=0;
+            }
+          });
+      } */
+  }
+  else {customAlert("This video is broken");VideoErr=1;}
+}
 }
 //Fix broken MP4 function END
 
@@ -2386,11 +2478,13 @@ function resetSelectionHighlightPlaylist(){
   tabelaVideoBarLista.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
 }
 //Apply selection highlight to current playing track
-function applySelectionHighlightPlaylist(){
+function applySelectionHighlightPlaylist(fromVideo){
   resetSelectionHighlightPlaylist();
   document.body.querySelectorAll('tr[trackIndex="'+track_index+'"]').forEach((el) => {
   el.classList.add('selected');
+  if(!fromVideo){
   el.scrollIntoView();
+  }
   });
 }
 //Search table function for playlist
@@ -2469,6 +2563,7 @@ function sortTable(n,table) {
 </script>
 <script src="components/visualizer.js"></script>
 <script src="components/selectActionMenu.js"></script>
+
 <!-- <script src="components/frequencyAnalyzer.js"></script> -->
 <!---------------------------- HLS Test -------------------------------------------->
 <!-- <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script> -->
