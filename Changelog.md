@@ -24,14 +24,26 @@ Version 2.1
 -Added always on top option for virtualizer
 -Improved CSS for context menus
 </pre>
+Version 2.2
+<pre>
+-Added search for songs
+-Fixed file loading when file has special characters
+-Reworked the way playlists are populated
+-Added duration information for media
+-Added loading files from folder
+-Changed playlist saving type
+-Fixed track not going to next track, cause javascripts 1+1 is 11.....
+-Fixed video loading
+</pre>
 To fix in next version:
 <pre>
--On track end it should go to next track for songs, but for videos default would be repeat
--Drag player when holding video (code is there, but disabled)
+-Load dark mode diffrently via CSS and add CSS variables for colors
+-Make metadata load faster
 -Make update button do the update
 -Load playlists only once with separate lists
--When using drag and drop select highlight last track as selected
 -When changing between video/music tabs keep selection highlight of current track
--Frequency analyzer (in works)
+-Add frequency analyzer (in works)
+-Add frequency generator
+-Add equalizer
 -Make code more efficient, cause it's all over the place
 </pre>
