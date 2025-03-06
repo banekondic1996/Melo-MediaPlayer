@@ -37,7 +37,7 @@
     overflow: hidden;
     width: 100%;
     height: 100%;
-    position: fixed;
+    position: fixeds;
   }
   #visualizer {
     width: 100%;
@@ -961,7 +961,7 @@
             <div class="duration" id="durationEId" style="margin-right: 130px;"><span class="total-duration">00:00</span></div>
             <div class="yes">
               <div class="overley" id="overleyId" onmouseover="overleymentFunction(overleyment)"></div>
-              <div style="display:none;" id="volume2"><input type="range" min="1" max="99" value="99" step="1" class="volume_slider" id="volumesliderId" onchange="setVolume()"></div>
+              <div style="display:none;" id="volume2"><input type="range" min="1" max="100" value="99" class="volume_slider" id="volumesliderId" onchange="setVolume()"></div>
             </div>
           </div>
       </div>
@@ -1066,11 +1066,11 @@ document.addEventListener("keydown", (event) => {
 if(event.code=='Space'){playpauseTrack();}
 if(event.code=='ArrowLeft'){audioVideoElement.pause();audioVideoElement.currentTime-=0.8;}
 if(event.code=='ArrowRight'){audioVideoElement.pause();audioVideoElement.currentTime+=0.8;}
-if(event.code=='ArrowUp'){audioVideoElement.volume+=0.1;volume_slider.value=audioVideoElement.volume*100}  // I don't get it
-if(event.code=='ArrowDown'){audioVideoElement.volume-=0.1;volume_slider.value=audioVideoElement.volume*100}
+if(event.code=='ArrowUp'){Number(volume_slider.value)+=10;setVolume();}  // I don't get it
+if(event.code=='ArrowDown'){volume_slider.value-=10;setVolume();}
 if(event.code=='Numpad8'){nextTrack();}
 if(event.code=='Numpad2'){prevTrack();}
-if(event.code=='KeyF'){if(!document.getElementById('musicCategoryBtnId').classList.contains('selected'))WindowMinMax();}
+if(event.code=='KeyF'){WindowMinMax();}
 console.log(event);
 });
 document.addEventListener("keyup", (event) => {
@@ -1109,12 +1109,144 @@ if(isDeveloper)
     type:"video/mp4",
   });
 }
+//File path string splitter, depends on platform
+function pathArgSpliter(filePath){
+  if (process.platform == "windows") {return filePath.split("\\");}
+  else{return filePath.split("/");}
+}
+
+/* const { Worker } = require("worker_threads");
+const worker = new Worker("./metadataWorker.js");
+worker.on("message", (data) => 
+{
+  if (data.success) 
+    {
+      console.log(`Metadata loaded:`, data.metadata);
+      updateTrackMetadata(data.metadata); // ✅ Update UI
+    } 
+  else {console.error("Metadata error:", data.error);}  
+});
+worker.on("error", (err) => console.error("Worker Error:", err));
+worker.on("exit", (code) => { if (code !== 0) console.error(`Worker stopped with exit code ${code}`);}); */
+ 
+// Process file and push into list (Not used yet, cause it's slower)
+async function processFile(filePath)
+{
+  let found_file=0;
+  track_list.forEach((element,index)=>{if (filePath==element.path) {found_file=1;track_index=index;return}});
+  if (process.platform != "windows") {filePath="file://"+filePath;} // If not on windows, adds needes string to file path
+  let splitArg=pathArgSpliter(filePath); // Split given file path into strings
+  let nameIndex=splitArg.length-1; // Index of file name in splited string array, last one is extension
+  let nameArg=splitArg[nameIndex];  // The name of file including file extension
+  let extArg=filePath.substring(filePath.lastIndexOf('.')) // The file extension
+  let fileType // The file type
+  nameArg=nameArg.substring(0,nameArg.lastIndexOf('.')) // The name of the file, removes extension if left
+  let duration; // The audio/video duration variable
+  let folderPath = filePath.substring(0, filePath.length-nameArg.length); // Path of folder that contains the file
+  let durationMinutes
+  let durationSeconds
+    track_list.forEach(function(element,index) { if (filePath==element.path){found_file=1;track_index=index;playTrack(track_index)}} );
+    if(found_file==0)
+    { 
+      track_index=track_list.length; // Not -1 cause file will be added and track_list length will increase by 1
+      // If extension is audio
+      if(fileTypes.Audio.includes(extArg)) 
+      {
+        fileType='audio';
+        playlistMusic.innerHTML  = playlistMusic.innerHTML +
+        `<tr trackIndex='`+track_index+`'' onclick="loadTrack('`+ track_index +`');playTrack();resetSelectionHighlightPlaylist();this.classList.add('selected')">
+        <td>`+nameArg+`</td>
+        <td class="track-duration" style='align-self: center;'></td>
+        </tr>`;
+      } 
+      // If extension is video
+      if(fileTypes.Video.includes(extArg)) 
+      {
+        fileType='video';
+        playlistVideo.innerHTML  = playlistVideo.innerHTML +
+        `<tr trackIndex='`+track_index+`'' onclick="loadTrack('`+ track_index +`');playTrack();applySelectionHighlightPlaylist(true);">
+        <td>`+nameArg+`</td>
+        <td class="track-duration" style='align-self: center;'></td>
+        </tr>`;
+        tabelaVideoBarLista.innerHTML=tabelaVideoBarLista.innerHTML +
+        `<tr trackIndex='`+track_index+`'' oncontextmenu="track_list.splice('`+track_index+`',1);populateVideo();" onclick="loadTrack('`+ track_index +`');playTrack();applySelectionHighlightPlaylist(true);">
+        <td>`+nameArg+`</td>
+        <td class="track-duration" style='align-self: center;'></td>
+        </tr>`;
+      } 
+      let theFile={"name": nameArg, "artist": "","image":"set/default.jpg","path":filePath,"duration":"","type":fileType};
+      console.log("Push non repeated file");
+      track_list.push(theFile);
+     /*  worker.postMessage({trackIndex: Number(track_index),filePath: filePath }); */
+      loadMetaData(track_index);
+      console.log(theFile);
+    }
+}
+/* function updateTrackMetadata(metadata) {
+  let track = track_list[metadata.trackIndex];
+  track.duration = metadata.duration;
+  // Assuming there's a UI element for duration update
+  let durationElement = document.querySelector(`tr[trackIndex='${metadata.trackIndex}'] .track-duration`);
+  if (durationElement) {
+    durationElement.textContent = metadata.duration;
+  }
+  console.log(`Updated track metadata:`, track);
+} */
+async function loadMetaData(trackIndex){
+  let duration;
+  let durationMinutes;
+  let durationSeconds;
+  ffmpeg.ffprobe(track_list[trackIndex].path,function(err, data) 
+    {
+      duration=data.format.duration;
+      console.log(data.format.duration);
+      durationMinutes = Math.floor(duration / 60);
+      durationSeconds = Math.floor(duration - durationMinutes * 60);
+      durationMinutes = padZero(parseInt(durationMinutes, 10));
+      durationSeconds= padZero(parseInt(durationSeconds, 10));
+      let el=document.body.querySelector('tr[trackIndex="'+trackIndex+'"]');
+      el.children[1].innerHTML=durationMinutes+":"+durationSeconds;
+      track_list[trackIndex].duration=durationMinutes+":"+durationSeconds;
+      console.log("duration metadata: "+duration);
+      }); 
+  /* document.body.querySelector('tr[trackIndex]').forEach((el) => 
+  {
+    ffmpeg.ffprobe(track_list[el.attributes.trackindex.value].path,function(err, data) 
+    {
+      duration=data.format.duration;
+      console.log(data.format.duration);
+      durationMinutes = Math.floor(duration / 60);
+      durationSeconds = Math.floor(duration - durationMinutes * 60);
+      durationMinutes = padZero(parseInt(durationMinutes, 10));
+      durationSeconds= padZero(parseInt(durationSeconds, 10));
+      el.children[1].innerHTML=durationMinutes+":"+durationSeconds
+      track_list[el.attributes.trackindex.value].duration=durationMinutes+":"+durationSeconds;
+      console.log("duration metadata: "+duration);
+
+      }); 
+  }); */
+}
+
 console.log("Checkpoint 4");
 //Custom alert
 function customAlert(message)
 {
   customAlertElement.classList.remove('hide');
   customAlertElement.children[0].children[0].innerHTML=message;
+}
+//Windows maximization handling
+function WindowMinMax()
+{
+  if(isMax==1)
+  {
+    if(win.isKioskMode==true) {win.leaveKioskMode();isMax=0;win.setResizable(true);}
+    else {win.unmaximize();isMax=0;}
+  }
+  else
+  {
+    if(videoContainerElement.style.display=="block"){win.enterKioskMode();isMax=1;win.setResizable(false);}
+    else{win.maximize();isMax=1;}
+  }
 }
 //Populate music list (table)
 function populateMusic()
@@ -1165,114 +1297,418 @@ function populateVideo()
 console.log("Checkpoint 6");
 //Clear table
 function clearList(){playlistMusic.innerHTML="";playlistVideo.innerHTML="";tabelaVideoBarLista.innerHTML=""}
+//Volume slider show
+function volumeH()
+{
+  overleyment.style.display="block";
+  volumeb.style.animation="fade-in 0.4s"
+  volumeb.style.display='block';
+}
+//Volume slider show/hide
+function volumeC(){
+  switch(volumeb.style.display)
+  {
+  case 'none':
+    overleyment.style.display="block";
+    volumeb.style.animation="fade-in 0.4s"
+    volumeb.style.display='block';
+    break;
+  case 'block':
+    overleyment.style.display="none";
+    volumeb.style.animation="fade-out 0.4s"
+    break;
+  }
+}
+//Show sidebar list in video view, activate overlay for autohide
+function videoPlaylistSideButton()
+{
+  switch(videoPlaylistElement.style.display)
+  {
+  case 'none':
+    overleyment.style.display="block";
+    videoPlaylistElement.style.display='block';
+    break;
+  }
+}
+console.log("Checkpoint 7");
+//Main menu
+function openMenu()
+{
+  overleyment.style.display="block";
+  switch(menuListElement.style.display)
+  {
+  case 'none':
+    menuListElement.style.display='block';
+    menuListElement.style.animation="fade-in 0.4s";
+    break;
+  case 'block':
+    menuListElement.style.animation="fade-out 0.4s";
+    break;
+  }
+}
+//Get random number for random shuffle
+function getRandomInt(max) {return Math.floor(Math.random() * max);}
+
+//Shuffle button toggle function
+function shuffle()
+{
+  switch(shuffleEl.style.display)
+  {
+    case 'none':
+      shuffleEl.style.display='block';
+      repeatEl.style.display='none';
+      console.log("shuffle on");
+      audioVideoElement.removeEventListener("ended", nextTrack);
+      audioVideoElement.addEventListener("ended", shufflePlay);
+      break;
+    case 'block':
+      shuffleEl.style.display='none';
+      console.log("shuffle off");
+      audioVideoElement.removeEventListener("ended", shufflePlay);
+      audioVideoElement.addEventListener("ended", nextTrack);
+      break;
+  }
+}
+//Shuffle tracks at random function
+function shufflePlay()
+{
+  var randTrack=getRandomInt(track_list.length);
+  if(randTrack==track_index)
+  {
+    randTrack=randTrack+1;
+    console.log("while"+ randTrack);
+  }
+  else if(randTrack!=track_index)
+  {
+    console.log("played"+ randTrack);
+    loadTrack(randTrack);
+    playTrack();
+    applySelectionHighlightPlaylist();
+  }
+}
+console.log("Checkpoint 8");
+//Repeat button toggle
+function repeat()
+{
+  switch(repeatEl.style.display)
+  {
+    case 'none':
+      repeatEl.style.display='block';
+      shuffleEl.style.display='none';
+      console.log("repeat on");
+      audioVideoElement.removeEventListener("ended", nextTrack);
+      audioVideoElement.addEventListener("ended", playTrack);
+      break;
+    case 'block':
+      repeatEl.style.display='none';
+      console.log("repeat off");
+      audioVideoElement.removeEventListener("ended", playTrack);
+      audioVideoElement.addEventListener("ended", nextTrack);
+      break;
+  }
+}
+
+//Get current date/time for unpause at time menu
+const dateNow = new Date();
+let dateNowFormated= new Date().toISOString().slice(0, -8);
+unPause_time.value=dateNowFormated;
+unPause_time.min=dateNowFormated;
+console.log(dateNowFormated);
+console.log("Checkpoint 9");
+
+//Track loading function
+function loadTrack(index)
+{
+  track_index=index;
+  clearInterval(updateTimer);
+  resetValues();
+  if (track_list[track_index].type.includes("video"))
+  {
+    videoContainerElement.style.display="block";
+    videoPlaylistSideButtonElement.style.display="block";
+    track_art.style.display="none";
+  }
+  else
+  {
+    videoContainerElement.style.display="none";
+    videoPlaylistSideButtonElement.style.display="none";
+    track_art.style.display="block";
+  }
+  // Load a new track
+  audioVideoElement.src = track_list[track_index].path;
+  audioVideoElement.load();
+  // Update details of the track
+  track_art.src= track_list[track_index].image ;
+  track_name.textContent = track_list[track_index].name;
+  document.title = track_list[track_index].artist+' - '+track_list[track_index].name;
+  track_artist.textContent =  track_list[track_index].artist;
+  //now_playing.textContent = "PLAYING " + (track_index + 1) + " OF " + track_list.length;
+  // Set an interval of 1000 milliseconds for updating the seek slider
+  updateTimer = setInterval(seekUpdate, 1000);
+  // Move to the next track if the current one finishes playing
+}
+//Track error event listner
+audioVideoElement.addEventListener('error', function()
+{
+  console.log("Video error");
+  if(isNaN(audioVideoElement.duration) && track_list[track_index].path.includes(".mp4") && audioVideoElement.src!=error_track_src)
+  {
+    fixEncoding(track_list[track_index].path);
+    error_track_src=audioVideoElement.src;
+    setTimeout(()=>fixMedia(track_list[track_index].path),1500)
+  }
+},false);
+//Track loaded data event listener
+audioVideoElement.addEventListener('loadeddata', function() {console.log("Video loaded"); VideoErr=0; seekTrimEnd();}, false);
+audioVideoElement.addEventListener("ended", nextTrack);
+console.log("Checkpoint 10");
+
+//Open music list view
+function openMusic()
+{
+  playlistVideoTable.style.display='none';
+  document.getElementById('videoCategoryBtnId').classList.remove('selected');
+  document.getElementById('musicCategoryBtnId').classList.add('selected');
+  console.log("openMusic")
+  playerGEl.style.display="block";
+  infoEl.style.display="flex";
+  playlistContainerEl.style.display="flex";
+  playlistMusicTable.style.display="flex";
+  choiceMenuEl.style.display="flex";
+  choiceMenuEl.styledisplay="block";
+  videoContainerElement.style.display="none";
+}
+console.log("Checkpoint 11");
+//Open video list view
+function openVideo()
+{
+  playlistMusicTable.style.display='none';
+  document.getElementById('musicCategoryBtnId').classList.remove('selected');
+  document.getElementById('videoCategoryBtnId').classList.add('selected');
+  console.log("openVideo");
+  if (track_list[track_index].type.includes("video"))
+  {
+    videoContainerElement.style.display="block";
+    videoPlaylistSideButtonElement.style.display="block";
+  }
+  playerGEl.style.display="block";
+  infoEl.style.display="flex";
+  playlistContainerEl.style.display="flex";
+  playlistVideoTable.style.display="flex";
+  choiceMenuEl.style.display="flex";
+  choiceMenuEl.styledisplay="block";
+  if(visualizerOn){visualizerSwitch()};
+}
+// Reset track duration/current time values
+function resetValues()
+{
+  curr_time.textContent = "00:00";
+  total_duration.textContent = "00:00";
+  time_trim_end.textContent="00:00";
+  seek_slider.value = 0;
+}
+//Play/pause toggle function
+function playpauseTrack() {
+  if (!isPlaying) playTrack();
+  else {pauseTrack()};
+}
+//Play track and change icon to pause
+function playTrack()
+{
+  audioVideoElement.play();
+  isPlaying = true;
+  playpause.src = "set/pause.png";
+}
+
+console.log("Checkpoint 12");
+//Pause track and change icon to play
+function pauseTrack()
+{
+  audioVideoElement.pause();
+  isPlaying = false;
+  playpause.src = "set/play.png";
+}
+//Go to next track function
+function nextTrack()
+{
+  if (track_list.length>0 && track_index<track_list.length-1) {track_index=parseInt(track_index)+1;loadTrack(track_index);playTrack();}
+  else {track_index = 0;loadTrack(track_index);playTrack();}
+  applySelectionHighlightPlaylist();
+}
+//Go to previous track function
+function prevTrack()
+{
+  if (track_list.length>0 && track_index!=0){track_index=parseInt(track_index)-1;loadTrack(track_index);playTrack();}
+  else {track_index = track_list.length-1;loadTrack(track_index);playTrack();}
+  applySelectionHighlightPlaylist();
+}
+//Add zeros to duration number (if it's 9 sec, it will show 09 sec)
+function padZero(number) {return number < 10 ? '0' + number : number;}
+//Seeking on slider input function
+function seekTo()
+{
+  seekto = audioVideoElement.duration * (seek_slider.value / 500);
+  audioVideoElement.currentTime = seekto;
+}
+//Right thumb of video trimming slider
+function seekTrimEnd()
+{
+  seekEndDuration=audioVideoElement.duration*(seek_trim_end.value/500);
+  console.log("seekEndDuration:"+seekEndDuration+"seek_trim_end:"+seek_trim_end.value);
+  let seekEndMinutes = Math.floor(seekEndDuration/ 60);
+  let seekEndSeconds = Math.floor(seekEndDuration - seekEndMinutes * 60);
+  seekEndMinutes=padZero(parseInt(seekEndMinutes, 10));
+  seekEndSeconds=padZero(parseInt(seekEndSeconds, 10));
+  let seekEndText= seekEndMinutes+":"+seekEndSeconds;
+  time_trim_end.innerHTML=seekEndText;
+  console.log(seekEndText);
+  console.log("Duration"+seekEndDuration);
+}
+//Left thumb of video trimming slider
+function seekTrimStart()
+{
+  seekStartDuration=audioVideoElement.duration*(seek_trim_start.value/500);
+  audioVideoElement.currentTime = seekStartDuration;
+  console.log("seekEndDuration:"+seekStartDuration+"seek_trim_end:"+seek_trim_start.value);
+  let seekStartMinutes = Math.floor(seekStartDuration/ 60);
+  let seekStartSeconds = Math.floor(seekStartDuration - seekStartMinutes * 60);
+  seekStartMinutes=padZero(parseInt(seekStartMinutes, 10));
+  seekStartSeconds=padZero(parseInt(seekStartSeconds, 10));
+  let seekStartText= seekStartMinutes+":"+seekStartSeconds;
+  time_trim_start.innerHTML=seekStartText;
+  console.log(seekStartText);
+}
+//Change trimming slider color
+function seekTrimColor()
+{
+  let seek_trim_start_prc=seek_trim_start.value/5;
+  let seek_trim_end_prc=seek_trim_end.value/5;
+  seek_trim_start.style.background='linear-gradient(to right, rgb(8, 8, 8, 0.44) 0%, rgb(8, 8, 8, 0.44) '+seek_trim_start_prc+'%, '+style.getPropertyValue('--sliderColorFull')+' '+seek_trim_start_prc+'%, '+style.getPropertyValue('--sliderColorFull')+' '+seek_trim_end_prc+'%, rgb(8, 8, 8, 0.44) '+seek_trim_end_prc+'%, rgb(8, 8, 8, 0.44) 100%)';
+}
+//Set volume on volume slider input
+function setVolume() {audioVideoElement.volume = volume_slider.value / 100;}
+
+console.log("Checkpoint 13");
+//Auto move seekslider while track is playing
+function seekUpdate()
+{
+  let seekPosition = 0;
+  // Check if the current track duration is a legible number
+  if (!isNaN(audioVideoElement.duration))
+  {
+    seekPosition = audioVideoElement.currentTime * (500 / audioVideoElement.duration);
+    seek_slider.value = seekPosition;
+    // Calculate the time left and the total duration
+    let currentMinutes = Math.floor(audioVideoElement.currentTime / 60);
+    let currentSeconds = Math.floor(audioVideoElement.currentTime - currentMinutes * 60);
+    let durationMinutes = Math.floor(audioVideoElement.duration / 60);
+    let durationSeconds = Math.floor(audioVideoElement.duration - durationMinutes * 60);
+    // Adding a zero to the single digit time values
+    if (currentSeconds < 10) { currentSeconds = "0" + currentSeconds; }
+    if (durationSeconds < 10) { durationSeconds = "0" + durationSeconds; }
+    if (currentMinutes < 10) { currentMinutes = "0" + currentMinutes; }
+    if (durationMinutes < 10) { durationMinutes = "0" + durationMinutes; }
+    curr_time.textContent = currentMinutes + ":" + currentSeconds;
+    total_duration.textContent = durationMinutes + ":" + durationSeconds;
+  }
+}
+//Seek slider container events
+const container = document.getElementById("seekSliderContainer");
+  let isDraggingSeek = false;
+  function updateSlider(event) {
+    const rect = container.getBoundingClientRect();
+    const offsetX = event.clientX - rect.left;
+    const percentage = Math.max(0, Math.min(1, offsetX / rect.width));
+    seek_slider.value = percentage * (seek_slider.max - seek_slider.min);
+    seek_slider.dispatchEvent(new Event("input")); // Trigger input event
+  }
+  container.addEventListener("mousedown", (event) => {
+    isDraggingSeek = true;
+    updateSlider(event);
+  });
+
+  document.addEventListener("mousemove", (event) => {
+    if (isDraggingSeek) {
+      updateSlider(event);
+    }
+  });
+  document.addEventListener("mouseup", () => {
+    isDraggingSeek = false;
+  });
+//Invisible overlay that hides elements when hovered
+function overleymentFunction (pelement)
+{
+  overleyment.style.display="none";
+  videoPlaylistElement.style.display="none";
+  const eleArray=[volumeb,menuListElement];
+  overleyment.style.display="none";
+  eleArray.forEach((element) => {if(element!=pelement){element.style.animation="fade-out 0.4s"}});
+}
+console.log("Checkpoint 14");
+
+//Hide menu and volume slider on overlay hover
+function closeall()
+{
+  overleyment.style.display="none";
+  if(volumeb.style.display=='block')
+  {
+  volumeb.style.animation="fade-out 0.4s";
+  }
+  if(menuListElement.style.display=='block')
+  {
+  menuListElement.style.animation="fade-out 0.4s";
+  }
+}
+//Display unpause at the time dialog
+function unPauseTimeF(){unPauseAtTimeEl.style.display="flex";}
+//Unpause or play at given date and time
+function watchTime(targetTime)
+{
+  const currentTime = new Date();
+  const fixedDate = new Date(targetTime + ':00.000Z');
+  const totalDays=fixedDate.getDay()-currentTime.getDay();
+  const totalHours=fixedDate.getHours()-currentTime.getHours();
+  const totalMinutes=fixedDate.getMinutes()-currentTime.getMinutes();
+  customAlert("Play/pause in: "+totalDays+" Days "+totalHours+" Hours "+totalMinutes+" Minutes");
+  function updateStatus()
+  {
+    const currentTime = new Date();
+    const isoString = currentTime.toISOString();
+    const currentTimeString = isoString.slice(0,-8);
+    if (currentTimeString === targetTime) {
+      console.log( `Current time (${currentTimeString}) is equal to target time (${targetTime})!`);
+      playpauseTrack();
+    } else {
+      console.log( `Current time: ${currentTimeString}`);
+    }
+  }
+  updateStatus();
+  setInterval(updateStatus, 60000);
+}
+console.log(unPause_time.value)
 </script>
-<script src="js/uiChanges.js"></script>
-<script src="js/playerFunctions.js"></script>
 <script src="js/fileProcessing.js"></script>
 <script src="js/documentEvents.js"></script>
 <script src="js/nwEvents.js"></script>
 <script>
 console.log("Checkpoint 19");
 
-//Fix file path encoding for files with special characters
-function fixEncoding(filePath){
-  let splitArg=pathArgSpliter(filePath);
-  let nameLen=splitArg.length-1;
-  let nameArg=splitArg[nameLen];
-  let folderPath = filePath.substring(0, filePath.length-nameArg.length);
-  let nameEncoded = encodeURI(nameArg).replace(/#/g, "%23");
-  audioVideoElement.src=folderPath+nameEncoded;
-  playTrack();
-  console.log("File path encoding fixed");
-}
-//END
-</script>
-<script type="text/javascript" src="js/ffmpegVideoProcess.js"></script>
-<script>
-//win.showDevTools(); //debuging only, will crash nw.js non sdk version, you have to download nw.js sdk package
-document.addEventListener('mousemove', function()
+//Context menu START
+if (document.addEventListener)
 {
-    resetTimeout();
-    document.getElementById('slider_container_Id').classList.remove('hidden');
-    document.getElementById('homeButtonsId').classList.remove('hidden');
-    choiceMenuEl.style.opacity="1";
-    choiceMenuEl2.style.opacity="1";
-    infoEl.style.opacity="1";
-    infoEl.style.mixBlendMode='';
-    playlistContainerEl.style.opacity="1";
-    audioVideoElement.style.cursor = 'auto';
-});
-document.addEventListener('mouseout', function() {resetTimeout();
-  if(visualizerOn){
+  videoContainerElement.addEventListener('contextmenu', function(e)
+  {
+    contextMenuVideo.style.display="block";
+    contextMenuVideo.style.left=e.clientX+"px";
+    contextMenuVideo.style.top=e.clientY+"px";
+    e.preventDefault();
+  }, false);
+}
+else {videoContainerElement.attachEvent('oncontextmenu', function() {window.event.returnValue = false;});}
 
-  }
-});
-setInterval(()=>
-{
-  if(visualizerOn && (!isOverList && !overChoiceMenu))
-  {
-      choiceMenuEl.classList.add('hide');
-      choiceMenuEl2.classList.add('hide');
-      track_art.classList.add('hide');
-      playlistContainerEl.classList.add('hide');
-      infoEl.style.width="500px";
-      infoEl.style.justifyContent="left";
-  }
-},5000);
-function addEventsForVisualizer()
-{
-  choiceMenuContainer.addEventListener('mouseenter', function() 
-  {
-    if(visualizerOn){unHideElementsForVisual();}
-  });
-  listaContainterEl.addEventListener('mouseenter', function() 
-  {
-    console.log("mouse in");
-    if(visualizerOn){unHideElementsForVisual();}
-  });
-  canvas.addEventListener('click',function(){playpauseTrack(); });
-  canvas.addEventListener('dblclick',function()
-  {
-    if(win.isKioskMode==true) {win.leaveKioskMode();isMax=0;win.setResizable(true);}
-    else if(win.isKioskMode==false) {win.enterKioskMode();isMax=1;win.setResizable(false);}
-  })
-  canvas.addEventListener('contextmenu', function(e)
-    {
-      contextMenuCanvas.style.display="block";
-      contextMenuCanvas.style.left=e.clientX+"px";
-      contextMenuCanvas.style.top=e.clientY+"px";
-      e.preventDefault();
-    }, false);
-};
-
-//Set window always on top switch
-function alwaysOnTopSwitch(){
-  if(!alwaysOnTop){
-    win.setAlwaysOnTop(true);
-    alwaysOnTop=true;
-  }
-  else if(alwaysOnTop){
-    win.setAlwaysOnTop(false);
-    alwaysOnTop=false;
-  }
-}
-//New window options
-let playlistWindowOptions = { "title": "Playlist", "frame": false, "fullscreen": false, "transparent": false, "resizable": true, "show": true, "always_on_top": true,"width": 400,
-      "height": 600};
-var playlistWindow;
-//Open new window function
-function newWindow(url,options,append)
-{
-  playlistWindow=nw.Window.open(url,options,function(newWindow)
-    {
-        playlistWindow = newWindow;
-        playlistWindow.once('loaded', function(){
-        playlistWindow.setAlwaysOnTop=true;
-        playlistWindow.window.document.body.appendChild(append);
-        /* topWindow.append(playlistContainerEl); */
-        });
-    });
-}
+document.addEventListener('click', function(e) {contextMenuVideo.style.display="none";}, false);
+//Context menu END
+let response;
 //Update app function
 async function updateApp()
 {
@@ -1291,8 +1727,167 @@ async function updateApp()
 });
   customAlert("Update complete. Restart the app to see changes");
 }
+
+console.log("Checkpoint 20");
+//Fix file path encoding for files with special characters
+function fixEncoding(filePath){
+  let splitArg=pathArgSpliter(filePath);
+  let nameLen=splitArg.length-1;
+  let nameArg=splitArg[nameLen];
+  let folderPath = filePath.substring(0, filePath.length-nameArg.length);
+  let nameEncoded = encodeURI(nameArg).replace(/#/g, "%23");
+  audioVideoElement.src=folderPath+nameEncoded;
+  playTrack();
+  console.log("File path encoding fixed");
+}
+//END
+</script>
+<script type="text/javascript" src="js/ffmpegVideoProcess.js"></script>
+<script>
+//win.showDevTools(); //debuging only, will crash nw.js non sdk version, you have to download nw.js sdk package
+console.log("Checkpoint 22");
+//Auto hide elements function START
+const inactivityTimeout = 700; //Time until hiding
+let timeoutId;
+function hideElementsAndCursor()
+{
+  if(isMax==1 && !overVideoElements)
+  {
+    document.getElementById('slider_container_Id').classList.add('hidden');
+    document.getElementById('homeButtonsId').classList.add('hidden');
+    audioVideoElement.style.cursor = 'none';
+  }
+  if(visualizerOn && !isOverList && !overChoiceMenu){
+    infoEl.style.opacity="0.4";
+    infoEl.style.mixBlendMode='plus-lighter';
+    playlistContainerEl.style.opacity="0.2";
+    choiceMenuEl.style.opacity="0.2";
+    choiceMenuEl2.style.opacity="0.2";
+    audioVideoElement.style.cursor = 'none';
+  }
+  else
+  {
+    audioVideoElement.style.cursor = 'none';
+  }
+}
+function resetTimeout()
+{
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(hideElementsAndCursor, inactivityTimeout);
+}
+console.log("Checkpoint 23");
+document.addEventListener('mousemove', function()
+{
+    resetTimeout();
+    document.getElementById('slider_container_Id').classList.remove('hidden');
+    document.getElementById('homeButtonsId').classList.remove('hidden');
+    choiceMenuEl.style.opacity="1";
+    choiceMenuEl2.style.opacity="1";
+    infoEl.style.opacity="1";
+    infoEl.style.mixBlendMode='';
+    playlistContainerEl.style.opacity="1";
+    audioVideoElement.style.cursor = 'auto';
+});
+document.addEventListener('mouseout', function() {resetTimeout();
+  if(visualizerOn){
+
+  }
+});
+setInterval(()=>{
+  if(visualizerOn && (!isOverList && !overChoiceMenu)){
+      choiceMenuEl.classList.add('hide');
+      choiceMenuEl2.classList.add('hide');
+      track_art.classList.add('hide');
+      playlistContainerEl.classList.add('hide');
+      infoEl.style.width="500px";
+      infoEl.style.justifyContent="left";
+  }
+},5000);
+function addEventsForVisualizer(){
+choiceMenuContainer.addEventListener('mouseenter', function() {
+  if(visualizerOn){
+    unHideElementsForVisual();
+  }
+});
+listaContainterEl.addEventListener('mouseenter', function() {
+  console.log("mouse in");
+  if(visualizerOn){
+    unHideElementsForVisual();
+  }
+});
+canvas.addEventListener('click',function(){
+  playpauseTrack();
+})
+canvas.addEventListener('dblclick',function(){
+  if(win.isKioskMode==true) {win.leaveKioskMode();isMax=0;win.setResizable(true);}
+  else if(win.isKioskMode==false) {win.enterKioskMode();isMax=1;win.setResizable(false);}
+})
+canvas.addEventListener('contextmenu', function(e)
+  {
+    contextMenuCanvas.style.display="block";
+    contextMenuCanvas.style.left=e.clientX+"px";
+    contextMenuCanvas.style.top=e.clientY+"px";
+    e.preventDefault();
+  }, false);
+};
+//Unhide left side elements hidden when visualizator on
+function unHideElementsForVisual(){
+    choiceMenuEl.classList.remove('hide');
+    choiceMenuEl2.classList.remove('hide');
+    track_art.classList.remove('hide');
+    playlistContainerEl.classList.remove('hide');
+    infoEl.style.width="auto";
+    infoEl.style.justifyContent="center";
+}
+resetTimeout();
+//Auto hide elements function END
+//Pip video
+async function pipVideo(){
+  let videoElement = document.body.querySelector('video');
+  try {
+      if (!document.pictureInPictureElement) {
+          win.minimize();
+          await videoElement.requestPictureInPicture();
+      } else {
+          await document.exitPictureInPicture();
+      }
+  } catch (error) {
+      console.error("Error enabling PiP:", error);
+  }
+}
+//End
+//Set window always on top switch
+function alwaysOnTopSwitch(){
+  if(!alwaysOnTop){
+    win.setAlwaysOnTop(true);
+    alwaysOnTop=true;
+  }
+  else if(alwaysOnTop){
+    win.setAlwaysOnTop(false);
+    alwaysOnTop=false;
+  }
+}
 </script>
 <script type="text/javascript" src="js/playlistManipulation.js"></script>
+<script>
+//New window options
+let playlistWindowOptions = { "title": "Playlist", "frame": false, "fullscreen": false, "transparent": false, "resizable": true, "show": true, "always_on_top": true,"width": 400,
+      "height": 600};
+var playlistWindow;
+//Open new window function
+function newWindow(url,options,append)
+{
+  playlistWindow=nw.Window.open(url,options,function(newWindow)
+    {
+        playlistWindow = newWindow;
+        playlistWindow.once('loaded', function(){
+        playlistWindow.setAlwaysOnTop=true;
+        playlistWindow.window.document.body.appendChild(append);
+        /* topWindow.append(playlistContainerEl); */
+        });
+    });
+}
+</script>
 <script src="js/visualizer.js"></script>
 <script src="components/selectActionMenu.js"></script>
 

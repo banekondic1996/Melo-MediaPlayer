@@ -961,7 +961,7 @@
             <div class="duration" id="durationEId" style="margin-right: 130px;"><span class="total-duration">00:00</span></div>
             <div class="yes">
               <div class="overley" id="overleyId" onmouseover="overleymentFunction(overleyment)"></div>
-              <div style="display:none;" id="volume2"><input type="range" min="1" max="99" value="99" step="1" class="volume_slider" id="volumesliderId" onchange="setVolume()"></div>
+              <div style="display:none;" id="volume2"><input type="range" min="1" max="100" value="99" class="volume_slider" id="volumesliderId" onchange="setVolume()"></div>
             </div>
           </div>
       </div>
@@ -1066,11 +1066,11 @@ document.addEventListener("keydown", (event) => {
 if(event.code=='Space'){playpauseTrack();}
 if(event.code=='ArrowLeft'){audioVideoElement.pause();audioVideoElement.currentTime-=0.8;}
 if(event.code=='ArrowRight'){audioVideoElement.pause();audioVideoElement.currentTime+=0.8;}
-if(event.code=='ArrowUp'){audioVideoElement.volume+=0.1;volume_slider.value=audioVideoElement.volume*100}  // I don't get it
-if(event.code=='ArrowDown'){audioVideoElement.volume-=0.1;volume_slider.value=audioVideoElement.volume*100}
+if(event.code=='ArrowUp'){Number(volume_slider.value)+=10;setVolume();}  // I don't get it
+if(event.code=='ArrowDown'){volume_slider.value-=10;setVolume();}
 if(event.code=='Numpad8'){nextTrack();}
 if(event.code=='Numpad2'){prevTrack();}
-if(event.code=='KeyF'){if(!document.getElementById('musicCategoryBtnId').classList.contains('selected'))WindowMinMax();}
+if(event.code=='KeyF'){WindowMinMax();}
 console.log(event);
 });
 document.addEventListener("keyup", (event) => {
@@ -1115,6 +1115,20 @@ function customAlert(message)
 {
   customAlertElement.classList.remove('hide');
   customAlertElement.children[0].children[0].innerHTML=message;
+}
+//Windows maximization handling
+function WindowMinMax()
+{
+  if(isMax==1)
+  {
+    if(win.isKioskMode==true) {win.leaveKioskMode();isMax=0;win.setResizable(true);}
+    else {win.unmaximize();isMax=0;}
+  }
+  else
+  {
+    if(videoContainerElement.style.display=="block"){win.enterKioskMode();isMax=1;win.setResizable(false);}
+    else{win.maximize();isMax=1;}
+  }
 }
 //Populate music list (table)
 function populateMusic()
@@ -1168,12 +1182,85 @@ function clearList(){playlistMusic.innerHTML="";playlistVideo.innerHTML="";tabel
 </script>
 <script src="js/uiChanges.js"></script>
 <script src="js/playerFunctions.js"></script>
+<script>
+//Open music list view
+function openMusic()
+{
+  playlistVideoTable.style.display='none';
+  document.getElementById('videoCategoryBtnId').classList.remove('selected');
+  document.getElementById('musicCategoryBtnId').classList.add('selected');
+  console.log("openMusic")
+  playerGEl.style.display="block";
+  infoEl.style.display="flex";
+  playlistContainerEl.style.display="flex";
+  playlistMusicTable.style.display="flex";
+  choiceMenuEl.style.display="flex";
+  choiceMenuEl.styledisplay="block";
+  videoContainerElement.style.display="none";
+}
+console.log("Checkpoint 11");
+//Open video list view
+function openVideo()
+{
+  playlistMusicTable.style.display='none';
+  document.getElementById('musicCategoryBtnId').classList.remove('selected');
+  document.getElementById('videoCategoryBtnId').classList.add('selected');
+  console.log("openVideo");
+  if (track_list[track_index].type.includes("video"))
+  {
+    videoContainerElement.style.display="block";
+    videoPlaylistSideButtonElement.style.display="block";
+  }
+  playerGEl.style.display="block";
+  infoEl.style.display="flex";
+  playlistContainerEl.style.display="flex";
+  playlistVideoTable.style.display="flex";
+  choiceMenuEl.style.display="flex";
+  choiceMenuEl.styledisplay="block";
+  if(visualizerOn){visualizerSwitch()};
+}
+  //Get current date/time for unpause at time menu
+  const dateNow = new Date();
+  let dateNowFormated= new Date().toISOString().slice(0, -8);
+  unPause_time.value=dateNowFormated;
+  unPause_time.min=dateNowFormated;
+  console.log(dateNowFormated);
+  console.log("Checkpoint 9");
+  //Display unpause at the time dialog
+  function unPauseTimeF(){unPauseAtTimeEl.style.display="flex";}
+  //Unpause or play at given date and time
+  function watchTime(targetTime)
+  {
+    const currentTime = new Date();
+    const fixedDate = new Date(targetTime + ':00.000Z');
+    const totalDays=fixedDate.getDay()-currentTime.getDay();
+    const totalHours=fixedDate.getHours()-currentTime.getHours();
+    const totalMinutes=fixedDate.getMinutes()-currentTime.getMinutes();
+    customAlert("Play/pause in: "+totalDays+" Days "+totalHours+" Hours "+totalMinutes+" Minutes");
+  function updateStatus()
+  {
+    const currentTime = new Date();
+    const isoString = currentTime.toISOString();
+    const currentTimeString = isoString.slice(0,-8);
+    if (currentTimeString === targetTime) {
+      console.log( `Current time (${currentTimeString}) is equal to target time (${targetTime})!`);
+      playpauseTrack();
+    } else {
+      console.log( `Current time: ${currentTimeString}`);
+    }
+  }
+  updateStatus();
+  setInterval(updateStatus, 60000);
+}
+console.log(unPause_time.value)
+</script>
 <script src="js/fileProcessing.js"></script>
 <script src="js/documentEvents.js"></script>
 <script src="js/nwEvents.js"></script>
 <script>
 console.log("Checkpoint 19");
-
+let response;
+console.log("Checkpoint 20");
 //Fix file path encoding for files with special characters
 function fixEncoding(filePath){
   let splitArg=pathArgSpliter(filePath);
@@ -1190,6 +1277,9 @@ function fixEncoding(filePath){
 <script type="text/javascript" src="js/ffmpegVideoProcess.js"></script>
 <script>
 //win.showDevTools(); //debuging only, will crash nw.js non sdk version, you have to download nw.js sdk package
+console.log("Checkpoint 22");
+console.log("Checkpoint 14");
+console.log("Checkpoint 23");
 document.addEventListener('mousemove', function()
 {
     resetTimeout();
