@@ -79,5 +79,9 @@ function reSize()
   let widthSeek=seeksliderEl.offsetWidth+"px";
   seek_trim_start.style.width=widthSeek;
   seek_trim_end.style.width=widthSeek;
+  if(vlcOn){ //If VLC make it follow main window
+    spawn2('xdotool', ['windowmove', wid, win.x*1.094, win.y*1.094+80]);
+    spawn2('xdotool', ['windowsize', wid, win.width*1.094, win.height*1.094-150]);
+    }
 }
 reSize();

@@ -35,6 +35,10 @@ function trackMousePosition()
       const xM = event.screenX-cX;
       const yM = event.screenY-cY;
       win.moveTo(xM, yM);
+      if(vlcOn){ //If VLC make it follow main window, works on linux
+      spawn2('xdotool', ['windowmove', wid, xM*1.094, yM*1.094+80]);
+      spawn2('xdotool', ['windowsize', wid, win.width*1.094, win.height*1.094-150]);
+      }
     }
     else if (holdingVideo && isMax!=1){
       console.log("holding video")

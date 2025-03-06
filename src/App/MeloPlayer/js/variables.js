@@ -51,10 +51,12 @@ let track_index = 0; //Starting track index
 let shufferN=0; //Shuffle on?
 let repeatN=0; //Repeat on?
 let isPlaying = false;
+let vlcOn = false;
 let fileInProcess;
 let updateTimer;
 let response;
 let command;
+let wid;
 let scaleValue=1;
 let seekStartDuration=0;
 let seekEndDuration=0;
