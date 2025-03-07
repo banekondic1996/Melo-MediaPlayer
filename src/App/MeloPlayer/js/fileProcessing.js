@@ -1,6 +1,6 @@
 //File path string splitter, depends on platform
 function pathArgSpliter(filePath){
-    if (process.platform == "windows") {return filePath.split("\\");}
+    if (processPlatform == "win32") {return filePath.split("\\");}
     else{return filePath.split("/");}
   }
   
@@ -23,7 +23,8 @@ function pathArgSpliter(filePath){
   {
     let found_file=0;
     track_list.forEach((element,index)=>{if (filePath==element.path) {found_file=1;track_index=index;return}});
-    if (process.platform != "windows") {filePath="file://"+filePath;} // If not on windows, adds needes string to file path
+    if (processPlatform != "win32") {filePath="file://"+filePath;} // If not on windows, adds needes string to file path
+    /* if(processPlatform=='win32'){filePath.replace(/\\/g, '\\\\');} */
     let splitArg=pathArgSpliter(filePath); // Split given file path into strings
     let nameIndex=splitArg.length-1; // Index of file name in splited string array, last one is extension
     let nameArg=splitArg[nameIndex];  // The name of file including file extension
@@ -93,10 +94,13 @@ function pathArgSpliter(filePath){
         durationSeconds = Math.floor(duration - durationMinutes * 60);
         durationMinutes = padZero(parseInt(durationMinutes, 10));
         durationSeconds= padZero(parseInt(durationSeconds, 10));
-        let el=document.body.querySelector('tr[trackIndex="'+trackIndex+'"]');
-        el.children[1].innerHTML=durationMinutes+":"+durationSeconds;
-        track_list[trackIndex].duration=durationMinutes+":"+durationSeconds;
-        console.log("duration metadata: "+duration);
+        let el=document.body.querySelectorAll('tr[trackIndex="'+trackIndex+'"]');
+        el.forEach((el)=>
+          { 
+            el.children[1].innerHTML=durationMinutes+":"+durationSeconds;
+            track_list[trackIndex].duration=durationMinutes+":"+durationSeconds;
+            console.log("duration metadata: "+duration);
+          })
         }); 
     /* document.body.querySelector('tr[trackIndex]').forEach((el) => 
     {
@@ -178,7 +182,7 @@ function loadMediaFromCurrentFolder(){
   let nameLen=splitArg.length-1; // Name part index of string
   let nameArg=splitArg[nameLen]; // The name of file
   let index=0; // Starting trim index
-  if (process.platform != "windows") {index=7} // To trim "file://" from file path
+  if (processPlatform != "win32") {index=7} // To trim "file://" from file path
   let folderPath = filePath.substring(index, filePath.length-nameArg.length); // Final folder path
   useFolderInput.nwworkingdir=folderPath; // Add default start directory to open folder dilog
   useFolderInput.click(); // Simulate click to start open folder dilog

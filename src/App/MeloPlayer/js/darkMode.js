@@ -18,6 +18,7 @@ function darkmode()
     document.getElementById('durationEId').style.color="white";
     menuListElement.style.color="white";
     menuListElement.style.background="#2c2c2c";
+    slider_container_trim.classList.remove('darkMe');
     for (let item of imgs) {item.classList.add("darkMe");}
     seeksliderEl.classList.add('darkMeSlider');
     volumeEl.classList.add('darkMeSlider');
@@ -37,6 +38,7 @@ function darkmode()
     volumeb.style.background="#dddddd70";
     document.getElementById('durationCId').style.color="black";
     document.getElementById('durationEId').style.color="black";
+    slider_container_trim.classList.add('darkMe');
     document.body.style.backgroundColor = "white";
     menuListElement.style.color="black";
     menuListElement.style.background="rgb(228, 228, 228)";
@@ -61,6 +63,7 @@ function darkmode()
     document.getElementById('durationEId').style.color="white";
     menuListElement.style.color="white";
     menuListElement.style.background="#2c2c2c";
+    slider_container_trim.classList.remove('darkMe');
     for (let item of imgs) {item.classList.add("darkMe");}
     seeksliderEl.classList.add('darkMeSlider');
     volumeEl.classList.add('darkMeSlider');

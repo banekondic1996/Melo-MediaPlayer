@@ -1,6 +1,7 @@
 //Video trimming function
 function doTrimConvert(filePath,formatOutput,isTrim)
 {
+ /*  if(processPlatform=='win32'){filePath = filePath.replace(/\\/g, '\\\\');} */
   let duration;
   let options=['-ab', '192k'];
   let codec= 'h264_amf';
@@ -19,19 +20,18 @@ function doTrimConvert(filePath,formatOutput,isTrim)
   outputFile=filePath.substring(0, lastIndex)+"_converted"+getRandomInt(999)+"."+formatOutput;
   let formatInput=filePath.substring(lastIndex+1,);
   console.log("inputFormat:"+formatInput);
-  console.log("outputFile:"+outputFile+formatOutput);
+  console.log("outputFile:"+outputFile);
   if(ffmpegOn){
-    ffmpegOn=false;
-    command.kill('SIGSTOP');
-    console.log(fileInProcess);
-    fs.unlinkSync(fileInProcess);
+    killFFmpeg();
+    doTrimConvert(filePath,formatOutput,isTrim);
   }
- if(ffmpegOn==false){
+  else if(ffmpegOn==false){
     let seek=time_trim_start.innerHTML;
     if(formatOutput.includes("gif")) {options=['-vf', 'scale=640:-1:flags=lanczos,fps=15'];codec='gif';}
     if(duration<0){console.log("in reverse");duration=Math.abs(duration);seek=time_trim_end.innerHTML;options=['-vf reverse','-af areverse'];}
     ffmpegOn=true;
-    fileInProcess=outputFile;
+    if (processPlatform == "linux" || processPlatform == "darwin") {fileInProcess=outputFile.substring(6,outputFile.length);}
+    else{fileInProcess=outputFile;}
     command = ffmpeg()
     /*  .inputOption([
         "-hwaccel d3d11va",
@@ -103,7 +103,6 @@ function fixMedia(filePath,formatInput,formatOutput)
           console.log('deleted');
         })
       }
-      if (process.platform != "windows") {outputFile="file://"+outputFile;}
       track_list[track_index].path=outputFile+'_MeloFixed.mp4';
       audioVideoElement.src=track_list[track_index].path;
       /* audioVideoElement.load(); */
@@ -143,5 +142,16 @@ function fixMedia(filePath,formatInput,formatOutput)
   }
   else {customAlert("This video is broken");VideoErr=1;}
 }
+}
+function killFFmpeg(){
+  if(ffmpegOn){
+    console.log("Stopping ffmpeg");
+    ffmpegOn=false;
+    command.kill('SIGKILL'); //SIGKILL works both on windows and linux!
+    document.getElementById('conversion').style.display="none";
+    document.getElementById('conversion').value=0;
+    console.log("Deleting file:"+fileInProcess);
+    setTimeout(()=>{fs.unlinkSync(fileInProcess);},1000);
+  }
 }
 //Fix broken MP4 function END

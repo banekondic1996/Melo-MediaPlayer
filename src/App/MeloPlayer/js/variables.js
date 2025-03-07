@@ -76,12 +76,13 @@ let holdingVideo=false; //Is holding video?
 let alwaysOnTop=false; //Is alwaysOnTop?
 let isOverList=false; 
 let ffmpegOn=false;
+let processPlatform=process.platform;
 let track_list = []; //The track list
 let style = window.getComputedStyle(document.body);
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegStatic = require('ffmpeg-static');
 const ffprobeStatic=require('ffmpeg-ffprobe-static');
-if (process.platform == "linux" || process.platform == "darwin") 
+if (processPlatform == "linux" || processPlatform == "darwin") 
 {
 ffmpeg.setFfmpegPath("/usr/bin/ffmpeg");
 ffmpeg.setFfprobePath("/usr/bin/ffprobe");
