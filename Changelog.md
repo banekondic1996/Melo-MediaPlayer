@@ -35,15 +35,19 @@ Version 2.2
 -Fixed track not going to next track, cause javascripts 1+1 is 11.....
 -Fixed video loading
 </pre>
+Version 2.3
+<pre>
+-Fixed bugs for Windows verison of media player (it was missing ffmpeg.exe, cause i built it on Linux)
+-Reworked how dark mode is applied
+-Added kill button for FFMpeg process
+</pre>
 To fix in next version:
 <pre>
--Load dark mode diffrently via CSS and add CSS variables for colors
--Make metadata load faster
+-Support more video formats
+-Fix metadata loading, cause it's slow
 -Make update button do the update
 -Load playlists only once with separate lists
--When changing between video/music tabs keep selection highlight of current track
--Add frequency analyzer (in works)
+-Add frequency analyzer
 -Add frequency generator
 -Add equalizer
--Make code more efficient, cause it's all over the place
 </pre>
