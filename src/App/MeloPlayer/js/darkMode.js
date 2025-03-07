@@ -1,5 +1,5 @@
 //Dark mode function
-function darkmode()
+/* function darkmode()
 {
   var imgs = document.getElementsByClassName("lMode");
   var elements = document.querySelectorAll("div.list>tr:nth-child(even)");
@@ -72,4 +72,4 @@ function darkmode()
     videoPlaylistElement.classList.add("darkMe");
     for (i = 0; i < elements.length; i++) { elements[i].style.background = "#838383";}
   }
-}
+} */

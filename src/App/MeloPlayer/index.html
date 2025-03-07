@@ -4,830 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Melo player</title>
-    <!--    
-    --selected: #c3c3c34a;
-    --playerUI: rgb(255 30 30 / 37%);
-    --contextColor: rgb(161 161 161 / 90%);
-    --sliderColorEmpty: rgb(8, 8, 8, 0.44);
-    --sliderColorFull: rgb(255 102 129);
-    --alertBackground: rgba(103, 103, 103, 0.551);
-    --trHover: rgb(246 42 42);
-    --trActive: rgb(170, 64, 64); 
-    -->
-    <style>
-    :root {
-    --selected: #c3c3c34a;
-    --playerUI:rgb(224 224 224 / 37%);
-    --contextColor:rgb(228 228 228 / 90%);
-    --sliderColorEmpty:rgb(8, 8, 8, 0.44);
-    --sliderColorFull:rgb(255 102 129);
-    --alertBackground:rgba(103, 103, 103, 0.551);
-    --trHover:rgb(48, 48, 48);
-    --trActive:rgb(170, 64, 64);
-    --transBar:#dddddd70;
-    }
-  *{
-    user-select: none;
-    -webkit-user-drag: none;
-  }
-  body {
-    background-color: rgb(255, 255, 255);
-    margin:0px;
-    transition: background-color .5s;
-    overflow: hidden;
-    width: 100%;
-    height: 100%;
-    position: fixed;
-  }
-  #visualizer {
-    width: 100%;
-    height: 100%;
-    z-index: -2;
-    position: absolute;
-    display: flex;
-    top: 0px;
-    filter:brightness(0.6);
-  }
-  .listaContainer{
-    position: absolute;
-    width: 400px;
-    height: 90%;
-    right: 0px;
-  }
-  .searchVisualizerMin{
-    width: auto !important;
-  }
-  .listaVisualizerMin{
-    position: fixed !important;
-    width: 400px;
-    left: auto !important;
-  }
-  .visualizerMin{
-    top: 145px !important;
-    width: calc(100vw - 450px) !important;
-    height: calc(100vh - 200px) !important;
-    position:absolute !important;
-    left:20px !important;
-    border-radius: 20px !important;
-  }
-  #alertID{
-    display: flex;
-    background: var(--alertBackground);
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: 9999;
-    top: 0px;
-    backdrop-filter: blur(3px);
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-content: center;
-    justify-content: center;
-    align-items: center;
-  }
-  #alertID input[type="button"]{
-    width: 113px;
-    height: 32px;
-    margin: auto;
-    background: #ffffffa6;
-    border-radius: 14px;
-    /* position: absolute; */
-    outline: none;
-    border: none;
-  }
-  #alertID input[type="button"]:hover{
-    opacity: 1;
-  }
-  #alertID input[type="button"]:active{
-    filter: contrast(0.5);
-  }
-  #alertMessageID{
-    margin: auto;
-    padding: 10px;
-    color: white;
-    text-shadow: 0px 0px 4px #312f2fbf;
-  }
-  ::-webkit-scrollbar {
-    width: 10px;
-    height:10px;
-  }
-  .scrollContainer:hover::-webkit-scrollbar-thumb {
-    width: 20px;
-  }
-  ::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 1px grey;
-    border-radius: 10px;
-  }
-  .darkMe2::-webkit-scrollbar-thumb {
-    background: gray;
-    border-radius: 10px;
-  }
-  /* If light mode is on, change slider color */
-  ::-webkit-scrollbar-thumb {
-    background: #dcdcdc;
-    border-radius: 10px;
-  }
-/*   ::-webkit-scrollbar-thumb:hover {
-    background: #dcdcdc;
-  } */
-  /*Video container */
-  .videoContainer {
-    right: 0px;
-    left: 0px;
-    bottom: 0px;
-    top: 0px;
-    margin: auto;
-    position: absolute;
-    z-index: 200;
-  }
-  /* Track image */
-  .track-art {
-    position: absolute;
-    top: 134px;
-    margin: 0px;
-    height: 220px;
-    width: 220px;
-    border-radius: 15%;
-    padding: 10px;
-    left: 11px;
-  }
-  .now-playing {
-    font-size: 1rem;
-  }
-  .track-name {
-    font-size: 1.6em;
-  }
-  .track-artist {
-    font-size: 1.3rem;
-  }
-  .buttons {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    border-radius: 40px;
-    padding: 2px;
-    justify-content: center;
-  }
-  .volume_slider{
-    bottom: 109px;
-    right: -47px;
-  }
-  .playpause-track,
-  .prev-track,
-  .next-track {
-    padding-inline: 1px;
-    opacity: 0.4;
-    transition: opacity .2s;
-  }
-  .playpause-track:hover,
-  .prev-track:hover,
-  .next-track:hover {
-    opacity: 1.0;
-  }
-  #seekSliderContainer{
-    width: 100%;
-    align-items: center;
-    height: 35px;
-    display: flex;
-  }
-  .slider_container {
-    width: 100%;
-    height: 40px;
-    background: var(--transBar);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    bottom: 0px;
-    z-index: 200;
-    position: absolute;
-    /* filter: invert(1); */
-  }
-  .slider2 {
-    height: 35px;
-  }
-  .slider2 div {
-    padding-inline:20px;
-  }
-  /* Modify the appearance of the slider */
-  .seek_slider,
-  .volume_slider {
-    border-radius: 20px;
-    height: 3px;
-    background: black;
-    accent-color: black;
-    opacity: 0.7;
-    -webkit-transition: .2s;
-    transition: opacity .2s;
-  }
-  .yes{
-    margin:0px
-  }
-  .seek_slider:hover,
-  .volume_slider:hover {
-    opacity: 1.0;
-  }
-  .seek_slider {
-    width: 100%;
-    user-select: none;
-  }
-  .volume_slider {
-    position: absolute;
-    bottom: 70px;
-    right: -51.5px;
-    transform: rotateZ(270deg);
-  }
-  .current-time,
-  .total-duration {
-    padding: 5px;
-  }
-  .duration{
-    margin: 10px;
-    opacity: 0.7;
-    border-radius: 40px;
-  }
-  .floatdetails{
-    display: flex;
-    height: 30px;
-    /* position: absolute; */
-    color: rgb(0, 0, 0);
-    margin: -8px;
-    padding: 36px;
-    border-radius: 26px;
-    opacity: 0.9;
-    padding-right: 21px;
-    padding-left: 23px;
-    /* text-align: center; */
-    justify-content: center;
-    align-items: center;
-    align-content: center;
-  }
-  .wcontrol
-  {
-    display: flex;
-    position: absolute;
-    right: 0px;
-    top: 13px;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    height: 84px;
-  }
-  /* Close,maximize,minimize buttons container */
-  .wcontrols{
-    margin-top: 3.4px;
-    right: 4px;
-    display: block;
-    position: absolute;
-  }
-    /* Close,maximize,minimize buttons */
-  .wcontrols2{
-    opacity: 0.5;
-  }
-  .wcontrols2:hover{
-    opacity: 0.8;
-  }
- /*  Container for list of loaded tracks */
-  .list{
-    position: fixed;
-    display: flex;
-    background-color: var(--playerUI);
-    border-radius: 10px;
-    margin: 0px;
-    height: auto;
-    top: 146px;
-    bottom: 51.3px;
-    left: 254px;
-    right: 10px;
-    z-index: 1;
-    overflow: auto;
-  }
-  /* Loaded video tracks list (Activated when moving cursor to right edge of the window) */
-  .list2{
-    position: absolute;
-    width: 176px;
-    height: fit-content;
-    background-color: var(--contextColor);
-    opacity: 0.5;
-    border: none;
-    border-radius: 10px;
-    overflow-y: hidden;
-    overflow-x: hidden;
-    z-index: 222;
-  }
-  .videoSidePlaylist{
-    top: 82px;
-    right: 40px;
-    width: 300px;
-    height: 80%;
-    overflow: auto;
-  }
-  .menuList{
-    border-collapse: collapse;
-    border-style: none;
-    right: 13px;
-    bottom: 46px;
-  }
-  .list2:hover{
-    opacity: 1;
-  }
-  .list2 tr th td{
-    color:white;
-    background-color:rgb(231, 231, 231);
-  }
-  table {
-    font-family: arial, sans-serif;
-    border-collapse: collapse;
-    width: 100%;
-    height:100%;
-  }
-  td, th {
-    text-align: left;
-    padding: 8px;
-  }
-  #playlistMusicId tr,#playlistVideoId tr{
-    display: flex;
-    width: 100%;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-  }
-  thead th{
-    margin:auto;
-    padding: 0px !important;
-  }
-  tbody tr:hover {
-    background-color: var(--trHover);
-    color: white;
-    user-select: none;
-  }
-  tbody tr:active {
-    background-color: var(--trActive);
-    color: white;
-  }
-  tbody tr:nth-child(even):hover {
-    background-color: var(--trHover);
-  }
-  tbody tr:nth-child(even):active {
-    background-color: var(--trActive);
-  }
-  .lista{
-    display:none;
-    position: absolute;
-    height: 25%;
-    right: 4px;
-    /* top: 47vh; */
-    top: 35vh;
-    opacity: 0;
-    z-index: 800;
-  }
-  .lista:hover{
-    opacity: 1;
-  }
- /*  Menu button */
-  .menu{
-    position: absolute;
-    right: 4px;
-    bottom: 10px;
-    opacity:0.5;
-    z-index:1000;
-  }
-   /*  volume button */
-  .volume{
-    position: absolute;
-    right: 104px;
-    bottom: 10px;
-  }
-  /* Repeat button */
-  .repeat{
-    position: absolute;
-    right: 34px;
-    bottom: 10px;
-    z-index:1000;
-  }
-  /* Shuffle button */
-  .shuffle{
-    position: absolute;
-    right: 68px;
-    bottom: 10px;
-    z-index:1000;
-  }
-  #volume2{
-    display: none;
-    position: absolute;
-    border: 1px solid #cfcfcf;
-    background-color: rgb(239, 239, 239);
-    width: 30px;
-    height: 148px;
-    bottom: 51px;
-    bottom: 34px;
-    right: 98px;
-    border-radius: 50px;
-    z-index: 202;
-  }
-  .infoplay
-  {
-    width: auto;
-    display: flex;
-    background-color: var(--playerUI);
-    margin-left: 10px;
-    border-radius: 11px;
-    margin-right: 10px;
-    margin-top: 47px;
-    justify-content: center;
-  }
-  .imagine {
-    height: 90%;
-    width: 98%;
-    /* margin-left: 1%; */
-    /* margin-right: 10%; */
-    /* margin-right: 30px; */
-    padding: auto;
-    margin: auto;
-    /* background-position: center; */
-    /* background-repeat: no-repeat; */
-    /* background-size: cover; */
-    z-index: 1000;
-    border-radius: 10px;
-  }
-  /* Dark/Light mode CSS */
-  .darkMe{
-    filter: invert(1);
-  }
-  /* Dark/Light mode CSS for text*/
-  .darkMe2{
-    color:#e7e7e7;
-  }
-  /* Dark/Light mode CSS for slider*/
-  .darkMeSlider{
-    accent-color: snow;
-  }
- /*  Button CSS when toggled */
-  .toggle{
-    position: absolute;
-    background-color: #d7d7d7;
-    width: 30px;
-    height: 30px;
-    border-radius: 100%;
-    z-index:1000;
-  }
-  /* Top bar container for elements */
-  .anal{
-    display: flex;
-    position: absolute;
-    width: 100%;
-    height: 30px;
-    background-color: rgba(255, 255, 255, 0);
-    align-items: flex-start;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    z-index: 1000;
-    top: 0px;
-  }
-  /*  Tab CSS */
-  /* Play/Pause button */
-  #playpauseId{
-    position: absolute;
-    right: 16px;
-    bottom: 67px;
-    opacity: 0.6;
-  }
-  /* Overlay to hide volume slider, track list when mouse goes over it */
-  .overley{
-    display: none;
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    /* z-index: 5555; */
-    top: 0px;
-    left: -150px;
-    /* background-color: #bb3b3b86;  */    /* remove in dist */
-  }
-  /* Top bar photo, video, radio list buttons */
-  .homeButtons{
-    display: flex;
-    background-color: var(--transBar);
-    position: absolute;
-    right: 0px;
-    top: 0px;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-  }
-  .homeButtons img{
-    padding: 10px;
-    opacity: 0.5;
-  }
-  .homeButtons img:hover{
-    opacity: 1;
-  }
-  #titleBarId{
-    display: block;
-    position: absolute;
-    width: calc(100% - 185px);
-    height: 32px;
-  }
-  .choiceMenu{
-    background-color: var(--playerUI);
-    border-radius: 10px;
-    margin: 0px;
-    left: 23px;
-    width: 218px;
-    z-index: 1;
-    overflow: hidden;
-  }
-  .choiceMenuHeader{
-    flex: none;
-    color: black;
-    overflow: hidden;
-    width: 100%;
-    height: 36px;
-    align-content: center;
-    background: gainsboro;
-    font-weight: bold;
-    font-family: arial, sans-serif;
-    border-collapse: collapse;
-  }
-  .hidden {
-    opacity: 0;
-    pointer-events: none; /* Ensure no interaction with hidden elements */
-    transition: opacity 1s ease;
-  }
-  .inputDialog{
-    display: none;
-    position-area: center;
-    /* top: calc(50% - 103px);
-    left: calc(50% - 139px); */
-    position: absolute;
-    background-color: #cfcfcfad;
-    height: 200px;
-    width: 280px;
-    margin: auto;
-    z-index: 1000;
-    border-radius: 15px;
-    flex-direction: column;
-    flex-wrap: wrap;
-    align-content: space-around;
-    justify-content: center;
-    padding-top: 10px;
-    backdrop-filter: blur(3px);
-  }
-  .inputDialog input[type="button"]{
-    margin:8px;
-    border:none;
-    opacity: 0.8;
-  }
-  .inputDialog input[type="button"]:hover{
-    opacity: 1;
-  }
-  .inputDialog input[type="button"]:active{
-    opacity: 1;
-  }
-  .buttonTime{
-    height: 43px;
-    width: 100%;
-    margin: 5px;
-    shape-outside: margin-box;
-    border: #37373700;
-    padding: 8px;
-    border-radius: 32px;
-    opacity: 0.8;
-  }
-  .buttonTime:hover{
-    opacity: 1;
-  }
-  .buttonTime:active{
-    filter: contrast(0.5);
-  }
-  #unPause-time{
-    margin: auto;
-    border-radius: 55px;
-    border: none;
-    height: 50px;
-    width: auto;
-    padding: 20px
-  }
-  .hide-scrollbar {
-  overflow: hidden;
-  }
-  .hide-scrollbar::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-  }
-  .hide-scrollbar {
-  scrollbar-width: none;
- }
- .hide{
-  display: none !important;
- }
- .bgBlur{
-  backdrop-filter: blur(4px);
- }
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  @keyframes fade-out {
-    from {
-      opacity: 1;
-    }
-    to {
-      opacity: 0;
-    }
-  }
-  th{
-    background: gainsboro;
-  }
-  .contextMenu{
-    display: none;
-    position: absolute;
-    width: fit-content;
-    height: fit-content;
-    max-width: 130px;
-    background-color: var(--contextColor);
-    backdrop-filter: blur(4px);
-    opacity: 0.8;
-    border: none;
-    border-radius: 10px;
-    overflow: hidden;
-    z-index: 222;
-    text-align: center;
-  }
-  .contextMenu td{
-    text-align: center;
-  }
-  .trim_slider{
-    position: absolute;
-    appearance: none;
-    background: none;
-    bottom: 16px;
-    pointer-events: none;
-  }
-  .trim_slider_up{
-    background:linear-gradient(to right, var(--sliderColorEmpty) 0%, var(--sliderColorEmpty) 0%, var(--sliderColorFull) 0%, var(--sliderColorFull) 100%, var(--sliderColorEmpty) 100%, var(--sliderColorEmpty 100%));
-    border: #a9a9a98f;
-    border-style: solid;
-    border-width: 0.1px;
-    mix-blend-mode: hard-light;
-  }
-  #trimBlock input[type=range]::-webkit-slider-thumb {
-    pointer-events: all;
-  }
-  #conversion{
-    display:none;
-    width: 50px;
-    position: absolute;
-    left: 18px;
-    bottom: 53px;
-    height: 10px;
-    filter: hue-rotate(118deg);
-    z-index: 999;
-  }
-  .messageDialog{
-    display:none;
-    background: #0404048f;
-    position: absolute;
-    top: 45%;
-    left: calc(50% - 150px);
-    padding-inline: 80px;
-    height: 100px;
-    width: 150px;
-    z-index: 10000;
-    backdrop-filter: blur(10px);
-    margin: auto;
-  }
-  #message{
-    margin: auto;
-    text-align: center;
-    font-size: 1em;
-    border-radius: 10px;
-    color: white;
-  }
-  .messageDialog input[type="button"]{
-    height: 34px;
-    width: 100px;
-    border-radius: 10px;
-    background: #afafaf33;
-    border-style: none;
-    color: white;
-  }
-  .messageDialog input[type="button"]:active{
-    background: #9a9a9a;
-  }
-  .focus{
-    opacity: 1;
-    pointer-events: all;
-    transition: opacity 1s ease;
-  }
-  .selected{
-    background: var(--selected);
-  }
-  #playlistSearchId{
-    border: 1px solid #80808066;
-    border-radius: 20px;
-    padding-inline: 10px;
-    text-align: center;
-    height: 20px;
-    width: calc(100vw - 500px);
-    background: none;
-  }
-  @media only screen and (max-width: 600px) {
-  #seekSliderContainer{
-    position: absolute!important;
-    height: 0px;
-  }
-  .seek_slider{
-      position: absolute!important;
-      bottom: 23px!important;
-  }
-  .trim_slider{
-      bottom: 30px!important;
-      height: 3px!important;
-      left: -4px!important;
-  }
-  .slider_container{
-    justify-content: space-between;
-    
-  }
-  #slider_container_trim_Id{
-    bottom: 42px;
-  }
-  #slider_container_trim_Id input[type=button]{
-    height: 18px !important;
-  }
-  .current-time{
-      position: absolute;
-      left: 84px;
-      bottom: 6px;
-  }
-  .total-duration{
-      position: absolute;
-      right: 143px;
-      bottom: 6px;
-  }
-  .fa-volume-up
-  {
-    margin-bottom: 2px;
-  }
-  .track-art{
-    display:none!important;
-  }
-  .list{
-    left:10px;
-  }
-  .choiceMenu{
-    display:none!important;
-  }
-  }
-  @media only screen and (max-width: 600px){
-    .track-name{
-      font-size: 1.3em;
-    }
-    #playlistSearchId{
-      width: calc(100vw - 200px);
-    }
-    .listaVisualizerMin{
-    right: 5px;
-    width: auto !important;
-    left: 10px !important;
-  }
-  .visualizerMin{
-    width: 100% !important;
-    height: 100% !important;
-    position: absolute !important;
-    top: 0px !important;
-    left: 0px !important;
-  }
-  .infoplay{
-    width: auto !important;
-  }
-  .buttons{
-    margin-bottom: 2%;
-  }
-  #durationTrimEndId{
-    margin-right: 14px !important;
-  }
- }
-  @media only screen and (max-height: 650px){
-  .videoSidePlaylist{
-    height:60vh!important;
-  }
-  .lMode{
-    display: block;
-  }
-}
-@media only screen and (max-height: 550px) {
-/*   .track-art{
-    display: none !important;
-  }
-  #choiceMenuContainerID{
-    top:146px !important;
-  } */
-}
-</style>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
   <body>
     <div class="inputDialog" id="unPauseAtTimeId">
@@ -877,7 +54,7 @@
   </div>
 </div>
   <div id="choiceMenuContainerID" style="display: flex;height: auto;bottom: 52px;width: 300px;position: absolute;top: 372px;flex-direction: column;" onmouseover="overChoiceMenu=true;" onmouseleave="overChoiceMenu=false">
-  <div class="choiceMenu bgBlur" id="choiceMenuId" style="color: white;
+  <div class="choiceMenu bgBlur" id="choiceMenuId" style="color: black;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -905,7 +82,7 @@
   </div>
   <div class="choiceMenu bgBlur" id="choiceMenuId2" style="
   height: 100%;
-  color: white;
+  color: black;
   position: relative;
   display: flex;
   flex-direction: column;" onmouseover="this.children[1].style.overflow='overlay';" onmouseleave="this.children[1].style.overflow='hidden';" >
@@ -916,19 +93,19 @@
     <table>
       <tbody>
       <tr onclick="visualizerSwitch()" oncontextmenu="presetMenu.show();">
-        <td> <img src="set/visualizer.png" class="lMode darkMe" width="22px" height="auto"></td>
-        <td>Visualizer<img src="set/settings.png" class="lMode darkMe" width="22px" height="auto" style="position: absolute;right: 5px;top: 10px;" onclick="event.stopPropagation();presetMenu.show();"></td>
+        <td> <img src="set/visualizer.png" class="lMode" width="22px" height="auto"></td>
+        <td>Visualizer<img src="set/settings.png" class="lMode" width="22px" height="auto" style="position: absolute;right: 5px;top: 10px;" onclick="event.stopPropagation();presetMenu.show();"></td>
       </tr>
       <tr onclick="" style="opacity: 0.3;">
-        <td>  <img src="set/test.png" class="lMode darkMe" width="22px" height="auto"></td>
+        <td>  <img src="set/test.png" class="lMode" width="22px" height="auto"></td>
         <td>Equalizer</td>
       </tr>
       <tr onclick="document.getElementById('frequencyAnalyzerID').style.display='block'" style="opacity: 0.3;">
-        <td>  <img src="set/test.png" class="lMode darkMe" width="22px" height="auto"></td>
+        <td>  <img src="set/test.png" class="lMode" width="22px" height="auto"></td>
         <td>Frequency analyser</td>
       </tr>
       <tr onclick="" style="opacity: 0.3;">
-        <td>  <img src="set/test.png" class="lMode darkMe" width="22px" height="auto"></td>
+        <td>  <img src="set/test.png" class="lMode" width="22px" height="auto"></td>
         <td>Frequency generator</td>
       </tr>
     </tbody></table>
@@ -945,14 +122,14 @@
           </div>
           <div class="lista lMode" id="videoPlaylistSideButtonID" onmouseover="videoPlaylistSideButton()"><img width="32px" height="auto"></div>
           <progress id="conversion" value="0" max="100" style="width: 50px;"></progress>
-          <div class="slider_container" id="slider_container_trim_Id" style="display:none;background: rgba(8, 8, 8, 0.44);bottom: 38.5px;">
+          <div class="slider_container" id="slider_container_trim_Id" style="display:none;bottom: 38.5px;">
             <!--  <progress id="conversion" value="0" max="100" style="width: 50px;"> 0% </progress> -->
-            <div class="duration" id="durationTrimStartId" style="color: white;margin-left: 90px;margin-right: 14px;"><span id="timeTrimStartId">00:00</span></div>
+            <div class="duration" id="durationTrimStartId" style="color: black;margin-left: 90px;margin-right: 14px;"><span id="timeTrimStartId">00:00</span></div>
             <div id="trimBlock" style="display: flex;width: 100%;">
             <input type="range" min="0" max="499" value="0" id="seeksliderTrimStartId" class="trim_slider trim_slider_up darkMeSlider" oninput="seekTrimColor();seekTrimStart();audioVideoElement.pause();" style="bottom: 15px;height:3px;left: 141px;margin:0px;">
             <input type="range" min="1" max="500" value="500" id="seeksliderTrimEndId" class="trim_slider trim_slider_up darkMeSlider" oninput="seekTrimColor();seekTrimEnd();audioVideoElement.pause();audioVideoElement.currentTime = seekEndDuration;" style="bottom: 15px;height:3px;left: 141px;margin:0px;">
             </div>
-            <div class="duration" id="durationTrimEndId" style="color: white;margin-right: 4px "><span id="timeTrimEndId">00:00</span></div>
+            <div class="duration" id="durationTrimEndId" style="color: black;margin-right: 4px "><span id="timeTrimEndId">00:00</span></div>
             <input type="button" onclick="doTrimConvert(track_list[track_index].path,'mp4',true);console.log(track_list[track_index].path.toString())" value="Trim" style="width: 40px;height: 22px;border-radius: 10px;margin-left: 1px;margin-right: 4px;border: none;box-shadow: 0px 0px 2px 1px #6e6e6ea1;">
             <input type="button" value="Close" onclick="slider_container_trim.style.display='none';" style="margin-right: 4px;width: 50px;height: 22px;border-radius: 10px;border: none;box-shadow: 0px 0px 2px 1px #6e6e6ea1;">
             <input type="button" value="Kill" onclick="killFFmpeg()" style="margin-right: 10px;width: 30px;height: 22px;border-radius: 10px;border: none;box-shadow: 0px 0px 2px 1px #6e6e6ea1;">
@@ -1033,7 +210,7 @@
         </table>
       </div>
       <div class="contextMenu" id="contextMenuVideoId" onmouseleave="this.style.display='none'">
-      <table style="display: contents;">
+      <table style="display: contents;backdrop-filter: blur(4px);">
       <tr onclick="convertDialog.style.display='flex';"><td>Convert</td></tr>
       <tr onclick="slider_container_trim.style.display='flex';seekTrimEnd();"><td>Trim</td></tr>
       <tr onclick="pipVideo()"><td>Pip video</td></tr>
@@ -1098,31 +275,8 @@ var win = nw.Window.get();
 win.resizeTo(1200,720);
 win.setPosition("center");
 //win.showDevTools();
-//Window customisation SEND
+//Window customisation END
 
-//Declerations END
-console.log("Checkpoint 3");
-if(isDeveloper)
-{
-  track_list.push(
-    {
-    name: "Mr. Plenty – Part Time AI cover",
-    artist: "Mr. Plenty",
-    image: "set/default.jpg",
-    path: "media/Mr. Plenty – Part Time AI cover.mp3",
-    duration: "3:23",
-    type:"audio/mpeg",
-  },
-  {
-    name: "Shipping Lanes",
-    artist: "Chad Crouch",
-    image: "set/default.jpg",
-    path: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    duration:"2:19",
-    type:"video/mp4",
-  });
-}
-console.log("Checkpoint 4");
 //Custom alert
 function customAlert(message)
 {
@@ -1149,7 +303,7 @@ function populateMusic()
     }
   });
 }
-console.log("Checkpoint 5");
+console.log("Checkpoint 2");
 //Populate video list (table)
 function populateVideo()
 {
@@ -1175,7 +329,7 @@ function populateVideo()
     }
 });
 }
-console.log("Checkpoint 6");
+console.log("Checkpoint 3");
 //Clear table
 function clearList(){playlistMusic.innerHTML="";playlistVideo.innerHTML="";tabelaVideoBarLista.innerHTML=""}
 </script>
@@ -1185,7 +339,7 @@ function clearList(){playlistMusic.innerHTML="";playlistVideo.innerHTML="";tabel
 <script src="js/documentEvents.js"></script>
 <script src="js/nwEvents.js"></script>
 <script>
-console.log("Checkpoint 19");
+console.log("Checkpoint 4");
 
 //Fix file path encoding for files with special characters
 function fixEncoding(filePath){
@@ -1269,6 +423,7 @@ function alwaysOnTopSwitch(){
     alwaysOnTop=false;
   }
 }
+console.log("Checkpoint 5");
 //New window options
 let playlistWindowOptions = { "title": "Playlist", "frame": false, "fullscreen": false, "transparent": false, "resizable": true, "show": true, "always_on_top": true,"width": 400,
       "height": 600};
@@ -1304,6 +459,7 @@ async function updateApp()
 });
   customAlert("Update complete. Restart the app to see changes");
 }
+console.log("Checkpoint 6");
 </script>
 <!-- <script src="js/vlcTest.js"></script> --> 
 <script type="text/javascript" src="js/playlistManipulation.js"></script>

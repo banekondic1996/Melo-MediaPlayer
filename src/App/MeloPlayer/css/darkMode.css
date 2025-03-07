@@ -1,0 +1,45 @@
+:root{
+    --selected:#0000004a !important;
+    --trActiveContext:rgb(0 186 166);
+    --sliderColorFull:rgb(255 102 129);
+}
+#alertID{
+    background: rgb(0 0 0 / 63%);
+}
+#choiceMenuId, #choiceMenuId2, #floatdetailsId,
+#durationCId,#durationEId{
+    color:white !important;
+}
+#slider_container_Id,#slider_container_trim_Id,#homeButtonsId{
+    background: #08080870 !important;
+}
+#slider_container_trim_Id input[type="button"],
+#slider_container_trim_Id .duration
+{
+ filter:invert(1)
+}
+.trim_slider, .seek_slider{
+    filter:invert(0) !important;
+}
+#menuID{
+    color:white !important;
+    background: #2c2c2c !important;
+}
+#videoPlaylistID, #volume2, .lMode, .contextMenu{
+    filter:invert(1) !important;
+}
+#seek_sliderId #volumesliderId{
+    accent-color: snow !important;
+}
+#playlistContainerId,#infoId{
+color:#e7e7e7 !important;
+}
+.inputDialog{
+    background: rgba(17, 17, 17, 0.68);
+    color:white;
+}
+body{
+    background-color: black !important;
+}
+
+

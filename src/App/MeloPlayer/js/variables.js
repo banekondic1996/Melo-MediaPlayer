@@ -1,5 +1,5 @@
 //Decleration  START
-let isDeveloper=false; //Add's test tracks into playlist
+let isDeveloper=true; //Add's test tracks into playlist
 
 let customAlertElement=document.getElementById("alertID")
 let now_playing = document.querySelector(".now-playing");
@@ -76,6 +76,7 @@ let holdingVideo=false; //Is holding video?
 let alwaysOnTop=false; //Is alwaysOnTop?
 let isOverList=false; 
 let ffmpegOn=false;
+let darkMode;
 let processPlatform=process.platform;
 let track_list = []; //The track list
 let style = window.getComputedStyle(document.body);
@@ -107,3 +108,23 @@ const fileTypes={
   Audio:['.mp3','.m4a','flac','wav','aac'],
   Video:['.mp4','.mov','.avi','webm','.ogg','.m4v','.mkv','.flv']
 }
+if(isDeveloper)
+  {
+    track_list.push(
+      {
+      name: "Mr. Plenty – Part Time AI cover",
+      artist: "Mr. Plenty",
+      image: "set/default.jpg",
+      path: "media/Mr. Plenty – Part Time AI cover.mp3",
+      duration: "3:23",
+      type:"audio/mpeg",
+    },
+    {
+      name: "Shipping Lanes",
+      artist: "Chad Crouch",
+      image: "set/default.jpg",
+      path: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+      duration:"2:19",
+      type:"video/mp4",
+    });
+  }

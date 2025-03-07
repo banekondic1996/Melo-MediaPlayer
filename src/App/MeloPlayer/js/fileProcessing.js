@@ -59,7 +59,7 @@ function pathArgSpliter(filePath){
           <td class="track-duration" style='align-self: center;'></td>
           </tr>`;
           tabelaVideoBarLista.innerHTML=tabelaVideoBarLista.innerHTML +
-          `<tr trackIndex='`+track_index+`'' oncontextmenu="track_list.splice('`+track_index+`',1);populateVideo();" onclick="loadTrack('`+ track_index +`');playTrack();applySelectionHighlightPlaylist(true);">
+          `<tr trackIndex='`+track_index+`'' oncontextmenu="track_list.splice('`+track_index+`',1);" onclick="loadTrack('`+ track_index +`');playTrack();applySelectionHighlightPlaylist(true);">
           <td>`+nameArg+`</td>
           <td class="track-duration" style='align-self: center;'></td>
           </tr>`;

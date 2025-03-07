@@ -1,3 +1,15 @@
+//Dark Mode
+function darkmode()
+{
+  if(!darkMode)
+  {
+    darkMode = document.createElement("link");
+    darkMode.href = "css/darkMode.css"; //your url
+    darkMode.rel = "stylesheet";
+    document.head.appendChild(darkMode);
+  }
+ else{darkMode.remove();darkMode=''}
+}
 //Windows maximization handling
 function WindowMinMax()
 {
