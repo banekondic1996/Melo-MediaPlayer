@@ -1,5 +1,5 @@
 //Decleration  START
-let isDeveloper=true; //Add's test tracks into playlist
+let isDeveloper=false; //Add's test tracks into playlist
 
 let customAlertElement=document.getElementById("alertID")
 let now_playing = document.querySelector(".now-playing");

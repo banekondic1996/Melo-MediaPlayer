@@ -1,0 +1,30 @@
+{
+    "name": "Melo player",
+    "main": "index.html",
+    "chromium-args": "--allow-running-insecure-content --allow-hidden-media-playback --disable-user-media-security --enable-webgl --enable-webgl2 --enable-webgl2-compute-context --enable-experimental-canvas-features --mixed-context --disable-web-security --ignore-gpu-blacklist --disable-pinch' --enable-features=UseOzonePlatform --ozone-platform=wayland",
+    "user-agent":"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114. 0.0.0 Mobile Safari/537.36",
+    "window": {
+      "frame": false,
+      "width": 1200,
+      "height": 720,
+      "position": "center",
+      "icon":"set/mello_logo2d.png",
+      "transparent": false,
+      "min_width":350,
+      "min_height":420
+     },
+     "webkit": {
+      "plugin": true
+  },
+     "webview": {
+        "partitions": [
+           {
+             "name": "trusted",
+             "accessible_resources": [
+                "<all_urls>"
+             ]
+           }
+        ]
+      }
+     
+  }

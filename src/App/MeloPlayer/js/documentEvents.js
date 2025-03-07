@@ -74,7 +74,7 @@ function trackMousePosition()
 if(dragByHoldingVideo){
 //Function to play/pause video when dragging window by grabing video, needs enabling other things too
 audioVideoElement.addEventListener('mousedown', function (event)
-{console.log(event);setTimeout(()=>{if(!holdingVideo){playpauseTrack()}},200)});
+{console.log(event);setTimeout(()=>{if(!holdingVideo && event.which==1){playpauseTrack()}},200)});
 }
 else{audioVideoElement.addEventListener('click', function (){playpauseTrack()});}
 //Track mouse position for window dragging function END
