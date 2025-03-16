@@ -52,6 +52,7 @@ let shufferN=0; //Shuffle on?
 let repeatN=0; //Repeat on?
 let isPlaying = false;
 let vlcOn = false;
+let videoHoldMouseTimeout;
 let fileInProcess;
 let updateTimer;
 let response;

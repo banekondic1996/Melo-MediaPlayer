@@ -18,8 +18,8 @@ console.log("Checkpoint 16");
 //Eventlistner for doubleclik on video to maximize the window
 videoContainerElement.addEventListener('dblclick', function (e)
 {
-  if(win.isKioskMode==false){win.enterKioskMode();isMax=1;win.setResizable(false);}
-  else if(win.isKioskMode==true){win.leaveKioskMode();isMax=0;win.setResizable(true);}
+  if(win.isKioskMode==false){win.enterKioskMode();isMax=1;win.setResizable(false);clearTimeout(videoHoldMouseTimeout)}
+  else if(win.isKioskMode==true){win.leaveKioskMode();isMax=0;win.setResizable(true);clearTimeout(videoHoldMouseTimeout)}
 });
 //Track mouse position for window dragging function START
 function trackMousePosition()
@@ -74,7 +74,7 @@ function trackMousePosition()
 if(dragByHoldingVideo){
 //Function to play/pause video when dragging window by grabing video, needs enabling other things too
 audioVideoElement.addEventListener('mousedown', function (event)
-{console.log(event);setTimeout(()=>{if(!holdingVideo && event.which==1){playpauseTrack()}},200)});
+{console.log(event);videoHoldMouseTimeout=setTimeout(()=>{if(!holdingVideo && event.which==1){playpauseTrack()}},200)});
 }
 else{audioVideoElement.addEventListener('click', function (){playpauseTrack()});}
 //Track mouse position for window dragging function END
