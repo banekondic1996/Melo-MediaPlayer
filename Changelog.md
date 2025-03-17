@@ -50,4 +50,5 @@ To fix in next version:
 -Add frequency analyzer
 -Add frequency generator
 -Add equalizer
+-Add 3d sound option
 </pre>
