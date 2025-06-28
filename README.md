@@ -1,5 +1,4 @@
 # <img src="src/App/MeloPlayer/set/melo_logo/logo128.png" height="64px" width="auto"> Melo
-# <img src="src/App/MeloPlayer/set/melo_logo/logo1282s.png" height="64px" width="auto" onerror="alert('hello')"> Melo
 Just a player, music and video player that's for Linux, Windows, MacOS. I'm so tired of ugly designed players on Linux distros and video loop of broken link on VLC player. 
 Melo as short for mellow and melody.</br>It's more beautiful then VLC, it can convert and trim video, and it's not Microsoft...Microsoft pushes you to update also it loads slower for me, so i use this player daily, also video playlist is super easy to access.</br></br>
 **Link to download:** <a href="https://github.com/banekondic1996/Melo/releases/tag/development">link</a></br></br>
