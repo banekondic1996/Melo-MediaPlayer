@@ -15,6 +15,14 @@ Current stage:
 01.03.2025 - Fixed file conversion bug, added visualizer for audio, fixed bug on Linux version, added save playlist and load playlist, code rework
 </pre>
 
+**To fix:**
+<pre>
+  -Sometimes it wont load video on app launch at first, but second time it works (needs to wait for certain functions to load)
+  -EQ to work
+  -Add video combiner
+  -Add more supported video formats 
+</pre>
+
 **Project to-do and problems:** <a href="https://github.com/users/banekondic1996/projects/5/views/2">link</a>
 Images of UI:
 1. Video play, with video trimming support
