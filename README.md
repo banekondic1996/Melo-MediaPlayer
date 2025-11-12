@@ -23,7 +23,7 @@ Current stage:
   -Add more supported video formats 
 </pre>
 
-**Project to-do and problems:** <a href="https://github.com/users/banekondic1996/projects/5/views/2">link</a>
+**Project to-do and problems:** <a href="https://github.com/users/banekondic1996/projects/5/views/2">link</a><br>
 Images of UI:
 1. Video play, with video trimming support
 ![image](https://github.com/banekondic1996/Melo/assets/22860264/8440a346-a98b-475e-baeb-f9cbc41fb9b3)
