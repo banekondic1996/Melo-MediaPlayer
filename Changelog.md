@@ -41,14 +41,29 @@ Version 2.3
 -Reworked how dark mode is applied
 -Added kill button for FFMpeg process
 </pre>
+Version 2.4
+<pre>
+-Added casting option
+-Added video combine option
+-Added option to mute audio on sound icon click
+-Added subtitles option
+-Added settings menu
+-Added frequency generator
+-Added frequency analyzer 
+-Added equalizer option
+-Added playback speed slider for video
+-Fixed and added time zone settings for "Unpause at time" option
+-Fixed video list and menus auto closing
+-Fixed update option
+-Fixed settings not being stored anywhere
+-Fixed load playlist, load folder not working when video is fullscreen
+</pre>
 To fix in next version:
 <pre>
 -Support more video formats
+-Add option to remove videos/songs from playlist
 -Fix metadata loading, cause it's slow
 -Make update button do the update
 -Load playlists only once with separate lists
--Add frequency analyzer
--Add frequency generator
--Add equalizer
 -Add 3d sound option
 </pre>
