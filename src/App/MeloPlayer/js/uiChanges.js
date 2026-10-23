@@ -1,14 +1,16 @@
 //Dark Mode
-function darkmode()
+function darkmode(force) //force: true = dark, false = light, nothing = switch
 {
-  if(!darkMode)
+  const enable = (typeof force === 'boolean') ? force : !darkMode;
+  if(enable && !darkMode)
   {
     darkMode = document.createElement("link");
     darkMode.href = "css/darkMode.css"; //your url
     darkMode.rel = "stylesheet";
     document.head.appendChild(darkMode);
   }
- else{darkMode.remove();darkMode=''}
+ else if(!enable && darkMode){darkMode.remove();darkMode=''}
+  setSetting('darkMode', !!darkMode); //Saved in config
 }
 //Windows maximization handling
 function WindowMinMax()
@@ -38,6 +40,7 @@ function openMusic()
   choiceMenuEl.style.display="flex";
   choiceMenuEl.styledisplay="block";
   videoContainerElement.style.display="none";
+  updateVideoMenuItems();
 }
 console.log("Checkpoint 11");
 //Open video list view
@@ -59,6 +62,7 @@ function openVideo()
   choiceMenuEl.style.display="flex";
   choiceMenuEl.styledisplay="block";
   if(visualizerOn){visualizerSwitch()};
+  updateVideoMenuItems();
 }
 //Context menu START
 if (document.addEventListener)
@@ -120,11 +124,16 @@ if (document.addEventListener)
         audioVideoElement.style.cursor = 'none';
       }
     }
+    let lastActivityTime = Date.now();
     function resetTimeout()
     {
+        lastActivityTime = Date.now();
         clearTimeout(timeoutId);
         timeoutId = setTimeout(hideElementsAndCursor, inactivityTimeout);
     }
+//Safety net: hide again when nothing happened for a while (the timer alone missed cases like a video starting while the mouse stays still)
+setInterval(function() {if (Date.now() - lastActivityTime >= inactivityTimeout + 100) {hideElementsAndCursor();}}, 500);
+audioVideoElement.addEventListener('playing', resetTimeout);
 //Volume slider show
 function volumeH()
 {
@@ -157,6 +166,34 @@ function videoPlaylistSideButton()
     videoPlaylistElement.style.display='block';
     break;
   }
+}
+//Side list: closes when the cursor leaves it (after it was inside) or when something else is clicked
+let videoListEntered = false;
+function closeVideoList()
+{
+  videoPlaylistElement.style.display = 'none';
+  videoListEntered = false;
+  if (menuListElement.style.display !== 'block' && volumeb.style.display !== 'block') {overleyment.style.display = 'none';}
+}
+videoPlaylistElement.addEventListener('mouseenter', function() {videoListEntered = true;});
+videoPlaylistElement.addEventListener('mouseleave', function() {if (videoListEntered && videoPlaylistElement.style.display === 'block') {closeVideoList();} videoListEntered = false;});
+document.addEventListener('mousedown', function(e)
+{
+  if (videoPlaylistElement.style.display === 'block' && !videoPlaylistElement.contains(e.target) && !videoPlaylistSideButtonElement.contains(e.target)) {closeVideoList();}
+});
+//File / folder dialogs open behind a fullscreen (kiosk) window and get stuck, so fullscreen is left first
+function openFileDialog(input)
+{
+  let wasFullscreen = false;
+  try {wasFullscreen = win.isKioskMode || win.isFullscreen;} catch (error) {}
+  if (wasFullscreen)
+  {
+    try {if (win.isKioskMode) {win.leaveKioskMode();} if (win.isFullscreen) {win.leaveFullscreen();}} catch (error) {}
+    isMax = 0;
+    try {win.setResizable(true);} catch (error) {}
+    setTimeout(function() {input.click();}, 400);
+  }
+  else {input.click();}
 }
 console.log("Checkpoint 7");
 //Main menu
@@ -240,3 +277,28 @@ async function pipVideo(){
   }
 }
 //End
+//Menu items that only make sense for video (playback speed, subtitles) are shown only while the video view is on
+function updateVideoMenuItems()
+{
+  const show = videoContainerElement.style.display==='block';
+  ['speedMenuRowID','subtitleAddRowID','subtitleSettingsRowID'].forEach(function(id)
+  {
+    const row = document.getElementById(id);
+    if(row){row.style.display = show ? '' : 'none';}
+  });
+}
+//Close menus when the mouse leaves the whole window, same as hovering the overlay does
+//mouseout without relatedTarget also happens inside the window (hidden elements, video element...), so check that the pointer is at the window edge
+function pointerLeftWindow(e)
+{
+  return e.clientX <= 24 || e.clientY <= 24 || e.clientX >= window.innerWidth - 24 || e.clientY >= window.innerHeight - 24;
+}
+function closeMenusOnExit()
+{
+  overleymentFunction(null); //Hides overlay, video side list, fades out volume slider and main menu
+  contextMenuVideo.style.display="none";
+  contextMenuCanvas.style.display="none";
+}
+//mouseleave of the page only fires when the pointer really leaves it. mouseout is a second chance (fast mouse moves), but only near the edge
+document.documentElement.addEventListener('mouseleave', closeMenusOnExit);
+document.addEventListener('mouseout', function(e){if(!e.relatedTarget && pointerLeftWindow(e)){closeMenusOnExit();}});

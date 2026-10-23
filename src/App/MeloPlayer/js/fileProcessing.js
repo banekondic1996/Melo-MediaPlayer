@@ -19,23 +19,24 @@ function pathArgSpliter(filePath){
   worker.on("exit", (code) => { if (code !== 0) console.error(`Worker stopped with exit code ${code}`);}); */
    
   // Process file and push into list (Not used yet, cause it's slower)
-  async function processFile(filePath)
+  async function processFile(filePath, silent)
   {
     let found_file=0;
-    track_list.forEach((element,index)=>{if (filePath==element.path) {found_file=1;track_index=index;return}});
+    track_list.forEach((element,index)=>{if (filePath==element.path || (processPlatform != "win32" && "file://"+filePath==element.path)) {found_file=1;track_index=index;return}});
     if (processPlatform != "win32") {filePath="file://"+filePath;} // If not on windows, adds needes string to file path
     /* if(processPlatform=='win32'){filePath.replace(/\\/g, '\\\\');} */
     let splitArg=pathArgSpliter(filePath); // Split given file path into strings
     let nameIndex=splitArg.length-1; // Index of file name in splited string array, last one is extension
     let nameArg=splitArg[nameIndex];  // The name of file including file extension
-    let extArg=filePath.substring(filePath.lastIndexOf('.')) // The file extension
+    let extArg=filePath.substring(filePath.lastIndexOf('.')).toLowerCase() // The file extension
+    if(!fileTypes.Audio.includes(extArg) && !fileTypes.Video.includes(extArg)){console.log('Not a supported file: '+filePath);return;} // Unknown files in the list used to crash the player
     let fileType // The file type
     nameArg=nameArg.substring(0,nameArg.lastIndexOf('.')) // The name of the file, removes extension if left
     let duration; // The audio/video duration variable
     let folderPath = filePath.substring(0, filePath.length-nameArg.length); // Path of folder that contains the file
     let durationMinutes
     let durationSeconds
-      track_list.forEach(function(element,index) { if (filePath==element.path){found_file=1;track_index=index;playTrack(track_index)}} );
+      track_list.forEach(function(element,index) { if (filePath==element.path){found_file=1;track_index=index;if(!silent){playTrack(track_index)}}} );
       if(found_file==0)
       { 
         track_index=track_list.length; // Not -1 cause file will be added and track_list length will increase by 1
@@ -185,56 +186,77 @@ function loadMediaFromCurrentFolder(){
   if (processPlatform != "win32") {index=7} // To trim "file://" from file path
   let folderPath = filePath.substring(index, filePath.length-nameArg.length); // Final folder path
   useFolderInput.nwworkingdir=folderPath; // Add default start directory to open folder dilog
-  useFolderInput.click(); // Simulate click to start open folder dilog
+  openFileDialog(useFolderInput); // Simulate click to start open folder dilog (leaves fullscreen first)
 }
 //Use folder function START
 function useFolder(files){
-  for (let i=0;i<files.length;i++)
+  const playingIndex = track_list.length>0 ? track_index : null; // Adding files must not change which track is the current one
+  const sortedFiles = Array.from(files).sort(function(a,b){return a.name.localeCompare(b.name, undefined, {numeric:true});});
+  for (let i=0;i<sortedFiles.length;i++)
   {
-    if(files[i].type.includes("audio") || files[i].type.includes("video") && !files[i].type.includes("tts") )
+    if(sortedFiles[i].type.includes("audio") || sortedFiles[i].type.includes("video") && !sortedFiles[i].type.includes("tts") )
     {
-      console.log(files[i])
-      processFile(files[i].path);
+      console.log(sortedFiles[i])
+      processFile(sortedFiles[i].path, true); // silent: doesn't restart playback
     }
   }
+  if (playingIndex !== null) {track_index = playingIndex;}
   clearList();
   populateVideo(); //Populate video playlist table
   populateMusic(); //Populate video playlist table
+  if (playingIndex !== null) {applySelectionHighlightPlaylist(true);}
 }
 //Use folder function END
 //Drop handling START
-document.addEventListener('dragover', function () {document.getElementById("drop_zone").style.display="block";});
+//Overlay only shows that dropping is possible. Dropping itself is handled on the whole document, so it works even if the overlay didn't show yet.
+//The overlay hides by itself 1.5 seconds after the last drag event (drag cancelled, left the window...)
+let dropZoneTimeout;
+function showDropZone()
+{
+  document.getElementById("drop_zone").style.display="block";
+  clearTimeout(dropZoneTimeout);
+  dropZoneTimeout=setTimeout(hideDropZone,1500);
+}
+function hideDropZone()
+{
+  clearTimeout(dropZoneTimeout);
+  document.getElementById("drop_zone").style.display="none";
+}
+document.addEventListener('dragenter', function(ev){ev.preventDefault();showDropZone();});
+document.addEventListener('dragover', function(ev){ev.preventDefault();showDropZone();});
+document.addEventListener('dragleave', function(ev){if(!ev.relatedTarget){hideDropZone();}});
+document.addEventListener('dragend', hideDropZone);
+document.addEventListener('mousemove', function(){if(document.getElementById("drop_zone").style.display==="block"){hideDropZone();}});
+document.addEventListener('drop', function(ev){dropHandler(ev);});
+//Paths of dropped files. Some Linux file managers only send file:// links, not real files
+function getDroppedPaths(dataTransfer)
+{
+  const paths=[];
+  [...dataTransfer.files].forEach(function(file){if(file.path){paths.push(file.path);}});
+  if(paths.length===0)
+  {
+    const uriList=dataTransfer.getData('text/uri-list') || dataTransfer.getData('text/plain') || '';
+    uriList.split(/\r?\n/).forEach(function(line)
+    {
+      line=line.trim();
+      if(line.startsWith('file://')){try{paths.push(decodeURIComponent(line.substring(7)));}catch(error){}}
+    });
+  }
+  return paths;
+}
+function isSupportedMediaFile(filePath)
+{
+  const ext=filePath.substring(filePath.lastIndexOf('.')).toLowerCase();
+  return fileTypes.Audio.includes(ext) || fileTypes.Video.includes(ext);
+}
 function dropHandler(ev)
 {
   console.log("File(s) dropped");
   ev.preventDefault();
-  if (ev.dataTransfer.items)
-  {
-    [...ev.dataTransfer.items].forEach((item, i) =>
-    {
-      if (item.kind === "file")
-      {
-        const file = item.getAsFile();
-        processFile(file.path); //New function to process files, seems slower
-        console.log("ev length");
-        console.log([...ev.dataTransfer.items].length);
-        console.log("current index");
-        console.log(i);
-        if([...ev.dataTransfer.items].length-1==i)
-        {
-          /* setTimeout(()=>loadMetaData(),500); */
-        }
-      }
-    }); 
-  }
-  else
-  {
-    [...ev.dataTransfer.files].forEach((file, i) =>
-    {
-      console.log(`… file[${i}].name = ${file.path}`);
-    });
-  }
-  document.getElementById("drop_zone").style.display="none";
+  hideDropZone();
+  const paths=getDroppedPaths(ev.dataTransfer).filter(isSupportedMediaFile);
+  if(paths.length===0){customAlert('No supported audio or video files were dropped');return;}
+  paths.forEach(function(filePath){processFile(filePath);});
   let trackType=track_list[track_index].type;
   if(trackType.includes('audio')){openMusic();}
   if(trackType.includes('video')){openVideo();}

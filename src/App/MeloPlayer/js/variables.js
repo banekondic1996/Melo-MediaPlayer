@@ -106,8 +106,8 @@ const fileObj={
 }
 //File types
 const fileTypes={
-  Audio:['.mp3','.m4a','flac','wav','aac'],
-  Video:['.mp4','.mov','.avi','webm','.ogg','.m4v','.mkv','.flv']
+  Audio:['.mp3','.m4a','.flac','.wav','.aac'],
+  Video:['.mp4','.mov','.avi','.webm','.ogg','.m4v','.mkv','.flv']
 }
 if(isDeveloper)
   {

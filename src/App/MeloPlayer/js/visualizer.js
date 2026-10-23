@@ -4,19 +4,8 @@
 let canvas
 //
 
-//Audio connection
-/* const audioContext = new(window.AudioContext || window.webkitAudioContext)().createAnalyser(); */
-const analyser= new(window.AudioContext || window.webkitAudioContext)().createAnalyser();
-const sourceNode = analyser.context.createMediaElementSource(audioVideoElement);
-
-// Connect audio to analyser
-sourceNode.connect(analyser);
-analyser.connect(analyser.context.destination);
-
-//Set analyser properties
-analyser.fftSize = 256;   // Controls the frequency resolution
-const bufferLength = analyser.frequencyBinCount;
-const dataArray = new Uint8Array(bufferLength);
+//Audio connection: the visualizer uses the shared audio graph from audioEngine.js (audioCtx, analyser, bufferLength, dataArray),
+//the audio can only be connected to the media element once, so nothing is created here.
 
 
 //Butter visualizer code
@@ -26,11 +15,12 @@ let visualizer;
 
 //Visualizer switch
  visualizerOn=false;
- let complexVisuals=true;
+ let complexVisuals=settings.complexVisuals; //Saved choice
  //Simple or complex visuals switch
  function visualizerTypeSwitch(){
     if(!complexVisuals){complexVisuals=true;visualizerSwitch();}
     else{complexVisuals=false;visualizerSwitch();}
+    setSetting('complexVisuals',complexVisuals);
   }
  function visualizerSwitch(){
   if(!visualizerOn){
@@ -45,7 +35,7 @@ let visualizer;
   //Adds events to hides menus when visualizer is on
   addEventsForVisualizer();
   if(complexVisuals){
-      visualizer = butterchurn.default.createVisualizer(analyser.context, canvas, {
+      visualizer = butterchurn.default.createVisualizer(audioCtx, canvas, {
         width: window.screen.width,
         height: window.screen.height,
         pixelRatio: window.devicePixelRatio || 1,
@@ -66,13 +56,13 @@ let visualizer;
     drawSimpleVisualizer();
   }
 }
-else if(visualizerOn){visualizerOn=false;canvas.remove();playlistContainerEl.classList.remove('listaVisualizerMin');playlistSearchEl.classList.remove('searchVisualizerMin');infoEl.style.backgroundColor='rgb(224 224 224 / 37%)';unHideElementsForVisual();}
+else if(visualizerOn){visualizerOn=false;if(visualizer){try{visualizer.disconnectAudio(analyser);}catch(error){}}canvas.remove();playlistContainerEl.classList.remove('listaVisualizerMin');playlistSearchEl.classList.remove('searchVisualizerMin');infoEl.style.backgroundColor='rgb(224 224 224 / 37%)';unHideElementsForVisual();}
  }
  //Complex visualizer
  let animationID
  function drawComplexVisualizer(){
   if(!visualizerOn){context=null; return;}
-  cancelAnimationFrame(animationID-1);
+  //(removed cancelAnimationFrame(animationID-1): frame ids are shared by the whole page, so it also cancelled the frequency analyser's frame)
   animationID=requestAnimationFrame(() => drawComplexVisualizer());
   // render a frame
   visualizer.render();

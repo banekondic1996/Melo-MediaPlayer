@@ -37,9 +37,15 @@ function loadTrack(index)
     videoPlaylistSideButtonElement.style.display="none";
     track_art.style.display="block";
   }
+  // Video uses the chosen playback speed, music always plays at normal speed (load() resets the rate to the default one)
+  const isVideoTrack = track_list[track_index].type.includes("video");
+  audioVideoElement.defaultPlaybackRate = isVideoTrack ? videoPlaybackRate : 1;
+  // Subtitles belong to the previous video
+  clearSubtitles();
   // Load a new track
   audioVideoElement.src = track_list[track_index].path;
   audioVideoElement.load();
+  updateVideoMenuItems();
   // Update details of the track
   track_art.src= track_list[track_index].image ;
   track_name.textContent = track_list[track_index].name;
@@ -81,9 +87,25 @@ function playpauseTrack() {
 //Play track and change icon to pause
 function playTrack()
 {
-  audioVideoElement.play();
   isPlaying = true;
   playpause.src = "set/pause.png";
+  startPlayback(3);
+}
+//Starts playback and tries again if the browser wasn't ready yet. Without this the first video opened on app start could stay stopped
+function startPlayback(retries)
+{
+  resumeAudioContext(); //A suspended audio context freezes the media element
+  const playPromise = audioVideoElement.play();
+  if (playPromise && playPromise.catch)
+  {
+    playPromise.catch(function(error)
+    {
+      console.log("Play failed: "+error.name);
+      if (error.name==='AbortError' || !isPlaying) {return;} //A newer track was loaded or user paused, nothing to do
+      if (retries>0) {setTimeout(function(){if(isPlaying){startPlayback(retries-1);}},250);}
+      else {isPlaying=false;playpause.src="set/play.png";}
+    });
+  }
 }
 
 console.log("Checkpoint 12");
@@ -153,12 +175,35 @@ function seekTrimColor()
 }
 //Set volume on volume slider input
 function setVolume() {audioVideoElement.volume = volume_slider.value / 100;
+    if(isMuted){setMuted(false);} //Moving the slider unmutes
+    setSetting('volume',parseInt(volume_slider.value,10));
     console.log("voolume is:"+audioVideoElement.volume);
     console.log("voolume is slider / 100:"+volume_slider.value / 100)
 };
 
 
 
+//Change volume by given amount (keyboard arrows), keeps it between 0 and 1
+function changeVolume(delta)
+{
+  const newVolume=Math.min(1,Math.max(0,audioVideoElement.volume+delta));
+  audioVideoElement.volume=newVolume;
+  volume_slider.value=newVolume*100;
+  setSetting('volume',Math.round(newVolume*100));
+}
+//Playback speed for video (slider in the menu). Music is always played at normal speed
+let videoPlaybackRate=1;
+function setPlaybackSpeed(value)
+{
+  let rate=parseFloat(value);
+  if(isNaN(rate)){rate=1;}
+  rate=Math.min(3,Math.max(0.25,rate));
+  videoPlaybackRate=rate;
+  audioVideoElement.defaultPlaybackRate=rate;
+  audioVideoElement.playbackRate=rate;
+  document.getElementById('speedSliderId').value=rate;
+  document.getElementById('speedValueId').textContent=rate.toFixed(2)+'x';
+}
 console.log("Checkpoint 13");
 //Auto move seekslider while track is playing
 function seekUpdate()
@@ -198,40 +243,81 @@ container.addEventListener("mousedown", (event) => { isDraggingSeek = true; upda
 document.addEventListener("mousemove", (event) => { if (isDraggingSeek) {updateSlider(event);} });
 document.addEventListener("mouseup", () => { isDraggingSeek = false; });
 
-//Get current date/time for unpause at time menu
-const dateNow = new Date();
-let dateNowFormated= new Date().toISOString().slice(0, -8);
-unPause_time.value=dateNowFormated;
-unPause_time.min=dateNowFormated;
-console.log(dateNowFormated);
-console.log("Checkpoint 9");
-//Display unpause at the time dialog
-function unPauseTimeF(){unPauseAtTimeEl.style.display="flex";}
-//Unpause or play at given date and time
-function watchTime(targetTime)
+//Unpause at time. Times are in the time zone chosen in Settings > Player (default: this PC's own time zone)
+let unPauseWatchTimer = null;
+let unPauseClockTimer = null;
+function getUnpauseZone() {return (settings.timeZone && settings.timeZone !== 'system') ? settings.timeZone : undefined;}
+//Date and time parts of a moment, as seen in a time zone
+function zonedParts(timestamp, zone)
 {
-    const currentTime = new Date();
-    const fixedDate = new Date(targetTime + ':00.000Z');
-    const totalDays=fixedDate.getDay()-currentTime.getDay();
-    const totalHours=fixedDate.getHours()-currentTime.getHours();
-    const totalMinutes=fixedDate.getMinutes()-currentTime.getMinutes();
-    customAlert("Play/pause in: "+totalDays+" Days "+totalHours+" Hours "+totalMinutes+" Minutes");
-    function updateStatus()
-    {
-    const currentTime = new Date();
-    const isoString = currentTime.toISOString();
-    const currentTimeString = isoString.slice(0,-8);
-    if (currentTimeString === targetTime) 
-    {
-        console.log( `Current time (${currentTimeString}) is equal to target time (${targetTime})!`);
-        playpauseTrack();
-    } 
-    else 
-    {
-        console.log( `Current time: ${currentTimeString}`);
-    }
-    }
-    updateStatus();
-    setInterval(updateStatus, 60000);
+  const parts = {};
+  new Intl.DateTimeFormat('en-CA', {timeZone: zone, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'})
+  .formatToParts(new Date(timestamp)).forEach(function(part) {parts[part.type] = part.value;});
+  return parts;
 }
-console.log(unPause_time.value)
+//"2026-10-23T14:05" for the time input, now + some minutes
+function unpauseInputValue(addMinutes)
+{
+  const zone = getUnpauseZone();
+  const timestamp = Date.now() + addMinutes * 60000;
+  const p = zonedParts(timestamp, zone);
+  return p.year + '-' + p.month + '-' + p.day + 'T' + p.hour + ':' + p.minute;
+}
+//Time typed in the input (wall clock of the chosen zone) to a real moment
+function unpauseTargetTime(text)
+{
+  const m = text.match(/^(\d+)-(\d+)-(\d+)T(\d+):(\d+)/);
+  if (!m) {return NaN;}
+  const zone = getUnpauseZone();
+  if (!zone) {return new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]).getTime();}
+  const wanted = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]);
+  let guess = wanted;
+  for (let i = 0; i < 2; i++)
+  {
+    const p = zonedParts(guess, zone);
+    guess -= Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second) - wanted;
+  }
+  return guess;
+}
+//Digital clock above the time setting
+function updateUnpauseClock()
+{
+  if (unPauseAtTimeEl.style.display === 'none' || unPauseAtTimeEl.style.display === '')
+  {
+    clearInterval(unPauseClockTimer);
+    unPauseClockTimer = null;
+    return;
+  }
+  const zone = getUnpauseZone();
+  const p = zonedParts(Date.now(), zone);
+  document.getElementById('unPauseClockId').textContent = p.hour + ':' + p.minute + ':' + p.second;
+  document.getElementById('unPauseZoneId').textContent = p.year + '-' + p.month + '-' + p.day + '  ' + (zone ? zone : 'This PC (' + Intl.DateTimeFormat().resolvedOptions().timeZone + ')');
+  unPause_time.min = unpauseInputValue(0);
+}
+function unPauseTimeF()
+{
+  unPauseAtTimeEl.style.display = "flex";
+  if (settings.autoTime || !unPause_time.value) {unPause_time.value = unpauseInputValue(1);} //Auto update: start from the current time
+  updateUnpauseClock();
+  if (unPauseClockTimer === null) {unPauseClockTimer = setInterval(updateUnpauseClock, 1000);}
+}
+//Unpause or play at given date and time
+function watchTime(targetText)
+{
+  const target = unpauseTargetTime(targetText);
+  const left = target - Date.now();
+  if (isNaN(target) || left <= 0) {customAlert("Choose a time in the future"); return;}
+  clearInterval(unPauseWatchTimer);
+  const totalMinutes = Math.ceil(left / 60000);
+  customAlert("Play/pause in: " + Math.floor(totalMinutes / 1440) + " Days " + Math.floor(totalMinutes % 1440 / 60) + " Hours " + (totalMinutes % 60) + " Minutes");
+  //Checked every second against the PC clock, so it still fires on time after the PC was asleep
+  unPauseWatchTimer = setInterval(function()
+  {
+    if (Date.now() >= target)
+    {
+      clearInterval(unPauseWatchTimer);
+      unPauseWatchTimer = null;
+      playpauseTrack();
+    }
+  }, 1000);
+}

@@ -1,42 +1,50 @@
-//Toggle dark mode
-darkmode();
+//Apply saved settings: dark mode (on by default) and volume
+darkmode(settings.darkMode);
+volume_slider.value=settings.volume;
+audioVideoElement.volume=settings.volume/100;
 //Arguments on app start
 let pathElm=nw.App.argv;
 //Focus app window
 win.focus();
-//If arguments are passed on app start
-if(pathElm)
+//Open files given on app start.
+//Runs after the window finished loading (all scripts, audio engine, waveform...). Opening them while scripts were still loading
+//was the timing problem that made the first video fail to load.
+function openStartupFiles()
 {
-  (pathElm).forEach(function(pathArg,index)
+  if(pathElm)
   {
-    processFile(pathArg);
-    console.log("launch arguments"+pathArg);
-    if(fileTypes.Video.some(format=>pathArg.includes(format)))
+    (pathElm).forEach(function(pathArg,index)
     {
-      console.log("pathElm lenght is:"+pathArg.length+"index is: "+index);
-      if(pathElm.length-1==index) //On last loaded file open video
+      processFile(pathArg);
+      console.log("launch arguments"+pathArg);
+      if(fileTypes.Video.some(format=>pathArg.includes(format)))
       {
-        if(track_list.length>0){
-        track_index=track_list.length-1;
+        console.log("pathElm lenght is:"+pathArg.length+"index is: "+index);
+        if(pathElm.length-1==index) //On last loaded file open video
+        {
+          if(track_list.length>0){
+          track_index=track_list.length-1;
+          }
+          openVideo();
+          loadTrack(track_index);
+          playTrack();
         }
-        openVideo();
-        loadTrack(track_index);
-        playTrack();
       }
-    }
-    if(fileTypes.Audio.some(format=>pathArg.includes(format)))
-    {
-      if(pathElm.length-1==index)
+      if(fileTypes.Audio.some(format=>pathArg.includes(format)))
       {
-        if(track_list.length>0){
-        track_index=track_list.length-1;
+        if(pathElm.length-1==index)
+        {
+          if(track_list.length>0){
+          track_index=track_list.length-1;
+          }
+          loadTrack(track_index);
+          playTrack();
         }
-        loadTrack(track_index);
-        playTrack();
       }
-    }
-  });
+    });
+  }
 }
+window.addEventListener('load',function(){setTimeout(openStartupFiles,100);});
 //Open file with app START
 //While app is opened, opened files via app as arguments
 nw.App.on('open', (args)=>{
@@ -57,7 +65,7 @@ nw.App.on('open', (args)=>{
     loadTrack(track_index);
     playTrack();
     },550);
-  
+
 });
 //Open file with app END
 //On app maximize and minimize events to stop CPU/GPU from processing visualizations when not needed START
@@ -76,7 +84,7 @@ win.on('restore', function () {
 window.onresize = reSize;
 function reSize()
 {
-  let widthSeek=seeksliderEl.offsetWidth+"px";
+  let widthSeek=document.getElementById('seekSliderContainer').offsetWidth+"px"; //Same width as the seek slider / waveform
   seek_trim_start.style.width=widthSeek;
   seek_trim_end.style.width=widthSeek;
   if(vlcOn){ //If VLC make it follow main window
