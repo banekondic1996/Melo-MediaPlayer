@@ -7,7 +7,9 @@
     <link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
   <body>
-    <div class="inputDialog" id="unPauseAtTimeId">
+    <div class="inputDialog" id="unPauseAtTimeId" style="height:auto;padding-bottom:10px;">
+      <div id="unPauseClockId" style="text-align:center;margin:10px;font-size:22px;font-family:Arial,Helvetica,sans-serif;font-variant-numeric:tabular-nums;"></div>
+      <div id="unPauseZoneId" style="text-align:center;font-size:12px;opacity:0.7;padding-bottom:8px;"></div>
       <input type="datetime-local" id="unPause-time" name="unPause-time" max="2039-08-08T00:00">
     <div style="display: flex;margin: auto;height: auto;width: 85%;max-width: 188px;">
       <input class="buttonTime" id="buttonTimeId" type="button" value="Set" onclick="watchTime(unPause_time.value);unPauseAtTimeEl.style.display='none';">
@@ -96,15 +98,15 @@
         <td> <img src="set/visualizer.png" class="lMode" width="22px" height="auto"></td>
         <td>Visualizer<img src="set/settings.png" class="lMode" width="22px" height="auto" style="position: absolute;right: 5px;top: 10px;" onclick="event.stopPropagation();presetMenu.show();"></td>
       </tr>
-      <tr onclick="" style="opacity: 0.3;">
+      <tr onclick="eqMenu.show()">
         <td>  <img src="set/test.png" class="lMode" width="22px" height="auto"></td>
         <td>Equalizer</td>
       </tr>
-      <tr onclick="document.getElementById('frequencyAnalyzerID').style.display='block'" style="opacity: 0.3;">
+      <tr id="spectrumRowID" onclick="toggleSpectrum()">
         <td>  <img src="set/test.png" class="lMode" width="22px" height="auto"></td>
         <td>Frequency analyser</td>
       </tr>
-      <tr onclick="" style="opacity: 0.3;">
+      <tr id="toneRowID" onclick="toneMenu.show()">
         <td>  <img src="set/test.png" class="lMode" width="22px" height="auto"></td>
         <td>Frequency generator</td>
       </tr>
@@ -118,7 +120,15 @@
           <div class="videoContainer" id="videoContainerID" style="display:none;overflow: hidden;">
               <video type="video/mp4" style="width: 100%; height: 100%;background-color: black;"id="audioVideoElementID" width="98.3%" onclick="">
               </video>
+              <div class="subtitleOverlay" id="subtitleOverlayID"><span id="subtitleTextID" class="hide"></span></div>
               <!-- <img class="lMode" id="playpauseId" src="set/pause2.png"  width="54px" height="auto"> -->
+          </div>
+          <div id="spectrumPanelId" class="spectrumPanel bgBlur hide">
+            <canvas id="spectrumOverlayId" class="spectrumCanvas"></canvas>
+            <div class="spectrumButtons">
+              <input type="button" id="spectrumClearBtnId" value="Transparent" onclick="toggleSpectrumBackground()">
+              <input type="button" value="X" onclick="toggleSpectrum()">
+            </div>
           </div>
           <div class="lista lMode" id="videoPlaylistSideButtonID" onmouseover="videoPlaylistSideButton()"><img width="32px" height="auto"></div>
           <progress id="conversion" value="0" max="100" style="width: 50px;"></progress>
@@ -139,7 +149,7 @@
               <div class="prev-track" onclick="prevTrack()"><img src="set/up.png" class="lMode" width="22px" height="auto"></div>
               <div class="next-track" onclick="nextTrack()"><img src="set/down.png" class="lMode" width="22px" height="auto"></div>
               <div class="playpause-track" onclick="playpauseTrack()"><img id="playpause" src="set/play.png" class="lMode" width="20px" height="auto"></div>
-              <img class="volume lMode" src="set/sound.png"  width="22px" height="auto" onmouseOver="volumeH()" onClick="volumeC()">
+              <img class="volume lMode" id="volumeIconId" src="set/sound.png"  width="22px" height="auto" onmouseOver="volumeH()" onClick="toggleMute()">
               <div class="toggle" id="shuffleId" style="right: 64px; bottom: 7px;display:none;"></div>
               <img class="shuffle lMode"  onclick="shuffle();closeall()" src="set/shuffle.png"  width="22px" height="auto">
               <div class="toggle" id="repeatId" style="right: 30px; bottom: 6px;display:none;"></div>
@@ -166,26 +176,40 @@
       <div id="overleyId" onmouseover="overleymentFunction(overleyment)"></div>
       <div class="list2 menuList" id="menuID" onclick="closeall()" style="display: none;"  onmouseover="overVideoElements=true" onmouseleave="overVideoElements=false">
         <table>
-          <tr onclick="document.getElementById('saveListID').click();">
+          <tr onclick="openFileDialog(document.getElementById('saveListID'));">
             <input type="file" id="saveListID"  nwsaveas="playlist.melolist" onchange="savePlaylist(this.value)" style="display:none;"/>
             <td> <img src="set/save.png" class="lMode" width="18px" height="auto"></td>
             <td><label>
               Save playlist
             </label></td>
           </tr>
-          <tr onclick="document.getElementById('loadListID').click();">
+          <tr onclick="openFileDialog(document.getElementById('loadListID'));">
             <input type="file" id="loadListID" accept=".melolist" onchange="loadPlaylist(event)" style="display:none;">
             <td> <img src="set/open.png" class="lMode" width="18px" height="auto"></td>
             <td><label>
               Load playlist
             </label></td>
           </tr>
-          <tr onclick="document.getElementById('useFolderID').click()">
+          <tr onclick="openFileDialog(document.getElementById('useFolderID'))">
             <input type="file" id="useFolderID" onchange="useFolder(files)" style="display:none;" webkitdirectory="">
             <td> <img src="set/folder.png" class="lMode" width="18px" height="auto"></td>
             <td><label>
               Use folder
             </label></td>
+          </tr>
+          <tr id="speedMenuRowID" style="display:none;" onclick="event.stopPropagation();">
+            <td>  <img src="set/clock.png" class="lMode" width="18px" height="auto"></td>
+            <td><label>Speed <span id="speedValueId" onclick="setPlaybackSpeed(1)">1.00x</span></label>
+              <input type="range" class="accentSlider" id="speedSliderId" min="0.25" max="3" step="0.05" value="1" oninput="setPlaybackSpeed(this.value)" style="width:100%;margin:0px;">
+            </td>
+          </tr>
+          <tr id="subtitleAddRowID" style="display:none;" onclick="openFileDialog(document.getElementById('subtitleFileID'));">
+            <td> <img src="set/open.png" class="lMode" width="18px" height="auto"></td>
+            <td><label>
+              Add subtitles
+            </label>
+              <input type="file" id="subtitleFileID" accept=".srt,.vtt" onchange="loadSubtitleFile(this)" style="display:none;">
+            </td>
           </tr>
           <tr onclick="darkmode()">
             <td>  <img src="set/lamp.png" class="lMode" width="18px" height="auto"></td>
@@ -195,11 +219,11 @@
             <td>  <img src="set/clock.png" class="lMode" width="18px" height="auto"></td>
             <td>Unpause at time</td>
           </tr>
-          <tr onclick="customAlert('Not working yet')">
+          <tr onclick="settingsMenu.show()">
             <td>  <img src="set/settings.png" class="lMode" width="18px" height="auto"></td>
             <td>Settings</td>
           </tr>
-          <tr onclick="customAlert('Not working yet')">
+          <tr onclick="updateApp()">
             <td>  <img src="set/system-update.png" class="lMode" width="18px" height="auto"></td>
             <td>Update</td>
           </tr>
@@ -212,7 +236,9 @@
       <div class="contextMenu" id="contextMenuVideoId" onmouseleave="this.style.display='none'">
       <table style="display: contents;backdrop-filter: blur(4px);">
       <tr onclick="convertDialog.style.display='flex';"><td>Convert</td></tr>
+      <tr onclick="combineMenu.show();"><td>Combine</td></tr>
       <tr onclick="slider_container_trim.style.display='flex';seekTrimEnd();"><td>Trim</td></tr>
+      <tr onclick="castMenu.show();"><td>Cast</td></tr>
       <tr onclick="pipVideo()"><td>Pip video</td></tr>
       <tr onclick="loadMediaFromCurrentFolder();"><td>Load all media from folder</td></tr>
       <tr onclick="customAlert('Not available yet')"><td>Remove from playlist</td></tr>
@@ -238,7 +264,7 @@
         </div>
       </div>
       </div>
-      <div id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="display:none;background:rgba(158, 20, 20, 0.582);width:100%;height:100%;position: absolute;z-index:9000;left:0px;top:0px">
+      <div id="drop_zone" style="display:none;background:rgba(158, 20, 20, 0.582);width:100%;height:100%;position: absolute;z-index:9000;left:0px;top:0px">
   </div>
   <div id="alertID" class="hide">
     <div style="text-align: center;font-size: 1.3em;">
@@ -249,6 +275,8 @@
   <!-- <div id="mpv-container"></div> -->
   <!-- Main script for the player -->
 <script type="text/javascript" src="js/variables.js"></script>
+<script type="text/javascript" src="js/settings.js"></script>
+<script src="js/appInfo.js"></script>
 <script type="text/javascript" src="js/darkMode.js"></script>
 <script>
 //Global keyboard events START
@@ -256,8 +284,8 @@ document.addEventListener("keydown", (event) => {
 if(event.code=='Space'){playpauseTrack();}
 if(event.code=='ArrowLeft'){audioVideoElement.pause();audioVideoElement.currentTime-=0.8;}
 if(event.code=='ArrowRight'){audioVideoElement.pause();audioVideoElement.currentTime+=0.8;}
-if(event.code=='ArrowUp'){audioVideoElement.volume+=0.1;volume_slider.value=audioVideoElement.volume*100}  // I don't get it
-if(event.code=='ArrowDown'){audioVideoElement.volume-=0.1;volume_slider.value=audioVideoElement.volume*100}
+if(event.code=='ArrowUp'){changeVolume(0.1);}  // I don't get it
+if(event.code=='ArrowDown'){changeVolume(-0.1);}
 if(event.code=='Numpad8'){nextTrack();}
 if(event.code=='Numpad2'){prevTrack();}
 if(event.code=='KeyF'){if(!document.getElementById('musicCategoryBtnId').classList.contains('selected'))WindowMinMax();}
@@ -331,7 +359,7 @@ function populateVideo()
 }
 console.log("Checkpoint 3");
 //Clear table
-function clearList(){playlistMusic.innerHTML="";playlistVideo.innerHTML="";tabelaVideoBarLista.innerHTML=""}
+function clearList(){playlistMusic.innerHTML="";playlistVideo.innerHTML="";tabelaVideoBarLista.innerHTML="<tr><th>File name</th><th>Duration</th></tr>"}
 </script>
 <script src="js/uiChanges.js"></script>
 <script src="js/playerFunctions.js"></script>
@@ -441,32 +469,22 @@ function newWindow(url,options,append)
         });
     });
 }
-//Update app function
-async function updateApp()
-{
-  let url="https://github.com/banekondic1996/Melo/archive/refs/heads/main.zip";
-  let destinationPath="main.zip"
-  const axios=require('axios');
-  const compressing=require('compressing');
-  response = await axios.get(url, { responseType: 'arraybuffer' })
-  .then(response => {
-        console.log(response.data);
-        const fileData = Buffer.from(response.data, 'binary')
-        fs.writeFile(destinationPath, fileData, (err) => {
-        if (err) { console.log("ErrorMessage:", err.message) }
-       });
-       compressing.zip.decompress("main.zip","update");
-});
-  customAlert("Update complete. Restart the app to see changes");
-}
 console.log("Checkpoint 6");
 </script>
 <!-- <script src="js/vlcTest.js"></script> --> 
 <script type="text/javascript" src="js/playlistManipulation.js"></script>
+<script src="js/audioEngine.js"></script>
 <script src="js/visualizer.js"></script>
 <script src="components/selectActionMenu.js"></script>
+<script src="js/equalizer.js"></script>
+<script src="js/frequencyAnalyzer.js"></script>
+<script src="js/subtitles.js"></script>
+<script src="js/toneGenerator.js"></script>
+<script src="js/cast.js"></script>
+<script src="js/combine.js"></script>
+<script src="js/updater.js"></script>
+<script src="js/settingsMenu.js"></script>
 
-<!-- <script src="js/frequencyAnalyzer.js"></script> -->
 
 <!---------------------------- HLS Test -------------------------------------------->
 <!-- <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script> -->

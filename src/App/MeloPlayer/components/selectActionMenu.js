@@ -72,10 +72,12 @@ class SelectActionMenu {
 
     show() {
         this.dialog.style.display = "flex";
+        if (this.onShow) {this.onShow();}
     }
 
     hide() {
         this.dialog.style.display = "none";
+        if (this.onHide) {this.onHide();}
     }
 }
 
@@ -96,5 +98,12 @@ for(var i = 0; i < presetKeys.length; i++) {
     opt.value = i;
     presetSelectEl.appendChild(opt);
 }
-presetSelectEl.value=94;
-presetSelectEl.onclick=()=>{console.log("Preset applied :"+presetKeys[presetSelectEl.value]);visualizer.loadPreset(presets[presetKeys[presetSelectEl.value]], 5.7);};
+//Saved preset (falls back to the old default if it doesn't exist)
+let savedPreset=parseInt(settings.visualizerPreset,10);
+if(isNaN(savedPreset) || savedPreset<0 || savedPreset>=presetKeys.length){savedPreset=Math.min(94,presetKeys.length-1);}
+presetSelectEl.value=savedPreset;
+presetSelectEl.onchange=()=>{
+    console.log("Preset applied :"+presetKeys[presetSelectEl.value]);
+    setSetting('visualizerPreset',parseInt(presetSelectEl.value,10));
+    if(visualizerOn && complexVisuals && visualizer){visualizer.loadPreset(presets[presetKeys[presetSelectEl.value]], 5.7);}
+};
