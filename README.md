@@ -18,9 +18,7 @@ Current stage:
 **To fix:**
 <pre>
   -Sometimes it wont load video on app launch at first, but second time it works (needs to wait for certain functions to load)
-  -EQ to work
-  -Add video combiner
-  -Add more supported video formats 
+  -Rebuild nw.js with ffmpeg flag set to "ChromeOS" to support more video formats
 </pre>
 
 **Project to-do and problems:** <a href="https://github.com/users/banekondic1996/projects/5/views/2">link</a><br>
