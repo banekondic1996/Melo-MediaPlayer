@@ -336,6 +336,32 @@
     flex-wrap: nowrap;
     justify-content: space-between;
   }
+  /* Music / video list: long names wrap inside the list, the duration stays visible */
+  #playlistMusicId tr td:first-child, #playlistVideoId tr td:first-child{
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  #playlistMusicId tr td:last-child, #playlistVideoId tr td:last-child{
+    flex: 0 0 auto;
+  }
+  #listaContainerID{
+    overflow-x: hidden;
+  }
+  /* Tables stay inside the window, so names wrap instead of pushing the duration out */
+  #playlistMusicTableId, #playlistVideoTableId{
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+  #playlistMusicId, #playlistVideoId{
+    width: 100%;
+    max-width: 100%;
+  }
+  #playlistMusicId tr td:first-child, #playlistVideoId tr td:first-child{
+    word-break: break-word;
+  }
   thead th{
     margin:auto;
     padding: 0px !important;
@@ -627,7 +653,7 @@
   }
   .contextMenu{
     display: none;
-    position: absolute;
+    position: fixed;
     width: fit-content;
     height: fit-content;
     max-width: 130px;
@@ -888,7 +914,30 @@
   }
   /* Video side list: stays inside its box, long file names wrap and the duration stays visible */
   #videoPlaylistID{
+    overflow: hidden !important;
+  }
+  #videoBarScroll{
+    position: relative;
+    height: 100%;
     overflow-x: hidden;
+    overflow-y: auto;
+  }
+  #videoPlaylistID.hasSearch #videoBarScroll{
+    height: calc(100% - 30px);
+  }
+  #videoBarSearchWrap{
+    display: none;
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    height: 30px;
+    padding: 4px;
+    box-sizing: border-box;
+    background: var(--contextColor);
+  }
+  #videoPlaylistID.hasSearch #videoBarSearchWrap{
+    display: block;
   }
   #videoBarLista{
     width: 100% !important;
@@ -898,24 +947,73 @@
     white-space: normal;
     overflow-wrap: anywhere;
   }
+  #videoBarSearchId{
+    width: 100%;
+    margin: 0px;
+    box-sizing: border-box;
+    border: 1px solid #80808066;
+    border-radius: 20px;
+    padding-inline: 10px;
+    text-align: center;
+    height: 20px;
+    background: none;
+  }
   #videoBarLista td:last-child, #videoBarLista th:last-child{
     width: 62px;
   }
-  /* Settings tab buttons: small player, so the window shrinks to a thin bar and expands when hovered */
-  @media only screen and (max-width: 600px){
+  /* Settings in a small player: tabs stay visible as one scrollable row, rows shrink to the window, the page scrolls */
+  @media only screen and (max-width: 600px), only screen and (max-height: 560px){
     #settingsTabDialogID{
-      max-width: 46px !important;
-      max-height: 12px;
-      overflow: hidden;
-      padding: 0px 10px !important;
-      opacity: 0.8;
-      transition: max-width .3s ease, max-height .3s ease, padding .3s ease, opacity .3s ease;
+      top: 6px !important;
+      max-width: calc(100vw - 12px) !important;
+      padding: 4px 6px !important;
+      flex-wrap: nowrap !important;
+      overflow-x: auto;
+      overflow-y: hidden;
+      justify-content: flex-start !important;
     }
-    #settingsTabDialogID:hover{
-      max-width: calc(100vw - 20px) !important;
-      max-height: 200px;
-      padding: 6px 10px !important;
-      opacity: 1;
+    #settingsTabDialogID > div{
+      flex-wrap: nowrap !important;
+      justify-content: flex-start !important;
+    }
+    #settingsTabDialogID input[type="button"]{
+      height: 26px !important;
+      margin: 2px !important;
+      padding: 0px 8px;
+      font-size: 12px;
+      flex: 0 0 auto;
+    }
+    #settingsMenuID{
+      position: fixed !important;
+      position-area: none !important;
+      top: 44px !important;
+      left: 50% !important;
+      transform: translateX(-50%);
+      margin: 0px !important;
+      width: calc(100vw - 12px) !important;
+      max-height: calc(100vh - 52px);
+      box-sizing: border-box;
+      overflow: hidden;
+      padding-top: 4px !important;
+      padding-bottom: 6px !important;
+    }
+    #settingsContentID{
+      width: 100%;
+      flex: 1 1 auto;
+      min-height: 0;
+      max-height: calc(100vh - 150px) !important;
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
+    }
+    #settingsContentID *{
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    #settingsContentID > div{
+      width: 100%;
+    }
+    #settingsContentID select, #settingsContentID input[type="text"]{
+      max-width: 55%;
     }
   }
   /* Video side list: header stays on top while scrolling, wider dark red scroll bar */
@@ -925,14 +1023,14 @@
     z-index: 1;
     background: var(--contextColor);
   }
-  #videoPlaylistID::-webkit-scrollbar{
-    width: 8px;
+  #videoBarScroll::-webkit-scrollbar{
+    width: 12px;
   }
-  #videoPlaylistID::-webkit-scrollbar-track{
+  #videoBarScroll::-webkit-scrollbar-track{
     background: transparent;
   }
   /* Black on the light theme. The list is color-inverted in the dark theme, so the same black shows as white there */
-  #videoPlaylistID::-webkit-scrollbar-thumb{
+  #videoBarScroll::-webkit-scrollbar-thumb{
     background: black;
     border-radius: 4px;
   }

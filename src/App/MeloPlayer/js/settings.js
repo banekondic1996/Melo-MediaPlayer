@@ -8,10 +8,16 @@ const settingsDefaults = {
   audioMono: false,
   audioDevice: '',
   settingsTab: 'audio',
+  devMode: false,
+  devIgnoreVersion: false,
+  videoFilter: {brightness: 100, contrast: 100, saturation: 100, sharpness: 0},
+  videoTransform: {x: 0, y: 0, zoom: 1, rot: 0},
   timeZone: 'system',
   autoTime: true,
+  streamBackBuffer: 0, //Seconds of already played stream kept for rewinding (0 = none)
+  streamBuffer: 15, //Seconds loaded ahead for streams
   spectrumV: 2,
-  spectrum: {colorLow: '#00ff8c', colorHigh: '#00ebff', type: 'line', barGap: 2, lineWidth: 2, peaks: false, glow: 14, bands: 128, minDb: -90, maxDb: -10, smoothing: 80, grid: 100},
+  spectrum: {colorLow: '#00ff8c', colorHigh: '#00ebff', freezeOnPause: false, type: 'line', barGap: 2, lineWidth: 2, peaks: false, glow: 14, bands: 128, minDb: -90, maxDb: -10, smoothing: 80, grid: 100},
   eqGains: [0,0,0,0,0,0,0,0,0,0],
   subtitle: {size: 28, color: '#ffffff', bgOpacity: 50, bottom: 8, delay: 0, encoding: 'auto'}
 };
@@ -36,6 +42,8 @@ function loadSettings()
   const merged = Object.assign({}, settingsDefaults, loaded);
   merged.subtitle = Object.assign({}, settingsDefaults.subtitle, loaded.subtitle);
   merged.spectrum = Object.assign({}, settingsDefaults.spectrum, loaded.spectrum);
+  merged.videoFilter = Object.assign({}, settingsDefaults.videoFilter, loaded.videoFilter);
+  merged.videoTransform = Object.assign({}, settingsDefaults.videoTransform, loaded.videoTransform);
   if (loaded.spectrumV !== 2) {merged.spectrum.type = 'line'; merged.spectrumV = 2;} //Default graph is now the line
   if (!Array.isArray(merged.eqGains) || merged.eqGains.length !== 10) {merged.eqGains = settingsDefaults.eqGains.slice();}
   return merged;

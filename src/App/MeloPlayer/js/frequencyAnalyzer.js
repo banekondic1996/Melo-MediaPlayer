@@ -43,6 +43,8 @@ const spectrumData = new Float32Array(spectrumAnalyser.frequencyBinCount);
 let spectrumFrame = null;
 let spectrumOn = false;
 let spectrumPeaks = [];
+let spectrumDrawn = false;
+function toneIsPlaying() {return (typeof toneOscillator !== 'undefined') && toneOscillator !== null;}
 //Apply dB range and smoothing from settings (called at start and when changed in Settings)
 function applySpectrumSettings()
 {
@@ -77,6 +79,7 @@ function drawSpectrum()
     spectrumOverlayEl.height = Math.round(cssHeight * ratio);
   }
   const s = settings.spectrum;
+  if (s.freezeOnPause && audioVideoElement.paused && !toneIsPlaying() && spectrumDrawn) {return;} //Graph stays as it was when the audio paused
   const ctx = spectrumOverlayEl.getContext('2d');
   ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
   ctx.clearRect(0, 0, cssWidth, cssHeight);
@@ -241,6 +244,7 @@ function drawSpectrum()
     if (tick.shown) {ctx.fillText(tick.label, xOf(tick.hz), bottomY + 24);}
   });
   ctx.shadowBlur = 0;
+  spectrumDrawn = true;
 }
 //Options > Frequency analyser (and the X button): switch on/off
 function toggleSpectrum()

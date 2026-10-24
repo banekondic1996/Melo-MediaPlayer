@@ -144,10 +144,10 @@ function listUpdateFiles(folder, base, result)
 function updateRemoveFolder(folder) {try {fs.rmSync(folder, {recursive: true, force: true});} catch (error) {}}
 //The running app can't be replaced while it is open, so a small script is started that waits until the player has closed,
 //moves the unpacked files into the main folder, deletes the temporary folder and starts the player again
-function installUpdateAndRestart(stagingFolder)
+function installUpdateAndRestart(stagingFolder, destFolder, launchFolder)
 {
   const spawnProcess = require('child_process').spawn;
-  const logFile = nodePath.join(require('os').tmpdir(), 'melo-update.log');
+  const logFile = nodePath.join(nw.App.dataPath, 'melo-update.log');
   const args = (nw.App.argv || []).slice();
   let script;
   let command;
@@ -161,6 +161,7 @@ function installUpdateAndRestart(stagingFolder)
       'set PPID2=%~2',
       'set SRC=%~3',
       'set DEST=%~4',
+      'set LAUNCH=%~6',
       'set EXE=%~5',
       'set /a TRIES=0',
       ':wait',
@@ -173,29 +174,29 @@ function installUpdateAndRestart(stagingFolder)
       'echo %date% %time% moving files >> "' + logFile + '"',
       'xcopy "%SRC%\\*" "%DEST%\\" /E /Y /I /Q >> "' + logFile + '" 2>&1',
       'rmdir /S /Q "%SRC%"',
-      'shift & shift & shift & shift & shift',
-      'start "" "%EXE%" "%DEST%" %1 %2 %3 %4 %5 %6 %7 %8 %9',
+      'shift & shift & shift & shift & shift & shift',
+      'start "" "%EXE%" "%LAUNCH%" %1 %2 %3 %4 %5 %6 %7 %8 %9',
       ''
     ].join('\r\n'));
     command = 'cmd.exe';
-    commandArgs = ['/c', script, String(process.pid), String(process.ppid), stagingFolder, appFolder, process.execPath].concat(args);
+    commandArgs = ['/c', script, String(process.pid), String(process.ppid), stagingFolder, destFolder, process.execPath, launchFolder].concat(args);
   }
   else
   {
     script = nodePath.join(require('os').tmpdir(), 'melo-apply-update.sh');
     fs.writeFileSync(script, [
       '#!/bin/sh',
-      'PID="$1"; PPID2="$2"; SRC="$3"; DEST="$4"; EXE="$5"; shift 5',
+      'PID="$1"; PPID2="$2"; SRC="$3"; DEST="$4"; EXE="$5"; LAUNCH="$6"; shift 6',
       'i=0',
       'while { kill -0 "$PID" 2>/dev/null || kill -0 "$PPID2" 2>/dev/null; } && [ $i -lt 60 ]; do sleep 0.5; i=$((i+1)); done',
       'sleep 2',
       'echo "$(date) moving files" >> "' + logFile + '"',
       'cp -rf "$SRC"/. "$DEST"/ >> "' + logFile + '" 2>&1 && rm -rf "$SRC"',
-      'exec "$EXE" "$DEST" "$@"',
+      'exec "$EXE" "$LAUNCH" "$@"',
       ''
     ].join('\n'), {mode: 0o755});
     command = 'sh';
-    commandArgs = [script, String(process.pid), String(process.ppid), stagingFolder, appFolder, process.execPath].concat(args);
+    commandArgs = [script, String(process.pid), String(process.ppid), stagingFolder, destFolder, process.execPath, launchFolder].concat(args);
   }
   spawnProcess(command, commandArgs, {detached: true, stdio: 'ignore', windowsHide: true}).unref();
   setTimeout(function() {nw.App.quit();}, 500); //Player closes first, the script waits for that
@@ -218,9 +219,10 @@ async function updateApp()
     if (assets.length === 0) {throw new Error('No ' + keyword + ' zip found in the release');}
     const asset = assets[0];
     //The version number is in the file name
-    const version = parseVersion(asset.name);
+    let version = parseVersion(asset.name);
+    if (!version && settings.devIgnoreVersion) {version = 'dev';}
     if (!version) {throw new Error('No version number in the file name "' + asset.name + '"');}
-    if (compareVersions(version, appVersion) <= 0)
+    if (!settings.devIgnoreVersion && compareVersions(version, appVersion) <= 0)
     {
       setUpdateStatus('You have the latest version (' + appVersion + ')', 100, true, false);
       finished = true;
@@ -236,9 +238,16 @@ async function updateApp()
       await updateExtract(zipFile, unpacked);
       const root = findUpdateRoot(unpacked, 3);
       if (!root) {throw new Error('The update does not look like Melo (no package.json or index.html)');}
-      //New folder next to the running one (name-version). If that place isn't writable, in the app data folder
-      const baseName = nodePath.basename(appFolder);
-      target = nodePath.join(nodePath.dirname(appFolder), baseName + '-' + version);
+      //Where the files go: the update zip can hold the whole install (package.json, nw, App/MeloPlayer/...) or only the app folder (index.html, js, css...)
+      const relativeApp = nodePath.relative(appRoot, appFolder);
+      let destination;
+      if (relativeApp && fs.existsSync(nodePath.join(root, relativeApp, 'index.html'))) {destination = appRoot;}
+      else if (fs.existsSync(nodePath.join(root, 'index.html'))) {destination = appFolder;}
+      else {throw new Error('The update has a different folder layout than this install (no ' + (relativeApp ? relativeApp + '/' : '') + 'index.html)');}
+      console.log("Update: files go to " + destination);
+      //New folder next to the destination (name-version). If that place isn't writable, in the app data folder
+      const baseName = nodePath.basename(destination);
+      target = nodePath.join(nodePath.dirname(destination), baseName + '-' + version);
       try {updateRemoveFolder(target); fs.mkdirSync(target, {recursive: true}); fs.accessSync(target, fs.constants.W_OK);}
       catch (error)
       {
@@ -257,11 +266,10 @@ async function updateApp()
           await new Promise(function(resolve) {setTimeout(resolve, 0);}); //Let the window redraw
         }
       }
-      fs.writeFileSync(nodePath.join(target, '.melo-version'), version, 'utf8');
       finished = true;
       setUpdateStatus('Version ' + version + ' is ready. The player will close, install it and start again...', 100, false, false);
       await new Promise(function(resolve) {setTimeout(resolve, 2500);});
-      installUpdateAndRestart(target);
+      installUpdateAndRestart(target, destination, appRoot);
     }
   }
   catch (error)

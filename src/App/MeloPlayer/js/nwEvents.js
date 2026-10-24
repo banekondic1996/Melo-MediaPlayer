@@ -47,25 +47,66 @@ function openStartupFiles()
 window.addEventListener('load',function(){setTimeout(openStartupFiles,100);});
 //Open file with app START
 //While app is opened, opened files via app as arguments
-nw.App.on('open', (args)=>{
-  win.focus();
-  let textArg=args.toString();
-  console.log("textArg "+textArg);
-  let pathArg=textArg.split('"')[5]
-  console.log("pathArg while running:"+pathArg);
-  processFile(pathArg);
-  setTimeout(()=>
+//Media file paths inside the command line text NW.js gives us (quotes are respected, so paths with spaces work)
+function mediaPathsFromCommandLine(args)
+{
+  const text = Array.isArray(args) ? args.map(function(item) {return '"' + item + '"';}).join(' ') : String(args);
+  const isMedia = function(path)
   {
-    console.log("App opened via file" + args);
-    //If last track is audio, open music view
-    if(track_list[track_index].type.includes('audio')){openMusic();}
-    //If last track is video, open video view
-    if(track_list[track_index].type.includes('video')){openVideo();}
-    //Load and play last track
-    loadTrack(track_index);
-    playTrack();
-    },550);
-
+    const dot = path.lastIndexOf('.');
+    const extension = dot >= 0 ? path.substring(dot).toLowerCase() : '';
+    return fileTypes.Audio.includes(extension) || fileTypes.Video.includes(extension);
+  };
+  const tokens = [];
+  const pattern = /"([^"]*)"|'([^']*)'|(\S+)/g;
+  let match;
+  while ((match = pattern.exec(text)) !== null) {tokens.push(match[1] !== undefined ? match[1] : (match[2] !== undefined ? match[2] : match[3]));}
+  let paths = [];
+  if (text.indexOf('"') < 0)
+  {
+    //No quotes: the path may contain spaces. Try the text starting at every "/" (or drive letter) after a space, last first, and use one that is a real file
+    const starts = [];
+    for (let i = 0; i < text.length; i++) {if ((text[i] === '/' || /^[A-Za-z]:[\\/]/.test(text.substr(i, 3))) && (i === 0 || /\s/.test(text[i - 1]))) {starts.push(i);}}
+    let fallback = null;
+    for (let k = starts.length - 1; k >= 0; k--)
+    {
+      const candidate = text.slice(starts[k]).trim().replace(/^file:\/\//, '');
+      if (!isMedia(candidate)) {continue;}
+      if (fallback === null) {fallback = candidate;}
+      try {if (fs.existsSync(candidate)) {paths = [candidate]; break;}} catch (error) {}
+    }
+    if (paths.length === 0 && fallback !== null) {paths = [fallback];}
+  }
+  if (paths.length === 0) {paths = tokens.map(function(token) {return token.replace(/^file:\/\//, '');}).filter(isMedia);}
+  return paths;
+}
+nw.App.on('open', (args)=>{
+  try
+  {
+    win.focus();
+    console.log("Open while running: " + args);
+    const paths = mediaPathsFromCommandLine(args);
+    if (paths.length === 0) {console.log("No media file in: " + args); return;}
+    paths.forEach(function(pathArg) {processFile(pathArg);});
+    const lastPath = paths[paths.length - 1];
+    const found = track_list.findIndex(function(track) {return track.path === lastPath || track.path === 'file://' + lastPath;});
+    if (found < 0) {return;}
+    track_index = found;
+    setTimeout(function()
+    {
+      try
+      {
+        console.log("App opened via file " + lastPath);
+        if (track_list[track_index].type.includes('audio')) {openMusic();}
+        if (track_list[track_index].type.includes('video')) {openVideo();}
+        loadTrack(track_index);
+        playTrack();
+        applySelectionHighlightPlaylist(true);
+      }
+      catch (error) {console.log("Could not open file: " + error.message);}
+    }, 300);
+  }
+  catch (error) {console.log("Open handler failed: " + error.message);}
 });
 //Open file with app END
 //On app maximize and minimize events to stop CPU/GPU from processing visualizations when not needed START

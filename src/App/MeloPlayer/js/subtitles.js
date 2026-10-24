@@ -134,7 +134,7 @@ function loadSubtitleFile(input)
 function createSubtitleRow(labelText, control)
 {
   const row = document.createElement('div');
-  row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;width:380px;margin:3px 0px;';
+  row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;width:380px;max-width:100%;flex-wrap:wrap;margin:3px 0px;';
   const label = document.createElement('label');
   label.innerText = labelText;
   row.appendChild(label);
@@ -166,7 +166,7 @@ const subtitleTitle = document.createElement('label');
 subtitleTitle.innerText = '';
 subtitleTitle.style.paddingBottom = '2px';
 const subtitleStatusEl = document.createElement('div');
-subtitleStatusEl.style.cssText = 'width:380px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:0.7;padding-bottom:6px;';
+subtitleStatusEl.style.cssText = 'width:380px;max-width:100%;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:0.7;padding-bottom:6px;';
 function updateSubtitleStatus() {subtitleStatusEl.textContent = subtitleFileName ? subtitleFileName : 'No subtitles loaded';}
 updateSubtitleStatus();
 subtitleSettingsContainer.appendChild(subtitleStatusEl);

@@ -1,3 +1,91 @@
+//One place that makes the rows of a track in the playlists (music list, video list, video side list)
+function escapeHtml(text) {return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function addPlaylistRows(track, index)
+{
+  const cells = '<td>' + escapeHtml(track.name) + '</td><td class="track-duration" style="align-self: center;">' + (track.duration || '') + '</td>';
+  if (track.type && track.type.includes('audio'))
+  {
+    playlistMusic.insertAdjacentHTML('beforeend',
+    '<tr trackIndex="' + index + '" onclick="loadTrack(\'' + index + '\');playTrack();resetSelectionHighlightPlaylist();this.classList.add(\'selected\')">' + cells + '</tr>');
+  }
+  else if (track.type && track.type.includes('video'))
+  {
+    const row = '<tr trackIndex="' + index + '" onclick="loadTrack(\'' + index + '\');playTrack();applySelectionHighlightPlaylist(true);">' + cells + '</tr>';
+    playlistVideo.insertAdjacentHTML('beforeend', row); //No re-parsing of the whole list, so thousands of entries stay fast
+    const sideBody = (tabelaVideoBarLista.tBodies && tabelaVideoBarLista.tBodies[0]) ? tabelaVideoBarLista.tBodies[0] : tabelaVideoBarLista;
+    sideBody.insertAdjacentHTML('beforeend', row);
+    updateSideSearch();
+  }
+}
+//Search box at the bottom of the video side list, only when there are more than 10 videos
+function updateSideSearch()
+{
+  const body = tabelaVideoBarLista.tBodies && tabelaVideoBarLista.tBodies[0];
+  if (!body) {return;}
+  videoPlaylistElement.classList.toggle('hasSearch', body.rows.length - 1 > 10);
+}
+function searchSideList(input)
+{
+  const filter = input.value.toUpperCase();
+  const rows = tabelaVideoBarLista.tBodies[0].rows;
+  for (let i = 0; i < rows.length; i++)
+  {
+    const cell = rows[i].getElementsByTagName('td')[0];
+    if (cell) {rows[i].style.display = (cell.textContent.toUpperCase().indexOf(filter) > -1) ? '' : 'none';}
+  }
+}
+//Context menu of playlist items (music list, video list and the video side list)
+let contextItemIndex = -1;
+function isNetworkPath(path) {return /^[a-z][a-z0-9+.-]*:\/\//i.test(path) && !/^file:\/\//i.test(path);}
+document.addEventListener('contextmenu', function(event)
+{
+  const row = event.target.closest ? event.target.closest('tr[trackIndex]') : null;
+  if (!row) {return;}
+  const index = parseInt(row.getAttribute('trackIndex'), 10);
+  if (isNaN(index) || !track_list[index]) {return;}
+  event.preventDefault();
+  contextItemIndex = index;
+  keepListUntil = Date.now() + 1500;
+  const menu = document.getElementById('contextMenuItemId');
+  document.getElementById('itemOpenFolderRowID').style.display = isNetworkPath(track_list[index].path) ? 'none' : '';
+  menu.style.display = 'block';
+  const flipLeft = event.clientX + menu.offsetWidth > window.innerWidth ? event.clientX - menu.offsetWidth : event.clientX;
+  const flipTop = event.clientY + menu.offsetHeight > window.innerHeight ? event.clientY - menu.offsetHeight : event.clientY;
+  menu.style.left = Math.max(0, flipLeft) + 'px';
+  menu.style.top = Math.max(0, flipTop) + 'px';
+});
+document.addEventListener('click', function() {keepListUntil = Date.now() + 1500; document.getElementById('contextMenuItemId').style.display = 'none';});
+function removeTrackFromPlaylist(index)
+{
+  if (!track_list[index]) {return;}
+  const wasCurrent = (index === track_index);
+  const wasPlaying = !audioVideoElement.paused;
+  track_list.splice(index, 1);
+  if (index < track_index) {track_index--;}
+  else if (wasCurrent) {track_index = Math.min(index, Math.max(track_list.length - 1, 0));}
+  clearList();
+  populateVideo();
+  populateMusic();
+  if (wasCurrent)
+  {
+    if (track_list.length > 0) {loadTrack(track_index); if (wasPlaying) {playTrack();}}
+    else
+    {
+      audioVideoElement.pause();
+      audioVideoElement.removeAttribute('src');
+      audioVideoElement.load();
+      track_name.textContent = '';
+    }
+  }
+  if (track_list.length > 0) {applySelectionHighlightPlaylist(true);}
+}
+function openTrackFolder(index)
+{
+  const track = track_list[index];
+  if (!track || isNetworkPath(track.path)) {return;}
+  const filePath = track.path.replace(/^file:\/\//, '');
+  try {nw.Shell.showItemInFolder(filePath);} catch (error) {customAlert('Could not open the folder: ' + error.message);}
+}
 //File path string splitter, depends on platform
 function pathArgSpliter(filePath){
     if (processPlatform == "win32") {return filePath.split("\\");}
@@ -40,34 +128,11 @@ function pathArgSpliter(filePath){
       if(found_file==0)
       { 
         track_index=track_list.length; // Not -1 cause file will be added and track_list length will increase by 1
-        // If extension is audio
-        if(fileTypes.Audio.includes(extArg)) 
-        {
-          fileType='audio';
-          playlistMusic.innerHTML  = playlistMusic.innerHTML +
-          `<tr trackIndex='`+track_index+`'' onclick="loadTrack('`+ track_index +`');playTrack();resetSelectionHighlightPlaylist();this.classList.add('selected')">
-          <td>`+nameArg+`</td>
-          <td class="track-duration" style='align-self: center;'></td>
-          </tr>`;
-        } 
-        // If extension is video
-        if(fileTypes.Video.includes(extArg)) 
-        {
-          fileType='video';
-          playlistVideo.innerHTML  = playlistVideo.innerHTML +
-          `<tr trackIndex='`+track_index+`'' onclick="loadTrack('`+ track_index +`');playTrack();applySelectionHighlightPlaylist(true);">
-          <td>`+nameArg+`</td>
-          <td class="track-duration" style='align-self: center;'></td>
-          </tr>`;
-          tabelaVideoBarLista.innerHTML=tabelaVideoBarLista.innerHTML +
-          `<tr trackIndex='`+track_index+`'' oncontextmenu="" onclick="loadTrack('`+ track_index +`');playTrack();applySelectionHighlightPlaylist(true);">
-          <td>`+nameArg+`</td>
-          <td class="track-duration" style='align-self: center;'></td>
-          </tr>`;
-        } 
+        fileType = fileTypes.Audio.includes(extArg) ? 'audio' : 'video';
         let theFile={"name": nameArg, "artist": "","image":"set/default.jpg","path":filePath,"duration":"","type":fileType};
         console.log("Push non repeated file");
         track_list.push(theFile);
+        addPlaylistRows(theFile, track_index);
        /*  worker.postMessage({trackIndex: Number(track_index),filePath: filePath }); */
         loadMetaData(track_index);
         console.log(theFile);

@@ -43,8 +43,28 @@ function loadTrack(index)
   // Subtitles belong to the previous video
   clearSubtitles();
   // Load a new track
-  audioVideoElement.src = track_list[track_index].path;
-  audioVideoElement.load();
+  if (typeof releaseStream === 'function') {releaseStream();}
+  const loadingTrack = track_list[track_index];
+  if (loadingTrack.stream || loadingTrack.hls)
+  {
+    //HLS is played by hls.js, rtsp is converted to HLS by ffmpeg first (address is ready when the local server has the first segments)
+    audioVideoElement.removeAttribute('src');
+    audioVideoElement.load();
+    getPlayableSource(loadingTrack).then(function(source)
+    {
+      if (track_list[track_index] !== loadingTrack) {return;} //Another track was chosen meanwhile
+      playHls(source);
+    }).catch(function(error)
+    {
+      audioVideoElement.dispatchEvent(new Event('streamfailed'));
+      if (typeof networkAttemptActive === 'undefined' || !networkAttemptActive) {customAlert('Could not open the stream: ' + error.message);}
+    });
+  }
+  else
+  {
+    audioVideoElement.src = loadingTrack.path;
+    audioVideoElement.load();
+  }
   updateVideoMenuItems();
   // Update details of the track
   track_art.src= track_list[track_index].image ;
@@ -210,7 +230,8 @@ function seekUpdate()
 {
   let seekPosition = 0;
   // Check if the current track duration is a legible number
-  if (!isNaN(audioVideoElement.duration))
+  if (audioVideoElement.duration === Infinity) {total_duration.textContent = 'LIVE';} //Live stream
+  else if (!isNaN(audioVideoElement.duration))
   {
     seekPosition = audioVideoElement.currentTime * (500 / audioVideoElement.duration);
     seek_slider.value = seekPosition;

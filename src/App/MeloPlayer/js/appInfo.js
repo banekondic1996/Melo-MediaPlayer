@@ -40,29 +40,43 @@ function compareVersions(a, b)
   return 0;
 }
 const appFolder = getAppFolder();
+//Folder with the package.json that NW.js starts (its "main" points to the index.html in the app folder). With a plain layout it is the app folder itself.
+//Example: /opt/ElveApps/MeloPlayer (nw, node_modules, package.json) with the app in App/MeloPlayer
+function getAppRoot()
+{
+  if (!appFolder) {return null;}
+  let folder = appFolder;
+  for (let level = 0; level < 4; level++)
+  {
+    const packageFile = nodePath.join(folder, 'package.json');
+    try
+    {
+      if (fs.existsSync(packageFile))
+      {
+        const main = JSON.parse(fs.readFileSync(packageFile, 'utf8')).main || 'index.html';
+        if (nodePath.resolve(folder, main) === nodePath.join(appFolder, 'index.html')) {return folder;}
+      }
+    }
+    catch (error) {}
+    const parent = nodePath.dirname(folder);
+    if (parent === folder) {break;}
+    folder = parent;
+  }
+  return appFolder;
+}
+const appRoot = getAppRoot();
 function readPackageVersion(file)
 {
   try {const version = JSON.parse(fs.readFileSync(file, 'utf8')).version; return version ? String(version) : null;}
   catch (error) {return null;}
 }
-//Version = "version" in package.json (the highest of the app's manifest and the package.json files around index.html;
-//.melo-version is written by the updater, in case the downloaded package.json didn't have the new number)
+//Version = "version" in the package.json NW.js starts (the one in the install root, e.g. /opt/ElveApps/MeloPlayer/package.json)
 function getAppVersion()
 {
-  const found = [];
-  try {if (nw.App.manifest && nw.App.manifest.version) {found.push(String(nw.App.manifest.version));}} catch (error) {}
-  if (appFolder)
-  {
-    let folder = appFolder;
-    for (let level = 0; level < 3; level++)
-    {
-      const version = readPackageVersion(nodePath.join(folder, 'package.json'));
-      if (version) {found.push(version);}
-      folder = nodePath.dirname(folder);
-    }
-    try {const text = fs.readFileSync(nodePath.join(appFolder, '.melo-version'), 'utf8').trim(); if (text) {found.push(text);}} catch (error) {}
-  }
-  if (found.length === 0) {return '0';}
-  return found.reduce(function(best, version) {return compareVersions(version, best) > 0 ? version : best;});
+  let version = null;
+  try {if (nw.App.manifest && nw.App.manifest.version) {version = String(nw.App.manifest.version);}} catch (error) {}
+  if (!version && appRoot) {version = readPackageVersion(nodePath.join(appRoot, 'package.json'));}
+  if (!version && appFolder) {version = readPackageVersion(nodePath.join(appFolder, 'package.json'));}
+  return version || '0';
 }
 const appVersion = getAppVersion();

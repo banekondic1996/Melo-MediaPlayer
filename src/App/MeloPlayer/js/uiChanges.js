@@ -70,8 +70,13 @@ if (document.addEventListener)
       videoContainerElement.addEventListener('contextmenu', function(e)
       {
         contextMenuVideo.style.display="block";
-        contextMenuVideo.style.left=e.clientX+"px";
-        contextMenuVideo.style.top=e.clientY+"px";
+        //Opens to the side of the cursor that has room, so it never leaves the window
+        const menuWidth = contextMenuVideo.offsetWidth, menuHeight = contextMenuVideo.offsetHeight;
+        let menuLeft = e.clientX, menuTop = e.clientY;
+        if (menuLeft + menuWidth > window.innerWidth) {menuLeft = e.clientX - menuWidth;}
+        if (menuTop + menuHeight > window.innerHeight) {menuTop = e.clientY - menuHeight;}
+        contextMenuVideo.style.left = Math.max(0, menuLeft) + "px";
+        contextMenuVideo.style.top = Math.max(0, menuTop) + "px";
         e.preventDefault();
       }, false);
     }
@@ -82,7 +87,13 @@ if (document.addEventListener)
     function overleymentFunction (pelement)
     {
       overleyment.style.display="none";
-      videoPlaylistElement.style.display="none";
+      if (pelement)
+      {
+        //Pointer left the list over the player: it closes after a short delay, and stays if the pointer comes back onto it
+        clearTimeout(videoListCloseTimer);
+        videoListCloseTimer = setTimeout(function() {videoListCloseTimer = null; if (!videoListPointerInside && !keepVideoListOpen()) {videoPlaylistElement.style.display="none";}}, 400);
+      }
+      else {videoPlaylistElement.style.display="none";}
       const eleArray=[volumeb,menuListElement];
       overleyment.style.display="none";
       eleArray.forEach((element) => {if(element!=pelement){element.style.animation="fade-out 0.4s"}});
@@ -175,11 +186,16 @@ function closeVideoList()
   videoListEntered = false;
   if (menuListElement.style.display !== 'block' && volumeb.style.display !== 'block') {overleyment.style.display = 'none';}
 }
-videoPlaylistElement.addEventListener('mouseenter', function() {videoListEntered = true;});
-videoPlaylistElement.addEventListener('mouseleave', function() {if (videoListEntered && videoPlaylistElement.style.display === 'block') {closeVideoList();} videoListEntered = false;});
+let videoListPointerInside = false;
+let videoListCloseTimer = null;
+videoPlaylistElement.addEventListener('mouseenter', function() {videoListEntered = true; videoListPointerInside = true; clearTimeout(videoListCloseTimer); videoListCloseTimer = null;});
+let keepListUntil = 0;
+function keepVideoListOpen() {return itemMenuOpen() || Date.now() < keepListUntil;}
+function itemMenuOpen() {const m = document.getElementById('contextMenuItemId'); return !!m && m.style.display === 'block';}
+videoPlaylistElement.addEventListener('mouseleave', function() {videoListPointerInside = false; if (itemMenuOpen()) {return;} if (videoListEntered && videoPlaylistElement.style.display === 'block') {closeVideoList();} videoListEntered = false;});
 document.addEventListener('mousedown', function(e)
 {
-  if (videoPlaylistElement.style.display === 'block' && !videoPlaylistElement.contains(e.target) && !videoPlaylistSideButtonElement.contains(e.target)) {closeVideoList();}
+  if (videoPlaylistElement.style.display === 'block' && !videoPlaylistElement.contains(e.target) && !e.target.closest('#contextMenuItemId') && !keepVideoListOpen() && !videoPlaylistSideButtonElement.contains(e.target)) {closeVideoList();}
 });
 //File / folder dialogs open behind a fullscreen (kiosk) window and get stuck, so fullscreen is left first
 function openFileDialog(input)

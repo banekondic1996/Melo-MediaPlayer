@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Melo player</title>
     <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script>
+    //Sometimes (first start by opening a file) the page loads before NW.js has given it Node (require, process, nw). Everything after would fail, so load the page again
+    if (typeof require === 'undefined' || typeof nw === 'undefined' || typeof process === 'undefined')
+    {
+      let tries = 0;
+      try {tries = parseInt(sessionStorage.getItem('meloReloadTries') || '0', 10);} catch (error) {}
+      if (tries < 5)
+      {
+        try {sessionStorage.setItem('meloReloadTries', String(tries + 1));} catch (error) {}
+        window.stop();
+        setTimeout(function() {location.reload();}, 300);
+      }
+    }
+    else {try {sessionStorage.removeItem('meloReloadTries');} catch (error) {}}
+    </script>
 </head>
   <body>
     <div class="inputDialog" id="unPauseAtTimeId" style="height:auto;padding-bottom:10px;">
@@ -75,7 +90,7 @@
         <td>  <img src="set/video.png"  class="lMode" width="22px" height="auto"></td>
         <td>Video</td>
       </tr>
-      <tr onClick="customAlert('Not available yet');">
+      <tr style="opacity:0.2;">
         <td>  <img src="set/radio.png" class="lMode" width="22px" height="auto"></td>
         <td>Radio list</td>
       </tr>
@@ -166,12 +181,15 @@
           </div>
       </div>
       <div class="list2 videoSidePlaylist" id="videoPlaylistID" style="display:none;" onmouseover="overVideoElements=true" onmouseleave="overVideoElements=false">
+        <div id="videoBarScroll">
         <table id="videoBarLista" style="position: absolute;height:auto;">
-          <tr>
+          <tbody><tr>
             <th>File name</th>
             <th>Duration</th>
-          </tr>
+          </tr></tbody>
         </table>
+        </div>
+        <div id="videoBarSearchWrap"><input type="text" id="videoBarSearchId" placeholder="Search" onkeyup="searchSideList(this)"></div>
       </div>
       <div id="overleyId" onmouseover="overleymentFunction(overleyment)"></div>
       <div class="list2 menuList" id="menuID" onclick="closeall()" style="display: none;"  onmouseover="overVideoElements=true" onmouseleave="overVideoElements=false">
@@ -195,6 +213,12 @@
             <td> <img src="set/folder.png" class="lMode" width="18px" height="auto"></td>
             <td><label>
               Use folder
+            </label></td>
+          </tr>
+          <tr onclick="networkMenu.show()">
+            <td> <img src="set/folder.png" class="lMode" width="18px" height="auto"></td>
+            <td><label>
+              Use network
             </label></td>
           </tr>
           <tr id="speedMenuRowID" style="display:none;" onclick="event.stopPropagation();">
@@ -238,15 +262,23 @@
       <tr onclick="convertDialog.style.display='flex';"><td>Convert</td></tr>
       <tr onclick="combineMenu.show();"><td>Combine</td></tr>
       <tr onclick="slider_container_trim.style.display='flex';seekTrimEnd();"><td>Trim</td></tr>
-      <tr onclick="castMenu.show();"><td>Cast</td></tr>
+      <tr onclick="castVideoMenu();"><td>Cast</td></tr>
       <tr onclick="pipVideo()"><td>Pip video</td></tr>
+      <tr onclick="transformDialog.show();"><td>Transform video</td></tr>
       <tr onclick="loadMediaFromCurrentFolder();"><td>Load all media from folder</td></tr>
       <tr onclick="customAlert('Not available yet')"><td>Remove from playlist</td></tr>
+      </table>
+      </div>
+      <div class="contextMenu" id="contextMenuItemId" onmouseleave="this.style.display='none'">
+      <table style="display: contents;backdrop-filter: blur(4px);">
+      <tr onclick="removeTrackFromPlaylist(contextItemIndex);"><td>Remove from playlist</td></tr>
+      <tr id="itemOpenFolderRowID" onclick="openTrackFolder(contextItemIndex);"><td>Open containing folder</td></tr>
       </table>
       </div>
       <div class="contextMenu" id="contextMenuCanvasId" onclick="contextMenuCanvas.style.display='none';" onmouseleave="contextMenuCanvas.style.display='none';">
       <table style="display: contents;">
       <tr onclick="alwaysOnTopSwitch();"><td>Always on top</td></tr>
+      <tr onclick="castVisualsMenu();"><td>Cast</td></tr>
       </table>
       </div>
       <div class="inputDialog" id="convertId">
@@ -314,52 +346,17 @@ function customAlert(message)
 //Populate music list (table)
 function populateMusic()
 {
-  track_list.forEach(function(element,index)
-  {
-    console.log("Element type is :"+ element.type);
-    if(element.type)
-    {
-      if (element.type.includes('audio'))
-      {
-        console.log(index);
-        playlistMusic.innerHTML  = playlistMusic.innerHTML +
-       `<tr trackIndex='`+index+`'' onclick="loadTrack('`+ index +`');playTrack();resetSelectionHighlightPlaylist();this.classList.add('selected')">
-        <td>`+element.name+`</td>
-        <td class="track-duration" style='align-self: center;'>`+element.duration+`</td>
-        </tr>`;
-      }
-    }
-  });
+  track_list.forEach(function(element,index) {if (element.type && element.type.includes('audio')) {addPlaylistRows(element,index);}});
 }
 console.log("Checkpoint 2");
 //Populate video list (table)
 function populateVideo()
 {
-  track_list.forEach(function(element,index)
-  {
-    console.log("Element type is :"+element.type);
-    if(element.type)
-    {
-      if (element.type.includes('video'))
-      {
-      console.log(index);
-      playlistVideo.innerHTML  = playlistVideo.innerHTML +
-      `<tr trackIndex='`+index+`'' onclick="loadTrack('`+ index +`');playTrack();applySelectionHighlightPlaylist(true);">
-      <td>`+element.name+`</td>
-      <td class="track-duration" style='align-self: center;'>`+element.duration+`</td>
-      </tr>`;
-      tabelaVideoBarLista.innerHTML=tabelaVideoBarLista.innerHTML +
-      `<tr trackIndex='`+index+`'' oncontextmenu="track_list.splice('`+index+`',1);populateVideo();" onclick="loadTrack('`+ index +`');playTrack();applySelectionHighlightPlaylist(true);">
-      <td>`+element.name+`</td>
-      <td class="track-duration" style='align-self: center;'>`+element.duration+`</td>
-      </tr>`;
-      }
-    }
-});
+  track_list.forEach(function(element,index) {if (element.type && element.type.includes('video')) {addPlaylistRows(element,index);}});
 }
 console.log("Checkpoint 3");
 //Clear table
-function clearList(){playlistMusic.innerHTML="";playlistVideo.innerHTML="";tabelaVideoBarLista.innerHTML="<tr><th>File name</th><th>Duration</th></tr>"}
+function clearList(){playlistMusic.innerHTML="";playlistVideo.innerHTML="";tabelaVideoBarLista.innerHTML="<tbody><tr><th>File name</th><th>Duration</th></tr></tbody>";document.getElementById("videoBarSearchId").value="";updateSideSearch()}
 </script>
 <script src="js/uiChanges.js"></script>
 <script src="js/playerFunctions.js"></script>
@@ -483,6 +480,9 @@ console.log("Checkpoint 6");
 <script src="js/cast.js"></script>
 <script src="js/combine.js"></script>
 <script src="js/updater.js"></script>
+<script src="js/hls.min.js"></script>
+<script src="js/network.js"></script>
+<script src="js/videoTools.js"></script>
 <script src="js/settingsMenu.js"></script>
 
 
