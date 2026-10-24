@@ -58,12 +58,25 @@ Version 2.4
 -Fixed settings not being stored anywhere
 -Fixed load playlist, load folder not working when video is fullscreen
 </pre>
+Version 2.5
+<pre>
+-Added transform video option
+-Fixed video casting bugs
+-Added option to cast visualizations
+-Added support to load m3u8 and rtsp network streams
+-Fixed settings modal CSS
+-Added option to freeze frequency analyzer graph on video pause
+-Added search input for video playlist
+-Changes to CSS
+-Added developer menu ctrl+shift+d
+-Added option to screenshot using keyboard key "s"
+</pre>
+
 To fix in next version:
 <pre>
--Support more video formats
--Add option to remove videos/songs from playlist
--Fix metadata loading, cause it's slow
--Make update button do the update
--Load playlists only once with separate lists
+-Support more video formats (rebuild nw.js with ffmpeg flag set to ChromeOS or modify the nw.js)
+-Fix metadata loading (it's slow)
+-Fix CPU usage and slow player when playing m3u8 and rtsp streams
+-Add DJ mode to change visualizations with animations and option to display images
 -Add 3d sound option
 </pre>
