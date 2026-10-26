@@ -14,7 +14,7 @@ Current stage:
 27.01.2024 - Videos can be trimmed and converted now, drag and drop works, responsive design is added, update button added (not final), context menu added
 25.07.2024 - Added option to convert to GIF, fixed styling of menus, fixed video triming bug, fixed conversion from .avi to .mp4, new alert message style, fixed loading files from folder, fixed sound icon, created   installer
 01.03.2025 - Fixed file conversion bug, added visualizer for audio, fixed bug on Linux version, added save playlist and load playlist, code rework
-24.10.2026 - Add frequency analyzer, equalizer, subtitles, settings menu, playback speed, load network url, UI changes, fixed update button (first version that's vibe coded),                  added video combine option, added video casting option, added pip video
+24.10.2026 - Add frequency analyzer, equalizer, subtitles, settings menu, playback speed, load network url, UI changes, fixed update button (first version that's vibe coded), added video combine option, added video casting option, added pip video
 </pre>
 
 **To fix:**
