@@ -1,10 +1,11 @@
 # <img src="src/App/MeloPlayer/set/melo_logo/logo128.png" height="64px" width="auto"> Melo
-Just a player, music and video player that's for Linux, Windows, MacOS. NOT VIBE CODED! <br><br>
+Just a player, music and video player that's for Linux, Windows, MacOS. NOT VIBE CODED! (till 2.2 version 😂) <br><br>
 **Why I made this?** <br>
 I'm so tired of ugly designed players on Linux distros and video loop of broken link on VLC player. 
 Melo as short for mellow and melody.</br>It's more beautiful then VLC, it can convert and trim video, and it's not Microsoft...<br>
 Microsoft pushes you to update also it loads slower for me, so i use this player daily, also video playlist is super easy to access.</br></br>
 **Link to download:** <a href="https://github.com/banekondic1996/Melo/releases/tag/development">link</a></br></br>
+
 Current stage:
 <pre>
 29.09.2022 - Player can play videos and music, also unplanned added functionlity to view images is being worked on. Dark mode is working
