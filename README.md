@@ -13,6 +13,7 @@ Current stage:
 27.01.2024 - Videos can be trimmed and converted now, drag and drop works, responsive design is added, update button added (not final), context menu added
 25.07.2024 - Added option to convert to GIF, fixed styling of menus, fixed video triming bug, fixed conversion from .avi to .mp4, new alert message style, fixed loading files from folder, fixed sound icon, created   installer
 01.03.2025 - Fixed file conversion bug, added visualizer for audio, fixed bug on Linux version, added save playlist and load playlist, code rework
+24.10.2026 - Add frequency analyzer, equalizer, subtitles, settings menu, playback speed, load network url, UI changes, fixed update button (first version that's vibe coded),                  added video combine option, added video casting option, added pip video
 </pre>
 
 **To fix:**
@@ -24,8 +25,11 @@ Current stage:
 **Project to-do and problems:** <a href="https://github.com/users/banekondic1996/projects/5/views/2">link</a><br>
 Images of UI:
 1. Video play, with video trimming support
-![image](https://github.com/banekondic1996/Melo/assets/22860264/8440a346-a98b-475e-baeb-f9cbc41fb9b3)
 ![image](https://github.com/banekondic1996/Melo/assets/22860264/23640013-c79b-4483-9d06-8584f75f881d)
 2. Music play
 ![image](https://github.com/banekondic1996/Melo/assets/22860264/7f21765e-959b-4773-be2f-dd6e45e1effd)
+3.Frequency analyzer + visualizer on
+<img width="1073" height="647" alt="image" src="https://github.com/user-attachments/assets/90fb76dc-8c9e-4387-8078-ba08ec59088f" />
+
+
 
